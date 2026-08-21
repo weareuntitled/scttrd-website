@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SCTTRD | Technical Rider und Stage Plot</title>
+  <style>
+    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Regular.otf') format('opentype');font-weight:400}
+    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Semibold.otf') format('opentype');font-weight:600}
+    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Bold.otf') format('opentype');font-weight:700}
+    :root{--ink:#090909;--paper:#f4f3ef;--red:#c92a2a;--line:#b9b8b3;--muted:#64635f}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:Founders,Arial,sans-serif;font-size:15px;line-height:1.55}
+    main{max-width:1080px;margin:auto;padding:48px}
+    header{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end;padding-bottom:28px;border-bottom:3px solid var(--ink)}
+    .brand{font-size:clamp(3.5rem,11vw,8rem);font-weight:700;line-height:.72;letter-spacing:-.04em;text-transform:uppercase}
+    .meta{text-align:right;font-size:12px;line-height:1.6;text-transform:uppercase;letter-spacing:.08em}
+    .deadline{margin:36px 0;padding:24px;background:var(--red);color:#fff;display:grid;grid-template-columns:1fr 1.5fr;gap:24px}
+    .deadline h1{margin:0;font-size:clamp(1.8rem,4vw,3.4rem);line-height:.92;text-transform:uppercase}
+    .deadline p{margin:0;font-size:17px;line-height:1.45}
+    .reply{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.5);display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;font-size:14px}
+    section{padding:52px 0;border-bottom:1px solid var(--line)}
+    .section-head{display:grid;grid-template-columns:80px 1fr;gap:24px;margin-bottom:28px}
+    .number{font-size:12px;letter-spacing:.14em;color:var(--red)}
+    h2{margin:0;font-size:clamp(2.5rem,7vw,5.5rem);line-height:.83;text-transform:uppercase;letter-spacing:-.035em}
+    h3{margin:0 0 10px;font-size:20px}
+    p{margin:0 0 12px}
+    .options{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .option{padding:22px;border:1px solid var(--ink);background:#fff}
+    .option.recommended{border-top:8px solid var(--red)}
+    .tag{display:inline-block;margin-bottom:18px;padding:4px 8px;background:var(--ink);color:#fff;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+    .recommended .tag{background:var(--red)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 8px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+    th{width:170px;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+    .requirements{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .requirement{padding:20px;border:1px solid var(--line);background:#fff}
+    .requirement strong{display:block;margin-bottom:7px;font-size:18px}
+    .plot{padding:24px;background:#fff;border:2px solid var(--ink)}
+    .plot svg{display:block;width:100%;height:auto}
+    .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;font-size:13px}
+    .legend span{padding-top:8px;border-top:2px solid var(--ink)}
+    .steps{counter-reset:step;display:grid;gap:0}
+    .step{counter-increment:step;display:grid;grid-template-columns:56px 1fr;gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
+    .step:before{content:counter(step,decimal-leading-zero);color:var(--red);font-weight:700}
+    .step strong{display:block;font-size:17px}
+    .feedback{margin-top:24px;padding:20px;border-left:8px solid var(--red);background:#fff}
+    footer{display:flex;justify-content:space-between;gap:24px;padding:28px 0;font-size:13px}
+    a{color:inherit}
+    @media(max-width:720px){main{padding:24px 18px}header,.deadline,.options,.requirements{grid-template-columns:1fr}.meta{text-align:left}.reply,.legend{grid-template-columns:1fr}.section-head{grid-template-columns:1fr}.number{margin-bottom:-12px}}
+    @media print{body{background:#fff;font-size:10px}main{max-width:none;padding:8mm}.brand{font-size:54px}.deadline{margin:6mm 0;padding:5mm}.deadline h1{font-size:24px}section{padding:7mm 0;break-inside:avoid}.section-head{margin-bottom:4mm}h2{font-size:28px}.option,.requirement{padding:4mm}.plot{padding:4mm}.plot svg{max-height:120mm}footer{padding:5mm 0}.no-print{display:none}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand">SCTTRD</div>
+    <div class="meta">Technical Rider + Stage Plot<br>Version 2026-08<br>Daniel Peters · +49 172 5231109</div>
+  </header>
+
+  <aside class="deadline">
+    <h1>Rückmeldung<br>5 Tage vorher</h1>
+    <div>
+      <p>Bitte bestätigt spätestens fünf Kalendertage vor der Show die Signaloption und den Soundcheck. Ohne Rückmeldung planen wir mit Option A und 60 Minuten Soundcheck.</p>
+      <div class="reply">
+        <span>□ Option A: XR18 + Tablet</span><span>□ Option B: Hauspult</span>
+        <span>Soundcheck: __________ Uhr</span><span>Showtime: __________ Uhr</span>
+        <span>FOH-Kontakt: ______________</span><span>Bühnenmaß: ______________</span>
+      </div>
+    </div>
+  </aside>
+
+  <section>
+    <div class="section-head"><span class="number">01 / SIGNAL</span><h2>Eine Option wählen</h2></div>
+    <div class="options">
+      <article class="option recommended">
+        <span class="tag">Option A · bevorzugt</span>
+        <h3>Mix auf unserem XR18</h3>
+        <p>Wir bringen XR18, Router, Tablet und Feedback Destroyer mit. FOH mischt den Raum über unser Tablet. Zur Haus-PA gehen Main L/R.</p>
+        <table><tr><th>Venue</th><td>2 freie Eingänge an der PA bzw. Systemübergabe L/R</td></tr><tr><th>Monitoring</th><td>Unser internes Monitoring bleibt im XR18</td></tr></table>
+      </article>
+      <article class="option">
+        <span class="tag">Option B</span>
+        <h3>Mix auf dem Hauspult</h3>
+        <p>FOH erhält Instrumente L/R, Vocalbus und Klick separat. Den Feedback Destroyer schleifen wir in den Vocal- und Effektweg ein.</p>
+        <table><tr><th>Ausgänge</th><td>2x Instrumente L/R, 1x Vocalbus, 1x Klick</td></tr><tr><th>Return</th><td>1x Monitor-Summe an die Band</td></tr></table>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="number">02 / VENUE</span><h2>Was wir brauchen</h2></div>
+    <div class="requirements">
+      <div class="requirement"><strong>1x stabiler Tisch</strong>Mindestens 120 x 60 cm, ca. 75 bis 90 cm hoch. Bühnenmitte für Danis Synths, Pads, XR18 und Feedback Destroyer.</div>
+      <div class="requirement"><strong>2x Podest</strong>Je 120 x 100 cm, 20 bis 30 cm hoch. Stage Left für Nate, Stage Right für Babsi.</div>
+      <div class="requirement"><strong>Strom</strong>1x 6-fach bei Dani, 1x 3-fach bei Nate, 1x 6-fach bei Babsi. Schuko, getrennt von störenden Verbrauchern.</div>
+      <div class="requirement"><strong>Mikrofone</strong>1x Vocal-Mikrofon mit Stativ für Babsi. 1x Mikrofon mit Galgenstativ für Nates Becken.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="number">03 / PLOT</span><h2>Stage Plot</h2></div>
+    <div class="plot">
+      <svg viewBox="0 0 920 570" role="img" aria-label="Stage Plot SCTTRD">
+        <rect x="20" y="20" width="880" height="500" fill="#fff" stroke="#090909" stroke-width="3"/>
+        <text x="460" y="48" text-anchor="middle" font-size="13" letter-spacing="4">UPSTAGE</text>
+        <text x="460" y="555" text-anchor="middle" font-size="13" letter-spacing="4">PUBLIKUM / FOH</text>
+
+        <rect x="322" y="120" width="276" height="120" fill="#f4f3ef" stroke="#c92a2a" stroke-width="4"/>
+        <text x="460" y="154" text-anchor="middle" font-size="24" font-weight="700">DANI</text>
+        <text x="460" y="180" text-anchor="middle" font-size="15">TISCH 120 x 60</text>
+        <text x="460" y="204" text-anchor="middle" font-size="13">Synths · Pads · XR18 · Feedback Destroyer</text>
+        <rect x="580" y="132" width="88" height="28" fill="#090909"/>
+        <text x="624" y="151" text-anchor="middle" fill="#fff" font-size="11">6-FACH</text>
+
+        <rect x="85" y="300" width="250" height="170" fill="#fff" stroke="#090909" stroke-width="2" stroke-dasharray="7 5"/>
+        <circle cx="210" cy="370" r="55" fill="#f4f3ef" stroke="#090909" stroke-width="3"/>
+        <text x="210" y="364" text-anchor="middle" font-size="22" font-weight="700">NATE</text>
+        <text x="210" y="389" text-anchor="middle" font-size="14">Drums · Ableton</text>
+        <text x="210" y="452" text-anchor="middle" font-size="12">PODEST 120 x 100</text>
+        <text x="105" y="327" font-size="12" fill="#c92a2a">BECKEN-MIKRO + GALGEN</text>
+        <rect x="95" y="423" width="75" height="25" fill="#090909"/>
+        <text x="132" y="440" text-anchor="middle" fill="#fff" font-size="10">3-FACH</text>
+
+        <rect x="585" y="300" width="250" height="170" fill="#fff" stroke="#090909" stroke-width="2" stroke-dasharray="7 5"/>
+        <circle cx="710" cy="370" r="55" fill="#f4f3ef" stroke="#090909" stroke-width="3"/>
+        <text x="710" y="364" text-anchor="middle" font-size="22" font-weight="700">BABSI</text>
+        <text x="710" y="389" text-anchor="middle" font-size="14">Vocals · RC-505 · FX</text>
+        <text x="710" y="452" text-anchor="middle" font-size="12">PODEST 120 x 100</text>
+        <text x="605" y="327" font-size="12" fill="#c92a2a">VOCAL-MIKRO + STATIV</text>
+        <rect x="750" y="423" width="75" height="25" fill="#090909"/>
+        <text x="787" y="440" text-anchor="middle" fill="#fff" font-size="10">6-FACH</text>
+
+        <path d="M335 300 L410 240 M585 300 L510 240" stroke="#c92a2a" stroke-width="2" stroke-dasharray="5 5"/>
+        <text x="460" y="282" text-anchor="middle" font-size="12" fill="#c92a2a">SIGNAL + MONITORING ZUM XR18</text>
+      </svg>
+      <div class="legend"><span>Stage Left: Nate</span><span>Mitte: Dani + Tisch</span><span>Stage Right: Babsi</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="number">04 / CHECK</span><h2>Soundcheck</h2></div>
+    <div class="steps">
+      <div class="step"><div><strong>60 Minuten blocken</strong>Aufbau und Linecheck sind darin nicht enthalten. Die bestätigte Uhrzeit brauchen wir fünf Tage vor der Show.</div></div>
+      <div class="step"><div><strong>Vocals zuerst</strong>Babsi trocken einpegeln. Danach In-Ear und Monitor prüfen.</div></div>
+      <div class="step"><div><strong>Feedback Destroyer einmessen</strong>Vocalbus, RE-202 und RC-505 einzeln prüfen. Grenzpegel festlegen, bevor der Gesamtmix läuft.</div></div>
+      <div class="step"><div><strong>Loops und Songs prüfen</strong>RC-505 testen und die Pegel der kritischen Songs angleichen.</div></div>
+      <div class="step"><div><strong>Gesamtmix</strong>Band, Raum und Monitoring gemeinsam prüfen. Danach Setup nicht mehr grundlegend ändern.</div></div>
+    </div>
+    <div class="feedback"><strong>Feedback ist der kritische Punkt.</strong> Vocal- und Effektpegel dürfen nach dem Einmessen nicht ohne Rücksprache angehoben werden. Bei Fragen Daniel direkt anrufen.</div>
+  </section>
+
+  <footer><span>Daniel Peters · <a href="tel:+491725231109">+49 172 5231109</a> · <a href="mailto:djdanep@gmail.com">djdanep@gmail.com</a></span><span>SCTTRD Technical Rider 2026</span></footer>
+</main>
+</body>
+</html>

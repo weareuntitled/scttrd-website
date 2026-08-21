@@ -1,0 +1,102 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getInteraction } from '../lib/showCard.js';
+
+interface Props {
+  shows: CollectionEntry<'shows'>[];
+  kind: 'upcoming' | 'past';
+}
+
+const { shows, kind } = Astro.props;
+---
+
+{
+  shows.map((show, index) => {
+    const interaction = getInteraction(kind, index);
+    const itemAttrs = interaction
+      ? { 'data-w-id': interaction.item, style: 'opacity:0' }
+      : {};
+    const wrapAttrs = interaction
+      ? { 'data-w-id': interaction.imageWrap }
+      : {};
+    const imageAttrs = interaction
+      ? { 'data-w-id': interaction.image }
+      : {};
+
+    const Tag = show.data.link ? 'a' : 'div';
+    const linkAttrs = show.data.link
+      ? { href: show.data.link, target: '_blank', rel: 'noopener noreferrer' }
+      : {};
+
+    return (
+      <Tag {...itemAttrs} {...linkAttrs} data-cms-show class:list={['customers-el', `customers-el-${kind}`]}>
+        <div id={interaction?.nameNode} class="customers-el-name">
+          <h6 class="heading-7">{show.data.venue}</h6>
+        </div>
+        <div id={interaction?.cityNode} class="customers-el-service">
+          <h6 class="heading-8">{show.data.city}</h6>
+        </div>
+        <div id={interaction?.dateNode} class="customers-el-date">
+          <h6>{show.data.date}</h6>
+        </div>
+        <div {...wrapAttrs} class="customers-el-img">
+          <img
+            {...imageAttrs}
+            sizes="150px"
+            alt={show.data.imageAlt}
+            loading="eager"
+            src={show.data.image}
+            srcset={show.data.srcset}
+            class="customers-el-img-pic"
+          />
+        </div>
+      </Tag>
+    );
+  })
+}
+
+<style is:global>
+  .customers-grid, .customers-list { border-top: none !important; }
+  .customers-grid { row-gap: var(--space-6) !important; }
+  .section-customers .wrapper + .wrapper { margin-top: var(--space-12) !important; }
+  .customers-text { margin-bottom: var(--space-4) !important; }
+  .customers-text .paragraph { font-size: var(--text-heading) !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -.02em !important; }
+  .customers-el[data-cms-show] { opacity: 1 !important; transform: none !important; }
+  .customers-list { grid-column: 1 / -1; }
+  .customers-section-description { padding-left: 15px !important; padding-right: var(--space-4) !important; }
+  .customers-el { padding: var(--space-4) var(--space-4) var(--space-4) var(--space-6) !important; border-bottom: 1px solid #000 !important; gap: var(--space-4) !important; }
+  .customers-el h6 { font-size: var(--text-show) !important; line-height: 1.3 !important; }
+  .customers-el-name { grid-column: span 3 !important; }
+  .customers-el-service { grid-column: span 3 !important; }
+  .customers-el-date { grid-column: span 2 !important; text-align: right; }
+  .customers-el .customers-el-img { display: none; }
+  .customers-el:hover .customers-el-img { display: block !important; }
+  .customers-el:hover .customers-el-img-pic { opacity: 1 !important; }
+  .customers-el:hover { background-color: var(--color, #ff0000) !important; color: #000 !important; }
+  .customers-el:hover .heading-7, .customers-el:hover .heading-8, .customers-el:hover h6 { color: #000 !important; }
+  @media (hover: none) { .customers-el .customers-el-img { display: block !important; opacity: .18 !important; } .customers-el:active .customers-el-img { opacity: 1 !important; } }
+  @media (max-width: 767px) {
+    .customers-el .customers-el-img { display: none !important; }
+    .home-hero-headline-strech { font-size: 18vw !important; }
+    .customers-grid { row-gap: var(--space-4) !important; }
+    .section-customers .wrapper + .wrapper { margin-top: var(--space-8) !important; }
+    .customers-text { margin-bottom: var(--space-3) !important; }
+    .customers-text .paragraph { font-size: 22px !important; }
+    .customers-el { padding: var(--space-4) var(--space-4) var(--space-4) var(--space-4) !important; gap: var(--space-2) !important; }
+    .customers-el h6 { font-size: var(--text-show-mobile) !important; line-height: 1.3 !important; }
+  }
+  @media (max-width: 479px) {
+    .home-hero-headline-strech { font-size: 16vw !important; }
+    .customers-grid { row-gap: var(--space-3) !important; }
+    .section-customers .wrapper + .wrapper { margin-top: var(--space-6) !important; }
+    .customers-text { margin-bottom: var(--space-2) !important; }
+    .customers-text .paragraph { font-size: 20px !important; }
+    .customers-el { gap: var(--space-1) !important; padding: var(--space-3) var(--space-3) var(--space-4) var(--space-3) !important; }
+    .customers-el h6 { font-size: var(--text-show-mobile-sm) !important; }
+    .customers-el-name { grid-column: span 4 !important; }
+    .customers-el-service { grid-column: span 4 !important; }
+    .customers-el-date { grid-column: span 8 !important; text-align: left !important; opacity: .6; }
+  }
+
+  .customers-el-upcoming:last-child { border-bottom: 0; }
+</style>

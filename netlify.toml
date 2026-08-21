@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[edge_functions]]
+  function = "protect-styleguide"
+  path = "/styleguide"
+
+[[edge_functions]]
+  function = "protect-styleguide"
+  path = "/styleguide/*"

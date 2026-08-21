@@ -1,0 +1,272 @@
+---
+const logos = [
+  { name: 'Wordmark', file: 'SCTTRD_logo_01' },
+  { name: 'Kreis', file: 'SCTTRD_logo_kreis' },
+];
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SCTTRD Styleguide</title>
+  </head>
+  <body>
+    <nav class="site-nav" aria-label="Styleguide Navigation">
+      <a class="nav-back" href="/" title="Zur öffentlichen Website">←</a>
+      <a class="nav-brand" href="#top">SCTTRD<span>®</span></a>
+      <div class="nav-links">
+        <a href="#logo">Logo</a><a href="#farbe">Farbe</a><a href="#typografie">Typo</a><a href="#presse">Presse</a><a href="#downloads">Downloads</a>
+      </div>
+    </nav>
+    <header class="masthead" id="top">
+      <div>
+        <span class="eyebrow">SCTTRD / STYLEGUIDE</span>
+        <h1>Punk<br /><em>aber schön.</em></h1>
+      </div>
+      <p class="edition">Brand system<br />2026 / DE</p>
+    </header>
+
+    <main>
+      <section class="intro">
+        <span class="section-no">00</span>
+        <div>
+          <p class="lede">Post-Punk Editorial für Live Techno. Roh, kontrastreich und direkt. Der bestehende SCTTRD-Look bleibt die Referenz.</p>
+          <p>Dieser Styleguide sammelt die verwendbaren Markenbausteine für Website, CMS, Social, Print und Live-Kommunikation.</p>
+        </div>
+      </section>
+
+      <section class="surface-inverse" id="logo">
+        <div class="section-head"><span class="section-no">01</span><h2>Logo</h2></div>
+        <div class="logo-grid">
+          {logos.map((logo) => (
+            <article class="logo-card">
+              <div class="logo-stage logo-stage-light"><img src={`/styleguide/assets/logos/${logo.file}_black.svg`} alt={`SCTTRD ${logo.name} schwarz`} /></div>
+              <div class="logo-stage logo-stage-dark"><img src={`/styleguide/assets/logos/${logo.file}_white.svg`} alt={`SCTTRD ${logo.name} weiß`} /></div>
+              <div class="logo-meta"><strong>{logo.name}</strong><span>Schwarz / Weiß / SVG / PNG</span></div>
+              <div class="logo-actions">
+                <a class="button" href={`/styleguide/assets/logos/${logo.file}_black.svg`} download><span class="button-label">Black SVG</span><span>↓</span></a>
+                <a class="button" href={`/styleguide/assets/logos/${logo.file}_black.png`} download><span class="button-label">Black PNG</span><span>↓</span></a>
+                <a class="button" href={`/styleguide/assets/logos/${logo.file}_white.svg`} download><span class="button-label">White SVG</span><span>↓</span></a>
+                <a class="button" href={`/styleguide/assets/logos/${logo.file}_white.png`} download><span class="button-label">White PNG</span><span>↓</span></a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="farbe">
+        <div class="section-head"><span class="section-no">02</span><h2>Farbe</h2></div>
+        <div class="swatches">
+          <div class="swatch swatch-black"><strong>#0C0C0C</strong><span>Primär / Nacht</span><button class="copy-button" type="button" data-copy="#0C0C0C" aria-live="polite">HEX kopieren</button></div>
+          <div class="swatch swatch-red"><strong>#FF0000</strong><span>Primär / Signal</span><button class="copy-button" type="button" data-copy="#FF0000" aria-live="polite">HEX kopieren</button></div>
+        </div>
+      </section>
+
+      <section id="typografie">
+        <div class="section-head"><span class="section-no">03</span><h2>Typografie</h2></div>
+        <div class="type-specimen">
+          <span class="type-label">Founders Grotesk / Display / uppercase</span>
+          <div class="display">LIVE<br />TECHNO</div>
+          <span class="type-label">Founders Grotesk / Text / deutsch</span>
+          <p class="body-copy">SCTTRD ist ein elektronisches Live-Projekt zwischen Post-Punk, Techno und Trance. Keine DJs. Echte Shows.</p>
+          <div class="font-samples">
+            <div><span class="type-label">Regular 400</span><p class="font-regular">Punk, aber schön.</p></div>
+            <div><span class="type-label">Medium 500</span><p class="font-medium">Punk, aber schön.</p></div>
+            <div><span class="type-label">Semibold 600</span><p class="font-semibold">Punk, aber schön.</p></div>
+            <div><span class="type-label">Bold 700</span><p class="font-bold">Punk, aber schön.</p></div>
+          </div>
+          <div class="font-downloads">
+            <span class="type-label">Schriftdateien</span>
+            <a class="button" href="/styleguide/assets/fonts/FoundersGrotesk-Regular.otf" download><span class="button-label">Regular OTF</span><span>↓</span></a>
+            <a class="button" href="/styleguide/assets/fonts/FoundersGrotesk-Medium.otf" download><span class="button-label">Medium OTF</span><span>↓</span></a>
+            <a class="button" href="/styleguide/assets/fonts/FoundersGrotesk-Semibold.otf" download><span class="button-label">Semibold OTF</span><span>↓</span></a>
+            <a class="button" href="/styleguide/assets/fonts/FoundersGrotesk-Bold.otf" download><span class="button-label">Bold OTF</span><span>↓</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="press-section" id="presse">
+        <div class="section-head"><span class="section-no">04</span><h2>Press Pack</h2></div>
+        <p class="press-intro">Freigegebene Pressebilder. Dieser Ordner ist die verbindliche Quelle.</p>
+        <a class="press-button" href="https://drive.google.com/drive/folders/1Rg5EQ-fS80NE6_jPfTeWaUVY4gwmnMEO?usp=drive_link" target="_blank" rel="noreferrer">
+          <span class="press-button-label">Google Drive / 03_Presse</span>
+          <strong>Pressebilder öffnen</strong>
+          <span class="press-button-meta">50+ Bilder <b>↗</b></span>
+        </a>
+      </section>
+
+      <section id="downloads">
+        <div class="section-head"><span class="section-no">05</span><h2>Downloads</h2></div>
+        <div class="utility-actions">
+          <a class="button button-large" href="https://scttrd.de" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Website</strong><small>scttrd.de</small></span><span aria-hidden="true">↗</span></a>
+          <a class="button button-large" href="/styleguide/assets/rider/scttrd-foh-rider.html"><span class="button-copy"><strong>Technical Rider</strong><small>HTML · Stage Plot</small></span><span aria-hidden="true">↗</span></a>
+          <a class="button button-large" href="https://drive.google.com/drive/folders/1R8LF6_T1DeVFs72Bm3O-HAaX2_3jqp45" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Hospitality Rider</strong><small>Google Drive</small></span><span aria-hidden="true">↗</span></a>
+          <a class="button button-large" href="https://drive.google.com/uc?export=download&id=1ORX9ptTiJjEDnK9D8UvOD2eBMsiXjp_D" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Factsheet DE</strong><small>PDF · Deutsch</small></span><span aria-hidden="true">↓</span></a>
+          <a class="button button-large" href="https://drive.google.com/uc?export=download&id=1JTGC42QTP5z2-DT9lYrjQ0a3jFQ3kPEm" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Factsheet EN</strong><small>PDF · English</small></span><span aria-hidden="true">↓</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer><span>SCTTRD</span><span>styleguide.scttrd.de / vorbereitet</span></footer>
+    <script>
+      document.querySelectorAll('[data-copy]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const value = button.getAttribute('data-copy');
+          if (!value) return;
+          const original = button.textContent;
+          try {
+            await navigator.clipboard.writeText(value);
+            button.setAttribute('data-copied', 'true');
+            button.textContent = `${value} kopiert`;
+          } catch {
+            button.textContent = 'Kopieren fehlgeschlagen';
+          }
+          window.setTimeout(() => { button.textContent = original; button.removeAttribute('data-copied'); }, 1200);
+        });
+      });
+
+      const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav-links a'));
+      const sections = navLinks
+        .map((link) => {
+          const href = link.getAttribute('href');
+          return href ? document.querySelector<HTMLElement>(href) : null;
+        })
+        .filter((section): section is HTMLElement => section !== null);
+      const observer = new IntersectionObserver((entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (!visible) return;
+        navLinks.forEach((link) => link.removeAttribute('aria-current'));
+        document.querySelector(`.nav-links a[href="#${visible.target.id}"]`)?.setAttribute('aria-current', 'location');
+      }, { rootMargin: '-20% 0px -65% 0px' });
+      sections.forEach((section) => observer.observe(section));
+    </script>
+  </body>
+</html>
+
+<style>
+  @font-face { font-family: 'Founders Grotesk'; src: url('/styleguide/assets/fonts/FoundersGrotesk-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Founders Grotesk'; src: url('/styleguide/assets/fonts/FoundersGrotesk-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Founders Grotesk'; src: url('/styleguide/assets/fonts/FoundersGrotesk-Semibold.otf') format('opentype'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Founders Grotesk'; src: url('/styleguide/assets/fonts/FoundersGrotesk-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
+  :global(:root) {
+    /* Global tokens */
+    --color-neutral-950: #0c0c0c;
+    --color-neutral-700: oklch(0.44 0.012 30);
+    --color-neutral-300: oklch(0.78 0.01 40);
+    --color-neutral-100: #ff0000;
+    --color-neutral-50: #ffffff;
+    --color-red-500: #ff0000;
+    --font-family-brand: 'Founders Grotesk', Arial, Helvetica, sans-serif;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --radius-2: 6px;
+    --radius-3: 12px;
+    --duration-fast: 140ms;
+    --duration-normal: 180ms;
+    --easing-out: cubic-bezier(.23,1,.32,1);
+
+    /* Alias tokens */
+    --color-text-primary: var(--color-neutral-950);
+    --color-text-inverse: var(--color-red-500);
+    --color-text-muted: var(--color-neutral-700);
+    --color-surface-page: var(--color-red-500);
+    --color-surface-raised: var(--color-red-500);
+    --color-surface-inverse: var(--color-neutral-950);
+    --color-border-subtle: color-mix(in srgb, var(--color-neutral-950) 42%, transparent);
+    --color-action-primary: var(--color-red-500);
+    --border-radius-control: var(--radius-2);
+    --border-radius-container: var(--radius-3);
+    --motion-duration-feedback: var(--duration-fast);
+    --motion-duration-transition: var(--duration-normal);
+    --motion-easing-enter: var(--easing-out);
+    --space-layout-section: clamp(5rem,10vw,9rem);
+
+    /* Component tokens */
+    --button-color-background-default: var(--color-surface-inverse);
+    --button-color-text-default: var(--color-action-primary);
+    --button-color-border-default: var(--color-border-subtle);
+    --button-color-background-hover: var(--color-action-primary);
+    --button-color-text-hover: var(--color-surface-inverse);
+    --press-button-color-background-default: var(--color-action-primary);
+    --press-button-color-background-hover: var(--color-surface-inverse);
+  }
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) { margin: 0; background: var(--color-surface-page); color: var(--color-text-primary); font-family: var(--font-family-brand); line-height: 1.5; }
+  :global(a:focus-visible), :global(button:focus-visible) { outline: 3px solid var(--color-action-primary); outline-offset: 4px; }
+  .site-nav, .masthead, main, footer { max-width: 1240px; margin: 0 auto; padding-left: 5vw; padding-right: 5vw; }
+  .site-nav { position: sticky; top: 0; z-index: 20; min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 2rem; background: color-mix(in oklch, var(--color-surface-page) 94%, transparent); border-bottom: 1px solid var(--color-border-subtle); }
+  .site-nav a { color: inherit; text-decoration: none; }
+  .nav-brand { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .nav-brand span { color: var(--color-action-primary); font-size: 9px; vertical-align: top; }
+  .nav-back { font-size: 16px; line-height: 1; color: var(--color-action-primary); text-decoration: none; margin-right: 1rem; }
+  .nav-links { display: flex; gap: clamp(.8rem,2vw,1.8rem); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+  .nav-links a { position: relative; padding: 20px 0; transition: color 160ms ease; }
+  .nav-links a[aria-current='location'] { font-weight: 700; }
+  .nav-links a[aria-current='location']::after { transform: scaleX(1); transform-origin: left; }
+  .nav-links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 14px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform var(--motion-duration-transition) var(--motion-easing-enter); }
+  .masthead { min-height: 78vh; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 8vw; padding-bottom: 8vw; border-bottom: 2px solid var(--color-text-primary); }
+  .eyebrow, .section-no, .section-head, .type-label, .edition, footer, .logo-meta span { font-size: 11px; line-height: 1.3; letter-spacing: .12em; text-transform: uppercase; }
+  h1, h2, .display { margin: 0; font-family: 'Founders Grotesk', 'Arial Narrow', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: -.025em; }
+  h1 { margin-top: 2rem; font-size: clamp(5rem, 15vw, 13rem); line-height: .78; }
+  h1 em { color: var(--color-surface-inverse); font-style: normal; }
+  .edition { text-align: right; }
+  section { padding: var(--space-layout-section) 0; border-bottom: 1px solid var(--color-border-subtle); scroll-margin-top: 70px; }
+  .surface-inverse { --color-border-subtle: color-mix(in srgb, var(--color-red-500) 46%, transparent); --button-color-border-default: var(--color-border-subtle); margin-left: -5vw; margin-right: -5vw; padding-left: 5vw; padding-right: 5vw; color: var(--color-text-inverse); background: var(--color-surface-inverse); }
+  .intro { display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; max-width: 900px; }
+  .intro p { max-width: 680px; margin: 0 0 1.5rem; font-size: 1.05rem; line-height: 1.7; }
+  .intro .lede { font-size: clamp(1.4rem, 3vw, 2.6rem); line-height: 1.18; letter-spacing: -.03em; }
+  .section-head { display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; align-items: baseline; margin-bottom: 3rem; }
+  h2 { font-size: clamp(3rem, 8vw, 7rem); line-height: .85; }
+  .logo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .logo-card { overflow: hidden; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border-subtle); border-radius: var(--border-radius-container); transition: transform 220ms var(--motion-easing-enter), box-shadow 220ms var(--motion-easing-enter); }
+  .logo-stage { min-height: 300px; display: grid; place-items: center; padding: 3rem; }
+  .logo-stage img { width: min(100%, 260px); height: auto; transition: transform 260ms var(--motion-easing-enter); }
+  .logo-stage-dark { background: var(--color-surface-inverse); }
+  .logo-meta { display: flex; justify-content: space-between; padding: 1rem; border-top: 1px solid var(--color-border-subtle); }
+  .logo-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); padding: var(--space-3); border-top: 1px solid var(--color-border-subtle); }
+  .button { display: inline-flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 48px; padding: .75rem .9rem; color: var(--button-color-text-default); background: var(--button-color-background-default); border: 1px solid var(--button-color-border-default); border-radius: var(--border-radius-control); font-size: 10px; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; cursor: pointer; transition: transform var(--motion-duration-feedback) var(--motion-easing-enter), color var(--motion-duration-transition) ease, background-color var(--motion-duration-transition) ease, border-color var(--motion-duration-transition) ease; }
+  .button > span:last-child { font-size: 15px; line-height: 1; transition: transform var(--motion-duration-transition) var(--motion-easing-enter); }
+  .button-label { font-size: 10px; line-height: 1.2; }
+  .button:active, .copy-button:active, .press-button:active { transform: scale(.97); }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
+  .swatch { min-height: 240px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--border-radius-container); }
+  .swatch-black { background: var(--color-surface-inverse); color: var(--color-surface-raised); }
+  .swatch-red { background: var(--color-action-primary); color: var(--color-surface-inverse); border: 1px solid var(--color-surface-inverse); }
+  .swatch span { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+  .copy-button { align-self: flex-start; margin-top: 1.4rem; padding: .65rem .8rem; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: var(--border-radius-control); font: inherit; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: transform var(--motion-duration-feedback) var(--motion-easing-enter), background-color var(--motion-duration-transition) ease, color var(--motion-duration-transition) ease; }
+  .copy-button[data-copied] { color: var(--color-action-primary); background: var(--color-surface-inverse); border-color: var(--color-surface-inverse); }
+  .type-specimen { max-width: 850px; }
+  .display { margin: 1.5rem 0 4rem; color: var(--color-surface-inverse); font-size: clamp(5rem, 16vw, 14rem); line-height: .75; }
+  .body-copy { max-width: 640px; font-size: clamp(1.5rem, 3vw, 2.5rem); line-height: 1.28; letter-spacing: -.03em; }
+  .font-samples { display: grid; gap: 1.5rem; margin-top: 4rem; max-width: 640px; }
+  .font-samples p { margin: .6rem 0 0; font-size: clamp(1.8rem, 4vw, 3.5rem); line-height: 1.2; }
+  .font-regular { font-weight: 400; }
+  .font-medium { font-weight: 500; }
+  .font-semibold { font-weight: 600; }
+  .font-bold { font-weight: 700; }
+  .font-downloads { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 4rem; max-width: 640px; }
+  .font-downloads .type-label { grid-column: 1 / -1; margin-bottom: .5rem; }
+  .press-section { background: var(--color-surface-inverse); color: var(--color-surface-raised); margin-left: -5vw; margin-right: -5vw; padding-left: 5vw; padding-right: 5vw; border-bottom: 0; }
+  .press-intro { max-width: 660px; margin: -1rem 0 4rem 25%; font-size: clamp(1.25rem, 2.5vw, 2.1rem); line-height: 1.3; }
+  .press-button { display: grid; grid-template-columns: 1fr auto; gap: 1.4rem; align-items: end; padding: clamp(1.4rem,4vw,3rem); color: var(--color-text-primary); background: var(--press-button-color-background-default); border: 1px solid var(--press-button-color-background-default); border-radius: var(--border-radius-container); text-decoration: none; transition: transform var(--motion-duration-transition) var(--motion-easing-enter), background-color var(--motion-duration-transition) ease, color var(--motion-duration-transition) ease; }
+  .press-button-label { grid-column: 1 / -1; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  .press-button strong { font-size: clamp(2.8rem,8vw,7rem); line-height: .8; font-weight: 600; letter-spacing: -.035em; text-transform: uppercase; }
+  .press-button-meta { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+  .press-button strong, .press-button-meta b { transition: transform 220ms var(--motion-easing-enter); }
+  .press-button-meta b { display: inline-block; margin-left: .6rem; font-size: 18px; }
+  .utility-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-2); }
+  .button-large { min-height: 88px; padding: 1rem 1.15rem; text-transform: none; }
+  .button-copy { display: grid; gap: 4px; text-align: left; }
+  .button-copy strong { font-size: 16px; line-height: 1.1; font-weight: 600; letter-spacing: -.01em; }
+  .button-copy small { font-size: 11px; line-height: 1.25; letter-spacing: .06em; text-transform: uppercase; opacity: .78; }
+  footer { display: flex; justify-content: space-between; gap: 2rem; padding-top: 2rem; padding-bottom: 2rem; }
+  @media (hover: hover) and (pointer: fine) { .logo-card:hover { transform: translateY(-3px); box-shadow: 0 18px 50px color-mix(in oklch, var(--color-surface-inverse) 22%, transparent); } .logo-card:hover .logo-stage img { transform: scale(1.035); } .button:hover { color: var(--button-color-text-hover); background: var(--button-color-background-hover); border-color: var(--button-color-background-hover); transform: translateY(-2px); } .button:hover > span:last-child { transform: translateX(3px); } .swatch-black .copy-button:hover { color: var(--color-text-primary); background: var(--color-action-primary); border-color: var(--color-action-primary); } .swatch-red .copy-button:hover { color: var(--color-action-primary); background: var(--color-surface-inverse); border-color: var(--color-surface-inverse); } .press-button:hover { color: var(--color-action-primary); background: var(--press-button-color-background-hover); transform: translateY(-3px); } .press-button:hover strong { transform: translateX(8px); } .press-button:hover .press-button-meta b { transform: translate(4px,-4px); } .nav-links a:hover { color: var(--color-surface-inverse); } .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; } }
+  @media (prefers-reduced-motion: reduce) { :global(html) { scroll-behavior: auto; } }
+  @media (max-width: 700px) { .site-nav { position: static; } .nav-links { display: none; } .masthead { min-height: 70vh; flex-direction: column; align-items: flex-start; justify-content: space-between; } .edition { text-align: left; } .intro, .section-head { grid-template-columns: 1fr; gap: 1rem; } .logo-grid, .swatches { grid-template-columns: 1fr; } .logo-stage { min-height: 220px; } .font-downloads, .utility-actions { grid-template-columns: 1fr; } .press-intro { margin-left: 0; } .press-button { grid-template-columns: 1fr; } footer { flex-direction: column; } }
+</style>

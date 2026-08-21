@@ -1,0 +1,626 @@
+/* ============================================================
+   SCTTRD DESIGN TOKENS
+   Tiers: 1. global (raw) -> 2. alias (semantic) -> 3. component
+   Convention: {category}-{property}-{variant}-{state}
+   ============================================================ */
+
+/* ---------- 1. GLOBAL TOKENS (raw values) ---------- */
+:root {
+  /* Color */
+  --color-red-500:    #c92a2a;
+  --color-red-400:    #e03131;
+  --color-red-50:     #fff5f5;
+  --color-red-100:    #ffe3e3;
+  --color-neutral-0:  #ffffff;
+  --color-neutral-50: #f8f9fa;
+  --color-neutral-100:#f1f3f5;
+  --color-neutral-200:#e9ecef;
+  --color-neutral-300:#dee2e6;
+  --color-neutral-400:#ced4da;
+  --color-neutral-500:#adb5bd;
+  --color-neutral-600:#868e96;
+  --color-neutral-700:#495057;
+  --color-neutral-800:#343a40;
+  --color-neutral-900:#212529;
+  --color-neutral-950:#0a0a0a;
+
+  /* Border */
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-width-1: 1px;
+  --border-width-3: 3px;
+
+  /* Motion */
+  --motion-duration-1: 0.15s;
+  --motion-ease-1: ease;
+
+  /* Elevation */
+  --elevation-1: 0 1px 2px rgba(0,0,0,0.05);
+  --elevation-2: 0 2px 6px rgba(0,0,0,0.08);
+  --elevation-focus-1: 0 0 0 3px rgba(201,42,42,0.15);
+}
+
+/* ---------- 2. ALIAS TOKENS (semantic references) ---------- */
+:root {
+  /* Surfaces */
+  --surface-background:      var(--color-neutral-0);
+  --surface-raised:          var(--color-neutral-50);
+  --surface-sunken:          var(--color-neutral-100);
+  --surface-hover:           var(--color-neutral-100);
+
+  /* Text */
+  --text-primary:            var(--color-neutral-900);
+  --text-secondary:          var(--color-neutral-600);
+  --text-tertiary:           var(--color-neutral-500);
+  --text-on-accent:          var(--color-neutral-0);
+  --text-on-accent-hover:    var(--color-neutral-0);
+
+  /* Brand / interaction */
+  --color-accent:            var(--color-red-500);
+  --color-accent-hover:      var(--color-red-400);
+  --color-accent-fill:       var(--color-red-100);
+  --color-accent-hover-fill: var(--color-red-50);
+
+  /* Borders */
+  --border-default:          var(--color-neutral-200);
+  --border-interactive:      var(--color-red-500);
+  --border-divider:          var(--color-neutral-200);
+
+  /* Focus */
+  --focus-ring:              var(--elevation-focus-1);
+}
+
+/* ---------- 3. COMPONENT TOKENS (scoped usage) ---------- */
+:root {
+  /* Sidebar */
+  --sidebar-bg:             var(--surface-background);
+  --sidebar-text:           var(--text-secondary);
+  --sidebar-text-hover:     var(--text-primary);
+  --sidebar-active-bg:      var(--color-accent-fill);
+  --sidebar-active-text:    var(--color-red-500);
+  --sidebar-border-left:    var(--border-width-3);
+  --sidebar-accent:         var(--color-accent);
+
+  /* App header */
+  --header-bg:              var(--surface-background);
+  --header-border-bottom:   var(--border-divider);
+
+  /* Collection top bar */
+  --collection-top-bg:      var(--surface-raised);
+  --collection-border:      var(--border-default);
+
+  /* Buttons */
+  --button-primary-bg:      var(--color-accent);
+  --button-primary-text:    var(--text-on-accent);
+  --button-primary-hover-bg: var(--color-accent-hover);
+  --button-primary-hover-text: var(--text-on-accent-hover);
+
+  /* List cards */
+  --card-bg:                var(--surface-background);
+  --card-text:              var(--text-secondary);
+  --card-border:            var(--border-default);
+  --card-hover-bg:          var(--surface-hover);
+  --card-hover-border:      var(--color-accent);
+  --card-hover-text:        var(--text-primary);
+
+  /* Inputs */
+  --input-bg:               var(--surface-background);
+  --input-text:             var(--text-primary);
+  --input-border:           var(--color-neutral-300);
+  --input-focus-border:     var(--border-interactive);
+  --input-focus-ring:       var(--focus-ring);
+
+  /* Toast / notification */
+  --toast-bg:               var(--color-accent);
+  --toast-text:             var(--text-on-accent);
+
+  /* Motion durations */
+  --motion-fast:            var(--motion-duration-1);
+}
+
+/* ============================================================
+   SCTTRD CMS ADMIN STYLING (Decap CSS-in-JS override)
+   ============================================================ */
+
+/* ---- Global ---- */
+html, body {
+  background-color: var(--surface-background) !important;
+}
+
+/* ---- Sidebar ---- */
+[class*="SidebarContainer"] {
+  background-color: var(--sidebar-bg) !important;
+  border-right: var(--border-width-1) solid var(--border-divider) !important;
+}
+
+[class*="SidebarNavLink"] {
+  background-color: transparent !important;
+  color: var(--sidebar-text) !important;
+  border-left: var(--sidebar-border-left) solid transparent !important;
+}
+
+[class*="SidebarNavLink"]:hover {
+  background-color: var(--surface-raised) !important;
+  color: var(--sidebar-text-hover) !important;
+  border-left-color: var(--sidebar-accent) !important;
+}
+
+[class*="sidebar-active"],
+[class*="SidebarNavLinkActive"] {
+  background-color: var(--sidebar-active-bg) !important;
+  color: var(--sidebar-active-text) !important;
+  border-left-color: var(--sidebar-accent) !important;
+  font-weight: 700 !important;
+}
+
+[class*="SidebarSearch"] input,
+[class*="SidebarContainer"] input[type="text"] {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border: var(--border-width-1) solid var(--input-border) !important;
+}
+
+/* ---- Header ---- */
+[class*="AppHeader"] {
+  background-color: var(--header-bg) !important;
+  border-bottom: var(--border-width-1) solid var(--header-border-bottom) !important;
+}
+
+[class*="AppHeaderButton"] {
+  color: var(--text-primary) !important;
+}
+
+[class*="AppHeaderButton"]:hover {
+  background-color: var(--surface-raised) !important;
+}
+
+/* ---- Main content ---- */
+[class*="CollectionMain"] {
+  background-color: var(--surface-background) !important;
+}
+
+/* ---- Collection top bar (Shows heading + Neue button) ---- */
+[class*="CollectionTopContainer"] {
+  background-color: var(--collection-top-bg) !important;
+  border-bottom: var(--border-width-1) solid var(--collection-border) !important;
+}
+
+[class*="CollectionTopNewButton"],
+[class*="CollectionTop"] button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background-color: var(--button-primary-bg) !important;
+  color: var(--button-primary-text) !important;
+  border: none !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0 20px !important;
+  height: 36px !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+[class*="CollectionTopNewButton"] svg,
+[class*="CollectionTop"] button svg {
+  width: 14px !important;
+  height: 14px !important;
+  fill: var(--button-primary-text) !important;
+}
+
+[class*="CollectionTopNewButton"]:hover,
+[class*="CollectionTop"] button:hover {
+  background-color: var(--button-primary-hover-bg) !important;
+  color: var(--button-primary-hover-text) !important;
+}
+
+/* ---- List cards ---- */
+[class*="ListCardLink"] {
+  background-color: var(--card-bg) !important;
+  color: var(--card-text) !important;
+  border: var(--border-width-1) solid var(--card-border) !important;
+  border-bottom: var(--border-width-1) solid var(--card-border) !important;
+  transition: all var(--motion-fast) !important;
+}
+
+[class*="ListCardLink"]:hover {
+  border-color: var(--card-hover-border) !important;
+  background-color: var(--card-hover-bg) !important;
+  color: var(--card-hover-text) !important;
+}
+
+[class*="ListCardLink"] h2,
+[class*="ListCardLink"] span {
+  color: inherit !important;
+}
+
+/* ---- View controls (list/grid buttons) ---- */
+[class*="ViewControlsButton"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border: var(--border-width-1) solid var(--border-default) !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+}
+
+[class*="ViewControlsButton"] svg {
+  width: 14px !important;
+  height: 14px !important;
+  fill: currentColor !important;
+  color: inherit !important;
+}
+
+[class*="ViewControlsButton"]:hover,
+[class*="ViewControlsButton"][class*="active"] {
+  background-color: var(--color-accent) !important;
+  color: var(--text-on-accent) !important;
+  border-color: var(--color-accent) !important;
+}
+[class*="ViewControlsButton"]:hover svg,
+[class*="ViewControlsButton"][class*="active"] svg {
+  fill: var(--text-on-accent) !important;
+}
+
+/* ---- Sort dropdown ---- */
+[class*="SortWidget"] button,
+[class*="Sort"] button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border: var(--border-width-1) solid var(--border-default) !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+}
+
+[class*="SortWidget"] button svg,
+[class*="Sort"] button svg {
+  width: 12px !important;
+  height: 12px !important;
+  fill: currentColor !important;
+}
+
+[class*="SortWidget"] button:hover,
+[class*="Sort"] button:hover {
+  border-color: var(--color-accent) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ---- StyledDropdownButton (Quick-Neu / Sort caret buttons) ---- */
+[class*="StyledDropdownButton"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+[class*="StyledDropdownButton"] svg,
+[class*="StyledDropdownButton"] [class*="caret"] {
+  width: 12px !important;
+  height: 12px !important;
+  fill: currentColor !important;
+  color: inherit !important;
+}
+
+/* ---- Editor / editing view ---- */
+[class*="EntryEditor"],
+[class*="EditorContainer"],
+[class*="EditorPane"],
+[class*="Pane"] {
+  background-color: var(--surface-background) !important;
+  color: var(--text-primary) !important;
+}
+
+[class*="EditorTopBar"],
+[class*="EditorToolbar"] {
+  background-color: var(--surface-raised) !important;
+  border-bottom: var(--border-width-1) solid var(--border-divider) !important;
+}
+
+[class*="ScrollPane"] {
+  background-color: var(--surface-background) !important;
+}
+
+[class*="Field"],
+[class*="EntryField"],
+[class*="ControlContainer"] {
+  background-color: var(--surface-background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-divider) !important;
+}
+
+[class*="FieldLabel"] h1,
+[class*="FieldLabel"] h4 {
+  color: var(--text-primary) !important;
+}
+
+[class*="EditorBottomBar"],
+[class*="EditorFooter"] {
+  background-color: var(--surface-raised) !important;
+  border-top: var(--border-width-1) solid var(--border-divider) !important;
+}
+
+[class*="MultiplePane"],
+[class*="ListItem"],
+[class*="EditorListItem"] {
+  background-color: var(--surface-background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-divider) !important;
+}
+
+/* ---- Inputs / Forms ---- */
+input[type="text"],
+input[type="email"],
+input[type="search"],
+textarea,
+select {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border: var(--border-width-1) solid var(--input-border) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--input-focus-border) !important;
+  outline: none !important;
+  box-shadow: var(--input-focus-ring) !important;
+}
+
+/* ---- Labels ---- */
+label,
+[class*="FieldLabel"] {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-size: 11px !important;
+}
+
+/* ---- Headings ---- */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+}
+
+/* ---- Buttons general ---- */
+button {
+  transition: all var(--motion-fast) !important;
+}
+
+button:active {
+  transform: scale(0.98) !important;
+}
+
+/* ---- Dropdowns ---- */
+[class*="Dropdown"] [class*="menu"],
+[class*="Dropdown"] [class*="option"],
+[class*="react-select"] [class*="menu"] {
+  background-color: var(--surface-background) !important;
+  border: var(--border-width-1) solid var(--border-default) !important;
+}
+
+[class*="react-select"] [class*="control"] {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-background); }
+::-webkit-scrollbar-thumb { background: var(--color-neutral-400); border-radius: var(--border-radius-md); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-neutral-600); }
+
+/* ---- Modal / Dialog ---- */
+[class*="Modal"] [class*="content"],
+[class*="Dialog"] {
+  background-color: var(--surface-background) !important;
+  color: var(--text-primary) !important;
+  border: var(--border-width-1) solid var(--border-default) !important;
+  border-radius: var(--border-radius-md);
+}
+
+/* ---- Toast / Notifications ---- */
+[class*="Toast"] {
+  background-color: var(--toast-bg) !important;
+  color: var(--toast-text) !important;
+  font-weight: 700 !important;
+}
+
+/* ---- Login page ---- */
+[class*="Login"] {
+  background-color: var(--surface-background) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Hide Decap built-in logo image + the "Welcome to Decap" title */
+[class*="Login"] img,
+[class*="LoginScreen"] img {
+  display: none !important;
+}
+
+/* SCTTRD wordmark replacing the Decap logo */
+[class*="Login"] [class*="login"] {
+  margin-top: 0 !important;
+}
+
+[class*="Login"] [class*="login-h1"],
+[class*="Login"] h1,
+[class*="Login"] h2 {
+  font-size: 0 !important;
+}
+
+[class*="Login"] [class*="login-h1"]::before,
+[class*="Login"] h1::before,
+[class*="Login"] h2::before {
+  content: 'SCTTRD' !important;
+  font-size: 42px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  color: var(--text-primary) !important;
+  line-height: 1 !important;
+}
+
+[class*="Login"] button,
+[class*="Login"] [class*="login-button"],
+[class*="Login"] [class*="github"],
+[class*="Login"] [class*="external"] {
+  background-color: var(--color-neutral-0) !important;
+  color: var(--color-neutral-950) !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  border: none !important;
+}
+
+[class*="Login"] button:hover,
+[class*="Login"] [class*="login-button"]:hover {
+  background-color: var(--color-red-500) !important;
+  color: var(--color-neutral-0) !important;
+}
+
+/* Hide Decap footer links (decapcms.org, documentation) */
+[class*="Login"] footer,
+[class*="Login"] [class*="login-footer"] {
+  display: none !important;
+}
+
+[class*="Login"] label {
+  color: var(--text-primary) !important;
+}
+
+/* ---- Links ---- */
+a {
+  color: var(--color-accent) !important;
+}
+
+a:hover {
+  color: var(--text-primary) !important;
+}
+
+/* ---- Selection ---- */
+::selection {
+  background-color: var(--color-accent) !important;
+  color: var(--text-on-accent) !important;
+}
+
+/* ---- Publish/Save bar — 1-Klick, SCTTRD rot, immer sichtbar ---- */
+[class*="EditorToolbar"] button,
+[class*="EditorControlBar"] button,
+[class*="ToolbarButton"] {
+  background-color: var(--button-primary-bg) !important;
+  color: var(--button-primary-text) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  border: none !important;
+  height: 38px !important;
+  padding: 0 22px !important;
+}
+[class*="EditorToolbar"] button:hover {
+  background-color: var(--button-primary-hover-bg) !important;
+}
+/* Hide editorial workflow status / Deploy preview cruft when in simple mode */
+[class*="WorkflowTopBar"], [class*="EditorWithWorkflow"] [class*="Workflow"] { display: none !important; }
+
+/* ---- Subtle top accent bar ---- */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-red-400));
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* ============================================================
+   ALL-THEME CLEANUP (catches Dekap leftovers my main rules miss)
+   ============================================================ */
+
+/* Kill every Dekap default blue (icons, carets, links, focus) */
+[class*="css-"] svg,
+[class*="css-"] span,
+[class*="css-"] path,
+[class*="css-"] use,
+[class*="css-"] i,
+[class*="css-"] [class*="caret"],
+[class*="css-"] [class*="Icon"] {
+  color: var(--text-secondary) !important;
+  fill: currentColor !important;
+}
+[class*="css-"] svg { fill: var(--text-secondary) !important; }
+[class*="css-"] [class*="caretDown"] svg,
+[class*="css-"] [class*="Icon"] svg { fill: currentColor !important; color: inherit !important; }
+
+/* Sidebar search input (Decap #SearchInput) + its container */
+[class*="SearchInput"],
+[class*="SearchContainer"] input {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border: var(--border-width-1) solid var(--input-border) !important;
+  box-shadow: none !important;
+}
+[class*="SearchInput"]::placeholder,
+[class*="SearchContainer"] input::placeholder { color: var(--text-secondary) !important; }
+
+/* Avatar / user placeholder circle */
+[class*="Avatar"],
+[class*="AvatarPlaceholder"],
+[class*="userDropdown"] span[class*="Avatar"] {
+  background-color: var(--surface-raised) !important;
+  color: var(--text-primary) !important;
+}
+[class*="Avatar"] svg { fill: var(--text-primary) !important; }
+
+/* List card <li> wrapper keeps white bg from Decap — force dark
+   (restricted to the card-card wrapper so the <a> link keeps its own bg) */
+[class*="ListCard-card-card"],
+[class*="ListCard"][class*="card-card"] {
+  background-color: transparent !important;
+}
+
+/* Header top links (Inhalt/Medien/Schnell-Erstellung) — theme */
+[class*="AppHeaderNavLink"],
+[class*="AppHeaderButton"],
+[class*="AppHeaderQuickNewButton"],
+[class*="StyledDropdownButton"],
+[class*="AppHeaderButton"] svg,
+[class*="AppHeaderNavLink"] svg {
+  color: var(--text-secondary) !important;
+}
+[class*="AppHeaderNavLink"]:hover,
+[class*="AppHeaderButton"]:hover,
+[class*="AppHeaderNavLink"][class*="Active"],
+[class*="AppHeaderButton"][class*="Active"] {
+  color: var(--text-primary) !important;
+}
+[class*="AppHeader"] svg { fill: var(--text-secondary) !important; }
+[class*="AppHeader"] [class*="Active"] svg { fill: var(--text-primary) !important; }
+
+/* Card title / collection stats text inside top bar */
+[class*="CollectionTopHeading"] { color: var(--text-primary) !important; }
+[class*="CollectionTopRow"] { color: var(--text-secondary) !important; }
+[class*="CollectionControlsContainer"] { color: var(--text-secondary) !important; }
+[class*="ListCardTitle"], [class*="ListCard"] h2, [class*="ListCard"] span { color: var(--card-text) !important; }
+[class*="ListCardLink"]:hover [class*="ListCardTitle"] { color: var(--card-hover-text) !important; }
+
+/* Sidebar section heading (Inhaltstypen) */
+[class*="SidebarHeading"] { color: var(--text-secondary) !important; font-weight: 600 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; font-size: 11px !important; }

@@ -1,0 +1,11 @@
+export const interactions = {
+  upcoming: [{ item: '029efd5e-7032-08f1-ad49-8239f8e4e03f', nameNode: 'w-node-_81cf27fd-d244-7b0c-2a4c-cf256ad61837-269f9a25', cityNode: 'w-node-_81cf27fd-d244-7b0c-2a4c-cf256ad6183a-269f9a25', dateNode: 'w-node-_81cf27fd-d244-7b0c-2a4c-cf256ad6183d-269f9a25', imageWrap: '81cf27fd-d244-7b0c-2a4c-cf256ad61840', image: '81cf27fd-d244-7b0c-2a4c-cf256ad61841' }],
+  past: [
+    { item: '32f1c3bd-c31f-ccd4-c1bf-79b95af192b3', nameNode: 'w-node-_70d716ca-e566-1909-4f84-5c11ebcb6d3e-269f9a25', cityNode: 'w-node-_70d716ca-e566-1909-4f84-5c11ebcb6d41-269f9a25', dateNode: 'w-node-_70d716ca-e566-1909-4f84-5c11ebcb6d44-269f9a25', imageWrap: '70d716ca-e566-1909-4f84-5c11ebcb6d47', image: '70d716ca-e566-1909-4f84-5c11ebcb6d48' },
+    { item: '85f8e666-1bbf-5be8-ba68-d59d48c4b6a6', nameNode: 'w-node-_5c49e693-bcfd-d753-7358-d398046ee60a-269f9a25', cityNode: 'w-node-_5c49e693-bcfd-d753-7358-d398046ee60d-269f9a25', dateNode: 'w-node-_5c49e693-bcfd-d753-7358-d398046ee610-269f9a25', imageWrap: '5c49e693-bcfd-d753-7358-d398046ee613', image: '5c49e693-bcfd-d753-7358-d398046ee614' },
+    { item: '27feec1e-c407-5826-55c7-b4f21d4966e5', nameNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d4966e6-269f9a25', cityNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d4966ef-269f9a25', dateNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d4966f2-269f9a25', imageWrap: '27feec1e-c407-5826-55c7-b4f21d4966f5', image: '27feec1e-c407-5826-55c7-b4f21d4966f6' },
+    { item: '27feec1e-c407-5826-55c7-b4f21d4966f7', nameNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d4966f8-269f9a25', cityNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d4966fb-269f9a25', dateNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d4966fe-269f9a25', imageWrap: '27feec1e-c407-5826-55c7-b4f21d496701', image: '27feec1e-c407-5826-55c7-b4f21d496702' },
+    { item: '27feec1e-c407-5826-55c7-b4f21d496703', nameNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d496704-269f9a25', cityNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d496707-269f9a25', dateNode: 'w-node-_27feec1e-c407-5826-55c7-b4f21d49670a-269f9a25', imageWrap: '27feec1e-c407-5826-55c7-b4f21d49670d', image: '27feec1e-c407-5826-55c7-b4f21d49670e' },
+  ],
+};
+export const getInteraction = (kind, index) => interactions[kind]?.[index] ?? null;
