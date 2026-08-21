@@ -2,9 +2,10 @@
 import { getCollection } from 'astro:content';
 import Customers from '../components/Customers.astro';
 import * as Termin from '../lib/termin.js';
+import { getShows } from '../lib/cms.ts';
 import '../styles/tokens.css';
 
-const shows = (await getCollection('shows'));
+const shows = (await getShows()) as any;
 const navLinks = (await getCollection('links')).sort((a, b) => a.data.order - b.data.order);
 const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
 const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);

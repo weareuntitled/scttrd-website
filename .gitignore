@@ -4,3 +4,7 @@ dist/
 .DS_Store
 *.log
 .env
+
+cms/.next
+/cms/dist
+/cms/tsconfig.tsbuildinfo
