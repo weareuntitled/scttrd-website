@@ -9,3 +9,11 @@
 [[edge_functions]]
   function = "protect-styleguide"
   path = "/styleguide/*"
+
+[[edge_functions]]
+  function = "protect-cms"
+  path = "/admin"
+
+[[edge_functions]]
+  function = "protect-cms"
+  path = "/admin/*"
