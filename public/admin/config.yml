@@ -1,9 +1,13 @@
 locale: de
 
 backend:
-  name: proxy
-  proxy_url: http://localhost:8081/api/v1
+  name: github
+  repo: weareuntitled/scttrd-website
   branch: main
+  base_url: https://scttrd-website.vercel.app
+  auth_endpoint: api/auth
+
+local_backend: true
 
 media_folder: public/images
 public_folder: /images
