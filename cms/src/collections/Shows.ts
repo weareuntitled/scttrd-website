@@ -3,6 +3,7 @@ export const Shows: CollectionConfig = {
   slug: 'shows',
   admin: { useAsTitle: 'venue', defaultColumns: ['venue', 'city', 'date', 'status'] },
   access: { read: () => true },
+  hooks: { afterChange: [async () => { if (process.env.VERCEL_DEPLOY_HOOK_URL) fetch(process.env.VERCEL_DEPLOY_HOOK_URL, { method: 'POST' }).catch(()=>{}) }] },
   fields: [
     { name: 'venue', type: 'text', required: true },
     { name: 'city', type: 'text', required: true },
