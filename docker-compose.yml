@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    ports:
+      - "4321:4321"
+    env_file: .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+      - /app/.astro
+    command: npm run dev -- --host 0.0.0.0 --port 4321
+  cms:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/app
+    command: npx decap-server
