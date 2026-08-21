@@ -42,7 +42,7 @@ export default async function middleware(request: Request) {
           });
         }
         return new Response(loginHtml(isAdmin ? 'SCTTRD CMS' : 'SCTTRD Press Pack', 'Falsches Passwort'), {
-          status: 401,
+          status: 200,
           headers: { 'Content-Type': 'text/html' },
         });
       } catch {}
