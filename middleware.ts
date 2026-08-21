@@ -32,10 +32,11 @@ export default async function middleware(request: Request) {
         const form = await request.formData();
         const v = String(form.get('password') || '');
         if (v === pw) {
+          const target = isAdmin ? '/admin/' : '/styleguide/';
           return new Response(null, {
             status: 303,
             headers: {
-              Location: url.href,
+              Location: target,
               'Set-Cookie': `${name}=1; Path=${isAdmin ? '/admin' : '/styleguide'}; Max-Age=86400; SameSite=Lax`,
             },
           });
