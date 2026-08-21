@@ -8,3 +8,4 @@ dist/
 cms/.next
 /cms/dist
 /cms/tsconfig.tsbuildinfo
+*.csv

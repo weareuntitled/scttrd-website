@@ -18,5 +18,5 @@ export default buildConfig({
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({ pool: { connectionString: process.env.DATABASE_URL || '' } }),
   sharp,
-  plugins: [vercelBlobStorage({ collections: { media: true }, token: process.env.BLOB_READ_WRITE_TOKEN || '' })],
+  plugins: process.env.BLOB_READ_WRITE_TOKEN ? [vercelBlobStorage({ collections: { media: true }, token: process.env.BLOB_READ_WRITE_TOKEN })] : [],
 })
