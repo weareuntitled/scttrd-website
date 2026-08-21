@@ -7,40 +7,51 @@ function loginHtml(realm: string, error = '') {
 }
 
 export default async function middleware(request: Request) {
-  const url = new URL(request.url);
-  if (url.pathname === '/admin/config.yml' || url.pathname.endsWith('/config.yml')) {
-    return fetch(request);
-  }
-  const isAdmin = url.pathname.startsWith('/admin');
-  const cookieName = isAdmin ? 'scttrd_cms' : 'scttrd_press';
-  const password = isAdmin ? process.env.CMS_PASSWORD : process.env.STYLEGUIDE_PASSWORD;
-  const realm = isAdmin ? 'SCTTRD CMS' : 'SCTTRD Press Pack';
-
-  if (!password) {
-    return new Response('Not configured', { status: 503 });
-  }
-
-  const cookies = request.headers.get('cookie') || '';
-  if (cookies.includes(`${cookieName}=1`)) {
-    return fetch(request);
-  }
-
-  if (request.method === 'POST') {
-    const form = await request.formData();
-    const pw = String(form.get('password') || '');
-    if (pw === password) {
-      const res = Response.redirect(url.href, 303);
-      res.headers.set('Set-Cookie', `${cookieName}=1; Path=${isAdmin ? '/admin' : '/styleguide'}; Max-Age=86400; SameSite=Lax`);
-      return res;
+  try {
+    const url = new URL(request.url);
+    if (url.pathname === '/admin/config.yml' || url.pathname.endsWith('/config.yml')) {
+      return fetch(request);
     }
-    return new Response(loginHtml(realm, 'Falsches Passwort'), {
+    const isAdmin = url.pathname.startsWith('/admin');
+    const pw = isAdmin
+      ? (typeof process !== 'undefined' ? (process as any).env?.CMS_PASSWORD : undefined)
+      : (typeof process !== 'undefined' ? (process as any).env?.STYLEGUIDE_PASSWORD : undefined);
+
+    if (!pw) {
+      return fetch(request);
+    }
+
+    const cookies = request.headers.get('cookie') || '';
+    const name = isAdmin ? 'scttrd_cms' : 'scttrd_press';
+    if (cookies.includes(`${name}=1`)) {
+      return fetch(request);
+    }
+
+    if (request.method === 'POST') {
+      try {
+        const form = await request.formData();
+        const v = String(form.get('password') || '');
+        if (v === pw) {
+          return new Response(null, {
+            status: 303,
+            headers: {
+              Location: url.href,
+              'Set-Cookie': `${name}=1; Path=${isAdmin ? '/admin' : '/styleguide'}; Max-Age=86400; SameSite=Lax`,
+            },
+          });
+        }
+        return new Response(loginHtml(isAdmin ? 'SCTTRD CMS' : 'SCTTRD Press Pack', 'Falsches Passwort'), {
+          status: 401,
+          headers: { 'Content-Type': 'text/html' },
+        });
+      } catch {}
+    }
+
+    return new Response(loginHtml(isAdmin ? 'SCTTRD CMS' : 'SCTTRD Press Pack'), {
       status: 401,
       headers: { 'Content-Type': 'text/html' },
     });
+  } catch {
+    return fetch(request);
   }
-
-  return new Response(loginHtml(realm), {
-    status: 401,
-    headers: { 'Content-Type': 'text/html' },
-  });
 }
