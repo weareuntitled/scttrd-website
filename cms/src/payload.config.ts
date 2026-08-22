@@ -6,9 +6,9 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
-import { Users } from './collections/Users.js'
-import { Media } from './collections/Media.js'
-import { Shows } from './collections/Shows.js'
+import { Users } from './collections/Users'
+import { Media } from './collections/Media'
+import { Shows } from './collections/Shows'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 export default buildConfig({
