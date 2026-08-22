@@ -13,7 +13,9 @@ const nextConfig = {
   ],
   experimental: {
     reactCompiler: false,
+    serverComponentsExternalPackages: ['pg', '@libsql/client', 'pino', 'pino-pretty'],
   },
+  serverExternalPackages: ['pg', '@libsql/client', 'pino', 'pino-pretty'],
 }
 
 export default withPayload(nextConfig)
