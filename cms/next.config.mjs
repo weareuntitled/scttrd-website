@@ -21,8 +21,15 @@ const nextConfig = {
   turbopack: {
     root: path.resolve(dirname),
   },
-  transpilePackages: ['payload', '@payloadcms/db-sqlite', '@payloadcms/next', '@payloadcms/richtext-lexical'],
-  serverExternalPackages: ['@libsql/client', 'pino', 'pino-pretty'],
+  transpilePackages: [
+    'payload',
+    '@payloadcms/db-sqlite',
+    '@payloadcms/next',
+    '@payloadcms/richtext-lexical',
+    '@libsql/client',
+    'pino',
+    'pino-pretty',
+  ],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })
