@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" payload build",
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload"
@@ -17,6 +17,7 @@
     "cross-env": "10.1.0",
     "graphql": "^16.9.0",
     "next": "15.4.11",
+    "payload": "^3.60.0",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
     "react": "19.1.0",
