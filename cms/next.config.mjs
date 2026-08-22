@@ -1,17 +1,28 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ponytail: Webpack muss Payload selbst transpilieren, sonst findet
-  // es 'payload/shared' Subpfad-Exports nicht (Vercel-Cache-Issue).
-  transpilePackages: [
-    'payload',
-    '@payloadcms/db-sqlite',
-    '@payloadcms/next',
-    '@payloadcms/richtext-lexical',
-    '@payloadcms/shared',
-  ],
+  images: {
+    localPatterns: [{ pathname: '/api/media/file/**' }],
+  },
+  webpack: (webpackConfig) => {
+    webpackConfig.resolve.extensionAlias = {
+      '.cjs': ['.cts', '.cjs'],
+      '.js': ['.ts', '.tsx', '.js', '.jsx'],
+      '.mjs': ['.mts', '.mjs'],
+    }
+    return webpackConfig
+  },
+  turbopack: {
+    root: path.resolve(dirname),
+  },
+  transpilePackages: ['payload', '@payloadcms/db-sqlite', '@payloadcms/next', '@payloadcms/richtext-lexical'],
   serverExternalPackages: ['@libsql/client', 'pino', 'pino-pretty'],
 }
 
-export default withPayload(nextConfig)
+export default withPayload(nextConfig, { devBundleServerPackages: false })
