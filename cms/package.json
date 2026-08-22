@@ -10,19 +10,15 @@
     "payload": "payload"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "^3.60.0",
+    "@libsql/client": "^0.14.0",
     "@payloadcms/db-sqlite": "^3.88.0",
     "@payloadcms/next": "^3.60.0",
     "@payloadcms/richtext-lexical": "^3.60.0",
-    "@payloadcms/storage-vercel-blob": "^3.60.0",
-    "@libsql/client": "^0.14.0",
     "cross-env": "10.1.0",
     "graphql": "^16.9.0",
     "next": "15.4.11",
-    "pg": "^8.13.0",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
-    "payload": "^3.60.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "sharp": "0.34.2"
