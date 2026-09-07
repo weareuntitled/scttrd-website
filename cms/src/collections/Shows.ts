@@ -55,6 +55,18 @@ export const Shows: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'lineup',
+      type: 'array',
+      admin: {
+        description: 'Acts des gemeinsamen Line-ups mit offiziellen Artist-Links und Quelle',
+      },
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        { name: 'url', type: 'text', admin: { description: 'Offizielle Artist- oder Social-URL' } },
+        { name: 'sourceUrl', type: 'text', admin: { description: 'Beleg, z. B. Festival-Line-up' } },
+      ],
+    },
+    {
       name: 'order',
       type: 'number',
       defaultValue: 0,

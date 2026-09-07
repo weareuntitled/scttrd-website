@@ -15,6 +15,11 @@ const shows = defineCollection({
     title_en: z.string().optional(),
     srcset: z.string().optional(),
     link: z.string().url().optional(),
+    lineup: z.array(z.object({
+      name: z.string(),
+      url: z.string().url().optional(),
+      sourceUrl: z.string().url().optional(),
+    })).default([]),
     order: z.number(),
   }),
 });

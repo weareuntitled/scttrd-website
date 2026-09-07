@@ -93,8 +93,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'link-hub': LinkHub;
+  };
+  globalsSelect: {
+    'link-hub': LinkHubSelect<false> | LinkHubSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -282,6 +286,23 @@ export interface Show {
   image?: (number | null) | Media;
   imageAlt?: string | null;
   link?: string | null;
+  /**
+   * Acts des gemeinsamen Line-ups mit offiziellen Artist-Links und Quelle
+   */
+  lineup?:
+    | {
+        name: string;
+        /**
+         * Offizielle Artist- oder Social-URL
+         */
+        url?: string | null;
+        /**
+         * Beleg, z. B. Festival-Line-up
+         */
+        sourceUrl?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   order?: number | null;
   /**
    * Zuordnung: auf welcher Seite erscheint die Show (z. B. Home)
@@ -483,6 +504,14 @@ export interface ShowsSelect<T extends boolean = true> {
   image?: T;
   imageAlt?: T;
   link?: T;
+  lineup?:
+    | T
+    | {
+        name?: T;
+        url?: T;
+        sourceUrl?: T;
+        id?: T;
+      };
   order?: T;
   page?: T;
   updatedAt?: T;
@@ -541,6 +570,68 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Profil, SEO und Anzeigeeinstellungen fuer die ArtisTree-/Linktree-Seite.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "link-hub".
+ */
+export interface LinkHub {
+  id: number;
+  profile: {
+    handle: string;
+    title: string;
+    description: string;
+    image?: (number | null) | Media;
+  };
+  appearance?: {
+    theme?: ('red' | 'black' | 'white') | null;
+    showUpcoming?: boolean | null;
+  };
+  seo?: {
+    /**
+     * Browser-Titel und OpenGraph-Titel
+     */
+    title?: string | null;
+    /**
+     * Meta- und OpenGraph-Beschreibung
+     */
+    description?: string | null;
+  };
+  bookingEmail?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "link-hub_select".
+ */
+export interface LinkHubSelect<T extends boolean = true> {
+  profile?:
+    | T
+    | {
+        handle?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  appearance?:
+    | T
+    | {
+        theme?: T;
+        showUpcoming?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  bookingEmail?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
