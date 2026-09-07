@@ -5,6 +5,7 @@ city: Schwabmünchen
 date: 21.08.2026
 image: /images/656080335_18402590875183080_2349387174786364507_n.webp
 imageAlt: Singoldsand Festival - SCTTRD live
+link: https://www.singoldsand-festival.de/
 lineup:
   - name: Sonic Heaven
     url: https://zeixdir.de/KuenstlerinnnenDetail/1064/Sonic%20Heaven
@@ -56,14 +57,21 @@ lineup:
   - name: Das Lumpenpack
     sourceUrl: https://www.singoldsand-festival.de/band/das-lumpenpack/
   - name: Tonic Walter
+    url: https://www.tonicwalter.de/
     sourceUrl: https://www.singoldsand-festival.de/band/tonic-walter/
   - name: janik elijah
     sourceUrl: https://www.singoldsand-festival.de/band/janik-elijah/
   - name: Junge Europäer*innen
+    url: https://www.instagram.com/jungeeuropaerinnen/
     sourceUrl: https://www.singoldsand-festival.de/band/junge-europaeerinnen/
   - name: SCHRAMM
+    url: https://www.instagram.com/schrammmmmmmmm/?hl=de
     sourceUrl: https://www.singoldsand-festival.de/band/schramm/
   - name: EASY EASY
+    url: https://www.easyeasymusic.de/
     sourceUrl: https://www.singoldsand-festival.de/band/easy-easy/
+  - name: Das Lumpenpack
+    url: https://daslumpenpack.de/
+    sourceUrl: https://www.singoldsand-festival.de/band/das-lumpenpack/
 order: 10
 ---
