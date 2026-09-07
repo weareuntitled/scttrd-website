@@ -53,5 +53,10 @@ jobs:
           ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml up -d --build"
       - name: Live smoke test
         run: |
-          sleep 20
+          for attempt in {1..15}; do
+            if curl -fsS https://scttrd.de/shows/singoldsand-21-08-2026/ | grep -q 'Alle Shows'; then
+              break
+            fi
+            sleep 2
+          done
           SMOKE_BASE_URL=https://scttrd.de node scripts/smoke.mjs
