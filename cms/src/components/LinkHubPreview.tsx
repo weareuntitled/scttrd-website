@@ -10,6 +10,7 @@ export const LinkHubPreview: React.FC = () => {
     description: formFields['profile.description']?.value as string,
     theme: formFields['appearance.theme']?.value as string,
     showUpcoming: formFields['appearance.showUpcoming']?.value as boolean,
+    releaseTitle: formFields['featuredRelease.title']?.value as string,
   }))
 
   return (
@@ -19,6 +20,7 @@ export const LinkHubPreview: React.FC = () => {
         <strong>{fields.handle || '@scttrd_ofc'}</strong>
         <small>{fields.description || 'Profilbeschreibung'}</small>
         <div className="link-hub-preview__socials">spotify&nbsp;&nbsp; soundcloud&nbsp;&nbsp; instagram</div>
+        <div className="link-hub-preview__release">{fields.releaseTitle || 'Neuester Track'}</div>
         {fields.showUpcoming !== false && <div className="link-hub-preview__section">UPCOMING SHOWS</div>}
         <div className="link-hub-preview__link">Spotify <span>↗</span></div>
         <div className="link-hub-preview__link">SoundCloud <span>↗</span></div>
@@ -36,6 +38,7 @@ export const LinkHubPreview: React.FC = () => {
         .link-hub-preview__phone small { display: block; margin: 12px auto; font-size: 11px; line-height: 1.35; }
         .link-hub-preview__socials { margin: 18px 0 28px; font-size: 8px; font-weight: 900; text-transform: uppercase; }
         .link-hub-preview__section { margin: 0 0 8px; text-align: left; font-size: 9px; font-weight: 900; letter-spacing: .12em; }
+        .link-hub-preview__release { display: flex; justify-content: space-between; align-items: center; margin: 0 0 10px; padding: 16px 12px; border: 2px solid currentColor; background: #111; color: #f4f1ea; font-size: 12px; font-weight: 900; text-align: left; }
         .link-hub-preview__link { display: flex; justify-content: space-between; margin-top: 8px; padding: 13px 12px; border: 1px solid currentColor; background: rgba(255, 255, 255, .72); font-size: 12px; font-weight: 900; text-align: left; }
         .link-hub-preview__phone--black .link-hub-preview__link { background: rgba(255, 255, 255, .08); }
         .link-hub-preview > p { margin: 12px 4px; color: var(--theme-elevation-500); font-size: 11px; line-height: 1.35; }
