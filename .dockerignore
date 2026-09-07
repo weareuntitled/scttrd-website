@@ -2,3 +2,12 @@ node_modules
 dist
 .astro
 .git
+**/.env
+.next
+trypost
+video-caption
+meeting-template-deploy
+*.zip
+*.log*
+*.csv
+wiki
