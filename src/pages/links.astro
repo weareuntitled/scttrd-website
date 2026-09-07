@@ -45,30 +45,29 @@ const profileSchema = {
     <main class="hub">
       <header>
         <img class="avatar" src={profileImage} alt="SCTTRD" />
-        <div class="mark">{profileName}</div>
-        <p>{profileDescription}</p>
-        <div class="socials" aria-label="SCTTRD auf Social Media">
-          {socialLinks.map((link) => <a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.platform}>{link.platform}</a>)}
-        </div>
+        <h1 class="name">{profileName}</h1>
+        <p class="bio">{profileDescription}</p>
       </header>
       {hub?.appearance?.showUpcoming !== false && upcoming.length > 0 && <section aria-labelledby="shows-title">
-        <div class="section-heading"><h1 id="shows-title">Upcoming Shows</h1><span>{upcoming.length}</span></div>
+        <div class="section-heading"><h2 id="shows-title">Upcoming Shows</h2></div>
         {upcoming.map((show) => {
           const date = parseShowDate(show.data.date);
+          const dateLabel = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
           const day = date.toLocaleDateString('de-DE', { day: '2-digit' });
           const month = date.toLocaleDateString('de-DE', { month: 'short' }).replace('.', '');
-          const dateLabel = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-          return <article class="show-link">
+          return <a class="link-btn show-btn" href={`/shows/${showSlug(show.data.venue, show.data.date)}/`}>
             <time datetime={show.data.date}><strong>{day}</strong><span>{month}</span></time>
-            <a href={`/shows/${showSlug(show.data.venue, show.data.date)}/`} class="show-copy"><strong>{show.data.venue}</strong><span>{show.data.city} · {dateLabel}</span></a>
-            {show.data.link ? <a class="ticket" href={show.data.link} target="_blank" rel="noopener noreferrer">Tickets</a> : <span class="ticket muted">Info</span>}
-          </article>;
+            <span class="show-copy"><strong>{show.data.venue}</strong><span>{show.data.city}</span></span>
+            {show.data.link ? <span class="ticket">Tickets</span> : <span class="ticket">Info</span>}
+          </a>;
         })}
       </section>}
       <nav aria-label="SCTTRD Links">
-        <div class="section-heading"><h1>Listen / Follow</h1></div>
-        {links.map((link) => <a class="main-link" href={link.url} target={link.target} rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}><span>{link.label}</span><span class="arrow">↗</span></a>)}
+        {links.map((link) => <a class="link-btn" href={link.url} target={link.target} rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}>{link.label}<span class="arrow">↗</span></a>)}
       </nav>
+      {socialLinks.length > 0 && <div class="socials" aria-label="SCTTRD auf Social Media">
+        {socialLinks.map((link) => <a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.platform}><span class="dot" aria-hidden="true">{link.platform[0]?.toUpperCase()}</span></a>)}
+      </div>}
       <footer><a href="/">scttrd.de</a><a href="mailto:info@scttrd.de">booking</a></footer>
     </main>
   </body>
@@ -76,18 +75,26 @@ const profileSchema = {
 
 <style>
   :global(*) { box-sizing: border-box; }
-  :global(body) { margin: 0; background: #f00000; color: #111; font-family: Arial, sans-serif; }
-  .hub { width: min(100% - 28px, 680px); margin: auto; padding: 24px 0 28px; min-height: 100vh; display: flex; flex-direction: column; }
-  header { text-align: center; margin: 8px 0 36px; } .avatar { width: 112px; height: 112px; object-fit: cover; border: 3px solid #111; border-radius: 50%; margin-bottom: 18px; } .mark { font-size: clamp(38px, 11vw, 72px); line-height: .8; letter-spacing: -.08em; font-weight: 900; } header p { max-width: 420px; margin: 16px auto 14px; font-size: 14px; font-weight: 700; line-height: 1.4; }
-  .socials { display: flex; justify-content: center; gap: 14px; } .socials a { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid #111; }
-  h1 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .16em; } .section-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; } .section-heading span { font-size: 12px; font-weight: 900; }
-  section, nav { display: grid; gap: 10px; margin-bottom: 28px; } a { color: inherit; text-decoration: none; }
-  .show-link, .main-link { border: 2px solid #111; background: #f4f1ea; min-height: 62px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
-  time { width: 42px; flex: 0 0 42px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 24px; } time span { margin-top: 5px; font-size: 10px; text-transform: uppercase; font-weight: 900; }
-  .show-copy { min-width: 0; flex: 1; display: grid; gap: 5px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .show-copy span { opacity: .55; font-size: 12px; }
-  .ticket { border: 1px solid #111; padding: 8px 10px; font-size: 10px; font-weight: 900; text-transform: uppercase; } .ticket.muted { opacity: .45; }
-  .main-link { justify-content: space-between; font-size: 16px; font-weight: 800; } .arrow { font-size: 20px; }
-  .show-link:hover, .main-link:hover { transform: translate(-3px, -3px); background: #fff; box-shadow: 5px 5px 0 #111; }
-  footer { margin-top: auto; padding-top: 36px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
-  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); } .show-link { padding-inline: 10px; gap: 8px; } .ticket { padding-inline: 7px; } }
+  :global(body) { margin: 0; background: #f4f1ea; color: #111; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+  .hub { width: min(100% - 32px, 680px); margin: auto; padding: 36px 0 30px; min-height: 100vh; display: flex; flex-direction: column; }
+  header { text-align: center; margin: 0 0 28px; }
+  .avatar { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 18px rgba(0,0,0,.12); margin-bottom: 16px; }
+  .name { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .bio { margin: 8px auto 0; max-width: 420px; font-size: 14px; line-height: 1.45; color: rgba(17,17,17,.72); }
+  .section-heading { margin: 0 0 12px; text-align: center; } .section-heading h2 { margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: rgba(17,17,17,.55); }
+  section, nav { display: grid; gap: 14px; margin-bottom: 26px; }
+  a { color: inherit; text-decoration: none; }
+  .link-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 14px 20px; background: #fff; border: 1px solid rgba(17,17,17,.08); border-radius: 14px; font-size: 16px; font-weight: 600; text-align: center; transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .link-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.12); border-color: rgba(17,17,17,.2); }
+  .link-btn .arrow { font-size: 13px; opacity: .5; }
+  .show-btn { justify-content: flex-start; text-align: left; }
+  time { width: 44px; flex: 0 0 44px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 20px; font-weight: 800; } time span { margin-top: 4px; font-size: 9px; text-transform: uppercase; font-weight: 700; color: rgba(17,17,17,.6); }
+  .show-copy { min-width: 0; flex: 1; display: grid; gap: 3px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; } .show-copy span { font-size: 12px; color: rgba(17,17,17,.6); }
+  .ticket { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 999px; background: #f00000; color: #fff; }
+  .socials { display: flex; justify-content: center; gap: 14px; margin-bottom: 26px; }
+  .socials a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid rgba(17,17,17,.08); box-shadow: 0 2px 8px rgba(0,0,0,.05); transition: transform .15s ease, box-shadow .15s ease; }
+  .socials a:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.12); }
+  .dot { font-size: 15px; font-weight: 800; }
+  footer { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: rgba(17,17,17,.5); }
+  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); padding-top: 28px; } }
 </style>
