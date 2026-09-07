@@ -7,6 +7,8 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  // Payload on serverless (Vercel): native/heavy deps must stay external.
+  serverExternalPackages: ['pg', 'sharp', 'pino', 'pino-pretty', '@libsql/client'],
   images: {
     localPatterns: [
       {
