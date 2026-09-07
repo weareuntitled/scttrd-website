@@ -77,7 +77,7 @@ const profileSchema = {
           return <a class="link-btn show-btn" href={`/shows/${showSlug(show.data.venue, show.data.date)}/`}>
             <time datetime={show.data.date}><strong>{day}</strong><span>{month}</span></time>
             <span class="show-copy"><strong>{show.data.venue}</strong><span>{show.data.city}</span></span>
-            {show.data.link ? <span class="ticket">Tickets</span> : <span class="ticket">Info</span>}
+            <span class="ticket">Show ansehen ↗</span>
           </a>;
         })}
       </section>}
