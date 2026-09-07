@@ -13,13 +13,17 @@ const seoTitle = hub?.seo?.title || `${profileTitle} | ${profileName}`;
 const seoDescription = hub?.seo?.description || profileDescription;
 const socialLinks = links.filter((link) => ['spotify', 'soundcloud', 'instagram', 'youtube'].includes(link.platform));
 const sameAs = socialLinks.map((link) => link.url);
-const release: any = hub?.featuredRelease ?? {};
-const releasePlatforms = [
-  { key: 'spotify', label: 'Spotify', url: release.spotify },
-  { key: 'soundcloud', label: 'SoundCloud', url: release.soundcloud },
-  { key: 'youtube', label: 'YouTube', url: release.youtube },
-  { key: 'applemusic', label: 'Apple Music', url: release.applemusic },
-].filter((p) => p.url);
+const spotifyUrl: string | undefined = hub?.featuredRelease?.spotify;
+let release: any = null;
+if (spotifyUrl) {
+  try {
+    const oembed = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(spotifyUrl)}`, { signal: AbortSignal.timeout(3000) } as any);
+    if (oembed.ok) {
+      const data = await oembed.json();
+      release = { title: data.title, cover: data.thumbnail_url, url: spotifyUrl };
+    }
+  } catch {}
+}
 const parseShowDate = (value: string) => {
   const german = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
   return german ? new Date(`${german[3]}-${german[2]}-${german[1]}T12:00:00`) : new Date(`${value}T12:00:00`);
@@ -55,18 +59,14 @@ const profileSchema = {
         <h1 class="name">{profileName}</h1>
         <p class="bio">{profileDescription}</p>
       </header>
-      {release.title && <section class="release" aria-labelledby="release-title">
-        <div class="release-card">
-          {release.cover?.url && <img class="release-cover" src={release.cover.url} alt="" />}
-          <div class="release-body">
-            {release.type && <span class="release-type">{release.type}</span>}
-            <h2 id="release-title" class="release-title">{release.title}</h2>
-            {releasePlatforms.length > 0 && <div class="release-links">
-              {releasePlatforms.map((p) => <a class="release-link" href={p.url} target="_blank" rel="noopener noreferrer">{p.label}</a>)}
-            </div>}
-          </div>
-        </div>
-      </section>}
+      {release && <a class="release-card" href={release.url} target="_blank" rel="noopener noreferrer">
+        <img class="release-cover" src={release.cover} alt="" />
+        <span class="release-body">
+          <span class="release-type">Neuester Track</span>
+          <strong class="release-title">{release.title}</strong>
+          <span class="release-play">Auf Spotify anhoeren →</span>
+        </span>
+      </a>}
       {hub?.appearance?.showUpcoming !== false && upcoming.length > 0 && <section aria-labelledby="shows-title">
         <div class="section-heading"><h2 id="shows-title">Upcoming Shows</h2></div>
         {upcoming.map((show) => {
@@ -84,9 +84,6 @@ const profileSchema = {
       <nav aria-label="SCTTRD Links">
         {links.map((link) => <a class="link-btn" href={link.url} target={link.target} rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}>{link.label}<span class="arrow">↗</span></a>)}
       </nav>
-      {socialLinks.length > 0 && <div class="socials" aria-label="SCTTRD auf Social Media">
-        {socialLinks.map((link) => <a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.platform}><span class="dot" aria-hidden="true">{link.platform[0]?.toUpperCase()}</span></a>)}
-      </div>}
       <footer><a href="/">scttrd.de</a><a href="mailto:info@scttrd.de">booking</a></footer>
     </main>
   </body>
@@ -94,33 +91,26 @@ const profileSchema = {
 
 <style>
   :global(*) { box-sizing: border-box; }
-  :global(body) { margin: 0; background: #f4f1ea; color: #111; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+  :global(body) { margin: 0; background: #000; color: #fff; font-family: Poppins, system-ui, sans-serif; }
   .hub { width: min(100% - 32px, 680px); margin: auto; padding: 36px 0 30px; min-height: 100vh; display: flex; flex-direction: column; }
   header { text-align: center; margin: 0 0 28px; }
-  .avatar { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 18px rgba(0,0,0,.12); margin-bottom: 16px; }
-  .name { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
-  .bio { margin: 8px auto 0; max-width: 420px; font-size: 14px; line-height: 1.45; color: rgba(17,17,17,.72); }
-  .section-heading { margin: 0 0 12px; text-align: center; } .section-heading h2 { margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: rgba(17,17,17,.55); }
-  .release { margin-bottom: 28px; } .release-card { display: flex; gap: 18px; align-items: center; padding: 16px; background: #111; color: #f4f1ea; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
-  .release-cover { width: 96px; height: 96px; flex: 0 0 96px; object-fit: cover; border-radius: 12px; }
-  .release-body { min-width: 0; flex: 1; } .release-type { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; color: rgba(244,241,234,.55); margin-bottom: 4px; }
-  .release-title { margin: 0 0 14px; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
-  .release-links { display: flex; flex-wrap: wrap; gap: 8px; }
-  .release-link { font-size: 12px; font-weight: 800; padding: 8px 14px; border-radius: 999px; background: #f00000; color: #fff; transition: transform .15s ease, box-shadow .15s ease; }
-  .release-link:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(240,0,0,.35); }
+  .avatar { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #f00000; margin-bottom: 16px; }
+  .name { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .bio { margin: 8px auto 0; max-width: 420px; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.7); }
+  .release-card { display: flex; gap: 18px; align-items: center; margin-bottom: 28px; padding: 16px; background: #f00000; color: #000; border-radius: 4px; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
+  .release-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(240,0,0,.4); }
+  .release-cover { width: 96px; height: 96px; flex: 0 0 96px; object-fit: cover; }
+  .release-body { min-width: 0; flex: 1; display: grid; gap: 4px; } .release-type { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; opacity: .65; } .release-title { font-size: 20px; font-weight: 800; letter-spacing: -.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .release-play { font-size: 12px; font-weight: 600; }
+  .section-heading { margin: 0 0 12px; text-align: center; } .section-heading h2 { margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: rgba(255,255,255,.55); }
   section, nav { display: grid; gap: 14px; margin-bottom: 26px; }
-  a { color: inherit; text-decoration: none; }
-  .link-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 14px 20px; background: #fff; border: 1px solid rgba(17,17,17,.08); border-radius: 14px; font-size: 16px; font-weight: 600; text-align: center; transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
-  .link-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.12); border-color: rgba(17,17,17,.2); }
+  a { color: inherit; }
+  .link-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 14px 20px; background: #111; border: 1px solid #2a2a2a; border-radius: 4px; font-size: 16px; font-weight: 700; text-align: center; text-decoration: none; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
+  .link-btn:hover { background: #f00000; border-color: #f00000; color: #000; transform: translateY(-2px); }
   .link-btn .arrow { font-size: 13px; opacity: .5; }
   .show-btn { justify-content: flex-start; text-align: left; }
-  time { width: 44px; flex: 0 0 44px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 20px; font-weight: 800; } time span { margin-top: 4px; font-size: 9px; text-transform: uppercase; font-weight: 700; color: rgba(17,17,17,.6); }
-  .show-copy { min-width: 0; flex: 1; display: grid; gap: 3px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; } .show-copy span { font-size: 12px; color: rgba(17,17,17,.6); }
-  .ticket { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 999px; background: #f00000; color: #fff; }
-  .socials { display: flex; justify-content: center; gap: 14px; margin-bottom: 26px; }
-  .socials a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid rgba(17,17,17,.08); box-shadow: 0 2px 8px rgba(0,0,0,.05); transition: transform .15s ease, box-shadow .15s ease; }
-  .socials a:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.12); }
-  .dot { font-size: 15px; font-weight: 800; }
-  footer { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: rgba(17,17,17,.5); }
-  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); padding-top: 28px; } .release-card { flex-direction: column; text-align: center; } .release-links { justify-content: center; } }
+  time { width: 44px; flex: 0 0 44px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 20px; font-weight: 800; } time span { margin-top: 4px; font-size: 9px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,.6); }
+  .show-copy { min-width: 0; flex: 1; display: grid; gap: 3px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; } .show-copy span { font-size: 12px; color: rgba(255,255,255,.6); }
+  .ticket { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 2px; background: #f00000; color: #000; }
+  footer { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); } footer a { color: inherit; text-decoration: none; }
+  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); padding-top: 28px; } .release-card { gap: 14px; } .release-cover { width: 80px; height: 80px; flex-basis: 80px; } }
 </style>
