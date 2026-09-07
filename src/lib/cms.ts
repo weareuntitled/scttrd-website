@@ -57,6 +57,8 @@ export async function getLinks() {
 
 export async function getShows() {
   const base = cmsBase()
+  const localShows = await getCollection('shows')
+  const localBySlug = new Map(localShows.map((show) => [showSlug(show.data.venue, show.data.date), show]))
   const abs = (u: any) => {
     if (!u) return ''
     if (/^https?:\/\//i.test(String(u))) return String(u)
@@ -66,7 +68,10 @@ export async function getShows() {
     const r = await fetch(`${base}/api/shows?limit=100&sort=-order`, { signal: AbortSignal.timeout(1500) } as any)
     if (r.ok) {
       const j: any = await r.json()
-      if (j.docs?.length) return j.docs.map((d: any) => ({ id: d.id, collection: 'shows', data: { venue: d.venue, city: d.city, date: d.date, status: d.status, order: d.order ?? 10, link: d.link || undefined, image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : ''), imageAlt: d.imageAlt || d.image?.alt || '', srcset: undefined, lineup: Array.isArray(d.lineup) ? d.lineup : [] } }))
+      if (j.docs?.length) return j.docs.map((d: any) => {
+        const local = localBySlug.get(showSlug(d.venue, d.date))
+        return { id: d.id, collection: 'shows', data: { venue: d.venue, city: d.city, date: d.date, status: d.status, order: d.order ?? 10, link: d.link || local?.data.link, image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : local?.data.image ?? ''), imageAlt: d.imageAlt || d.image?.alt || local?.data.imageAlt || '', srcset: undefined, lineup: Array.isArray(d.lineup) && d.lineup.length ? d.lineup : local?.data.lineup ?? [] } }
+      })
     }
   } catch {}
   return await getCollection('shows')
