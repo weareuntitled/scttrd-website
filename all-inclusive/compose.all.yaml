@@ -1,0 +1,154 @@
+# SCTTRD ALL-INCLUSIVE — Website + CMS + Wiki auf EINEM Docker-Host.
+#
+#   Ein Stack für CMS + Wiki auf dem Server. Die Website bleibt auf Vercel.
+#     cms.scttrd.de  -> Payload CMS
+#     docs.scttrd.de -> Docmost Wiki
+#
+#   Schritte:
+#     1. cp .env.example .env   (Secrets setzen: alle "change" ersetzen)
+#     2. DNS:  cms / docs -> A-Record auf die VPS-IP
+#     3. docker compose -f compose.all.yaml up -d --build
+#     4. Websites:  https://scttrd.de  https://cms.scttrd.de/admin  https://docs.scttrd.de
+#
+#   Lokal (ohne Domains): docker compose -f compose.all.yaml -f compose.local.yaml up -d --build
+
+services:
+  # ---------- Website-Fallback (Astro) ----------
+  web:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        PAYLOAD_URL: ${PAYLOAD_URL:-https://cms.scttrd.de}
+    container_name: scttrd-all-web
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PAYLOAD_URL: https://cms.scttrd.de
+    depends_on:
+      - cms
+
+  # ---------- CMS (Payload 3) ----------
+  cms:
+    build: ../cms
+    container_name: scttrd-all-cms
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${CMS_DB_USER:-cms}:${CMS_DB_PASSWORD}@cms-db:5432/${CMS_DB_NAME:-scttrd_cms}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      PAYLOAD_PUBLIC_SERVER_URL: https://cms.scttrd.de
+      # Das Schema wurde beim initialen Bootstrap gepusht. Produktion nutzt keine
+      # destruktiven Schemaänderungen beim Start.
+      PAYLOAD_PUSH: "false"
+      PORT: "3000"
+    volumes:
+      - cms_media:/app/media
+    depends_on:
+      cms-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/admin').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+
+  cms-db:
+    image: postgres:18
+    container_name: scttrd-all-cms-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${CMS_DB_NAME:-scttrd_cms}
+      POSTGRES_USER: ${CMS_DB_USER:-cms}
+      POSTGRES_PASSWORD: ${CMS_DB_PASSWORD}
+    volumes:
+      - cms_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CMS_DB_USER:-cms} -d ${CMS_DB_NAME:-scttrd_cms}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------- Wiki (Docmost) ----------
+  docmost:
+    image: docmost/docmost:latest
+    container_name: scttrd-all-docmost
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_URL: https://docs.scttrd.de
+      APP_SECRET: ${DOCMOST_APP_SECRET}
+      DATABASE_URL: postgresql://${DOCMOST_DB_USER:-docmost}:${DOCMOST_DB_PASSWORD}@docmost-db:5432/${DOCMOST_DB_NAME:-docmost}
+      REDIS_URL: redis://docmost-redis:6379
+      DISABLE_TELEMETRY: "true"
+    volumes:
+      - docmost_data:/app/data/storage
+    depends_on:
+      docmost-db:
+        condition: service_healthy
+      docmost-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  docmost-db:
+    image: postgres:18
+    container_name: scttrd-all-docmost-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DOCMOST_DB_NAME:-docmost}
+      POSTGRES_USER: ${DOCMOST_DB_USER:-docmost}
+      POSTGRES_PASSWORD: ${DOCMOST_DB_PASSWORD}
+    volumes:
+      - docmost_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DOCMOST_DB_USER:-docmost} -d ${DOCMOST_DB_NAME:-docmost}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  docmost-redis:
+    image: redis:8
+    container_name: scttrd-all-docmost-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - docmost_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ---------- Ein Reverse-Proxy für alles (auto-HTTPS) ----------
+  caddy:
+    image: caddy:2-alpine
+    container_name: scttrd-all-caddy
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile.all:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      cms:
+        condition: service_healthy
+      docmost:
+        condition: service_healthy
+
+volumes:
+  cms_media:
+  cms_db_data:
+  docmost_data:
+  docmost_db_data:
+  docmost_redis_data:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,15 @@
+# SCTTRD Server — Caddy für Website, CMS und Wiki.
+scttrd.de {
+	encode zstd gzip
+	reverse_proxy web:4321
+}
+
+cms.scttrd.de {
+	encode zstd gzip
+	reverse_proxy cms:3000
+}
+
+docs.scttrd.de {
+	encode zstd gzip
+	reverse_proxy docmost:3000
+}

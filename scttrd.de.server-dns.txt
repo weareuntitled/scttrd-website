@@ -1,0 +1,38 @@
+; SCTTRD DNS zone - server subdomains added
+; Based on export: 2026-09-07
+; Review the SOA/NS records with the DNS provider before importing.
+
+$ORIGIN scttrd.de.
+
+; SOA Record
+@ 3600 IN SOA ns65.domaincontrol.com. dns.jomax.net. (
+  2026090701
+  28800
+  7200
+  604800
+  3600
+)
+
+; Existing apex record from the supplied export
+@ 3600 IN A 89.58.27.240
+
+; SCTTRD server services
+cms 3600 IN A 89.58.27.240
+docs 3600 IN A 89.58.27.240
+
+; Existing TXT records
+@ 3600 IN TXT "MS=ms83817540"
+@ 3600 IN TXT "v=spf1 include:secureserver.net -all"
+_webflow 600 IN TXT "one-time-verification=d607f0b3-47cb-4509-8bfd-dfde2398e411"
+
+; Existing CNAME records
+email 3600 IN CNAME email.secureserver.net.
+www 3600 IN CNAME cdn.webflow.com.
+_domainconnect 3600 IN CNAME _domainconnect.gd.domaincontrol.com.
+
+; Existing NS records
+@ 3600 IN NS ns65.domaincontrol.com.
+@ 3600 IN NS ns66.domaincontrol.com.
+
+; Existing MX record
+@ 3600 IN MX 2 scttrd-de.mail.protection.outlook.com.

@@ -1,7 +1,34 @@
 import { getCollection } from 'astro:content'
-export async function getShows() {
+
+const cmsBase = () => {
   const url = import.meta.env.PAYLOAD_URL || (typeof process !== 'undefined' ? (process as any).env?.PAYLOAD_URL : undefined) || 'http://localhost:3000'
-  const base = url.replace(/\/$/, '')
+  return url.replace(/\/$/, '')
+}
+
+export async function getPage(slug: string) {
+  const base = cmsBase()
+  try {
+    const r = await fetch(`${base}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&depth=1&limit=1`, { signal: AbortSignal.timeout(1500) } as any)
+    if (r.ok) return ((await r.json()) as any).docs?.[0] ?? null
+  } catch {}
+  return null
+}
+
+export async function getGallery() {
+  const page: any = await getPage('about')
+  if (page?.gallery?.length) {
+    const base = cmsBase()
+    return page.gallery.map((item: any) => ({
+      src: /^https?:\/\//i.test(item.image?.url ?? '') ? item.image.url : new URL(item.image?.url ?? '', base).href,
+      alt: item.alt || item.image?.alt || 'SCTTRD',
+    }))
+  }
+  const [fallback] = await getCollection('aboutPageImages')
+  return (fallback?.data.gallery ?? []).map((src) => ({ src, alt: 'SCTTRD' }))
+}
+
+export async function getShows() {
+  const base = cmsBase()
   const abs = (u: any) => {
     if (!u) return ''
     if (/^https?:\/\//i.test(String(u))) return String(u)

@@ -2,10 +2,11 @@
 import { getCollection } from 'astro:content';
 import Customers from '../components/Customers.astro';
 import * as Termin from '../lib/termin.js';
-import { getShows } from '../lib/cms.ts';
+import { getPage, getShows } from '../lib/cms.ts';
 import '../styles/tokens.css';
 
 const shows = (await getShows()) as any;
+const homePage = (await getPage('home')) as any;
 const navLinks = (await getCollection('links')).sort((a, b) => a.data.order - b.data.order);
 const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
 const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
@@ -47,7 +48,7 @@ const pastShows = Termin.past(shows);
             {navLinks.map((l) => (<a href={l.data.url} class="nav-link-el-container w-inline-block"><div class="link-list-el">{l.data.label}</div></a>))}
           </div>
           <div class="nav-link-el-outer-wrapper info"><div class="link-list-el">{homeText?.data.email ?? 'info@scttrd.de'}</div></div>
-          <div class="nav-link-el-outer-wrapper"><a href="other-pages/about.html" class="nav-link-el-container w-inline-block"><div class="link-list-el">about</div></a><a href="https://www.linktree.com/scttrd_ofc" class="nav-link-el-container w-inline-block"><div class="link-list-el">music</div></a><a href="other-pages/contacts.html" class="nav-link-el-container w-inline-block"><div class="link-list-el">contact</div></a></div>
+          <div class="nav-link-el-outer-wrapper"><a href="other-pages/about.html" class="nav-link-el-container w-inline-block"><div class="link-list-el">about</div></a><a href="/gallery/" class="nav-link-el-container w-inline-block"><div class="link-list-el">gallery</div></a><a href="https://www.linktree.com/scttrd_ofc" class="nav-link-el-container w-inline-block"><div class="link-list-el">music</div></a><a href="other-pages/contacts.html" class="nav-link-el-container w-inline-block"><div class="link-list-el">contact</div></a></div>
         </div>
       </nav>
       <div class="nav-mobile-button w-nav-button"><div class="w-icon-nav-menu"></div></div>
@@ -68,7 +69,7 @@ const pastShows = Termin.past(shows);
       <div class="wrapper">
         <div class="about-grid">
           <div id="w-node-_529206b4-7da0-2990-4c60-98b86e7763c4-269f9a25" class="about-section-name"><div class="section-name"><p></p></div></div>
-          <div id="w-node-_61c881b4-2eb7-871b-4876-6bf2bfaa1b2b-269f9a25" data-w-id="61c881b4-2eb7-871b-4876-6bf2bfaa1b2b" style="opacity:0" class="about-section-content"><h2><strong class="bold-text">{homeText?.data.text}</strong></h2></div>
+          <div id="w-node-_61c881b4-2eb7-871b-4876-6bf2bfaa1b2b-269f9a25" data-w-id="61c881b4-2eb7-871b-4876-6bf2bfaa1b2b" style="opacity:0" class="about-section-content"><h2><strong class="bold-text">{homePage?.text ?? homeText?.data.text}</strong></h2></div>
           <div id="w-node-cd29ea5f-7453-d826-cc6d-399efe605862-269f9a25" class="about-divider-container"><div data-w-id="e874bee6-fa6b-19ee-6d1e-429f4ee903e7" style="width:0%" class="about-divider-line"></div></div>
           <div id="w-node-ec49d079-7c20-fd16-182a-884cbce6489d-269f9a25" class="about-section-empty"></div>
           <div id="w-node-_255ae96c-450a-d978-a401-15ae2c42833a-269f9a25" data-w-id="255ae96c-450a-d978-a401-15ae2c42833a" style="opacity:0" class="about-section-content"><h5 class="heading"><strong>SCTTRD. Augsburg, Germany. <br></strong>{homeText?.data.bio_de}</h5></div>
@@ -134,7 +135,7 @@ const pastShows = Termin.past(shows);
     <div class="footer">
       <div class="wrapper">
         <div class="footer-container">
-          <div class="footer-links"><a href="other-pages/about.html" class="footer-link">about</a><a href="other-pages/contacts.html" class="footer-link">contact</a><a href="/styleguide/#presse" class="footer-link">press pack</a><a href="mailto:info@scttrd.de?subject=STTRD%20Reqzest" class="link">{homeText?.data.email ?? 'info@scttrd.de'}</a></div>
+          <div class="footer-links"><a href="other-pages/about.html" class="footer-link">about</a><a href="/gallery/" class="footer-link">gallery</a><a href="other-pages/contacts.html" class="footer-link">contact</a><a href="/styleguide/#presse" class="footer-link">press pack</a><a href="mailto:info@scttrd.de?subject=STTRD%20Reqzest" class="link">{homeText?.data.email ?? 'info@scttrd.de'}</a></div>
         </div>
       </div>
     </div>

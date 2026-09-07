@@ -63,7 +63,7 @@ const { shows, kind } = Astro.props;
   .customers-text { margin-bottom: var(--space-4) !important; }
   .customers-text .paragraph { font-size: var(--text-heading) !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -.02em !important; }
   .customers-el[data-cms-show] { opacity: 1 !important; transform: none !important; }
-  .customers-list { grid-column: 1 / -1; }
+  .customers-list { grid-column: 1 / -1; max-width: 980px; width: 100%; margin-inline: auto; }
   .customers-section-description { padding-left: 15px !important; padding-right: var(--space-4) !important; }
   .customers-el { padding: var(--space-4) var(--space-4) var(--space-4) var(--space-6) !important; border-bottom: 1px solid #000 !important; gap: var(--space-4) !important; }
   .customers-el h6 { font-size: var(--text-show) !important; line-height: 1.3 !important; }

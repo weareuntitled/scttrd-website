@@ -1,0 +1,11 @@
+# Temporär: CMS einmalig im Dev-Modus starten (Payload pusht dann das Schema)
+# und Port 3001 für die Ersteinrichtung öffnen. Danach mit compose.all.yaml (ohne diese
+# Datei) zurücksetzen: docker compose -f compose.all.yaml up -d cms
+services:
+  cms:
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+      PAYLOAD_PUSH: "true"
+    ports:
+      - "127.0.0.1:3001:3000"

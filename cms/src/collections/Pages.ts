@@ -70,7 +70,7 @@ export const Pages: CollectionConfig = {
             },
             {
               name: 'text',
-              type: 'text',
+              type: 'textarea',
               admin: { description: 'Claim/Slogan (z. B. Punk, aber schön)' },
             },
             {
