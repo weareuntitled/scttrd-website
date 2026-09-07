@@ -8,6 +8,9 @@ export const Shows: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: ({ req }) => Boolean(req.user),
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => Boolean(req.user),
   },
   fields: [
     {
@@ -55,6 +58,15 @@ export const Shows: CollectionConfig = {
       name: 'order',
       type: 'number',
       defaultValue: 0,
+    },
+    {
+      name: 'page',
+      type: 'relationship',
+      relationTo: 'pages',
+      admin: {
+        position: 'sidebar',
+        description: 'Zuordnung: auf welcher Seite erscheint die Show (z. B. Home)',
+      },
     },
   ],
 }

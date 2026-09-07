@@ -23,9 +23,10 @@ const fm = (s) => {
 };
 
 describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
-  it('index.astro imports all collections used on homepage', () => {
+  it('index.astro loads shows via CMS (getShows) + all local collections', () => {
     const src = read('src/pages/index.astro');
-    for (const c of ['shows', 'links', 'videos', 'reels', 'homeText', 'homeImages']) {
+    assert.match(src, /import \{ getShows \} from '\.\.\/lib\/cms\.ts'/);
+    for (const c of ['links', 'videos', 'reels', 'homeText', 'homeImages']) {
       assert.match(src, new RegExp(`getCollection\\(['"]${c}['"]\\)`), `missing getCollection('${c}')`);
     }
   });
@@ -101,19 +102,18 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     }
   });
 
-  it('admin/config.yml collections match content.config.ts (grouped forms)', () => {
-    const yml = read('public/admin/config.yml');
+  it('payload.config.ts declares the CMS collections (Users/Media/Shows)', () => {
+    const pc = read('cms/src/payload.config.ts');
+    for (const c of ['Users', 'Media', 'Shows']) {
+      assert.match(pc, new RegExp(`./collections/${c}'`), `payload.config.ts missing ${c}`);
+    }
+  });
+
+  it('content collections still cover homepage groups for the fallback', () => {
     const ts = read('src/content.config.ts');
-    for (const name of ['shows', 'links', 'videos']) {
-      assert.match(yml, new RegExp(`name:\\s*${name}`), `config.yml missing ${name}`);
+    for (const name of ['shows', 'links', 'videos', 'reels', 'homeText', 'homeImages']) {
       assert.match(ts, new RegExp(`${name}\\s*=`), `content.config.ts missing ${name}`);
     }
-    assert.match(yml, /name:\s*homepage/, 'config.yml missing homepage group');
-    assert.match(yml, /name:\s*about/, 'config.yml missing about group');
-    assert.match(yml, /src\/content\/home\/text\.md/);
-    assert.match(yml, /src\/content\/home\/images\.md/);
-    assert.match(ts, /homeText\s*=/);
-    assert.match(ts, /homeImages\s*=/);
   });
 
   it('about/contact singletons parse and have email', () => {

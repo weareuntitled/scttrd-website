@@ -9,3 +9,7 @@ cms/.next
 /cms/dist
 /cms/tsconfig.tsbuildinfo
 *.csv
+
+*.log.err
+
+wiki/content/import/.b64_*

@@ -1,0 +1,60 @@
+# SCTTRD CMS (Payload 3) — Production-Stack für den VPS (cms.scttrd.de).
+# Schritte:
+#   1. DNS: cms A-Record auf die VPS-IP.
+#   2. cp cms/.env.example cms/.env; PAYLOAD_SECRET + DB-Passwort setzen; DATABASE_URL anpassen.
+#   3. docker compose -f compose.prod.yaml --profile proxy up -d
+#   4. https://cms.scttrd.de/admin -> ersten Admin-User anlegen, Shows seeden (scripts/seed-payload.mjs).
+
+services:
+  cms:
+    build: .
+    container_name: scttrd-cms
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cms}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-scttrd_cms}
+      PAYLOAD_PUBLIC_SERVER_URL: https://cms.scttrd.de
+      PORT: "3000"
+    volumes:
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18
+    container_name: scttrd-cms-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-scttrd_cms}
+      POSTGRES_USER: ${POSTGRES_USER:-cms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cms} -d ${POSTGRES_DB:-scttrd_cms}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: scttrd-cms-caddy
+    restart: unless-stopped
+    profiles: [proxy]
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - cms
+
+volumes:
+  media:
+  db_data:
+  caddy_data:
+  caddy_config:

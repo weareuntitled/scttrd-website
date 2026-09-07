@@ -1,0 +1,37 @@
+# Gig-Vorbereitung je Jour-fixe-Datum. Regel: Ab dem 3. Jour fixe vor dem Gig.
+# Format: ISO-Datum<TAB>TYPE<TAB>Text   (TYPE: H = Gig-Überschrift mit Datum, I = Checklisten-Zeile)
+2026-09-17	H	ByON Deep Dive · 25.–27.09. (1 JF vorher)
+2026-09-17	I	[x] Verfügbarkeit bestätigen · @alle
+2026-09-17	I	[ ] @Babsi · Unterkunft & Fahrt buchen
+2026-09-17	I	[x] Rückmeldung an BYON senden · @Babsi
+2026-09-17	I	[ ] @Daniel · Anreise checken (Regensburg)
+2026-10-15	H	Begrüßungs-WE By.on · 20.–22.11. (3 JFs vorher)
+2026-10-15	I	[ ] @Babsi · Anmeldung & Unterkunft checken
+2026-10-15	I	[ ] @Nate · D-Ticket/Reise prüfen
+2026-10-29	H	Begrüßungs-WE By.on · 20.–22.11. (2 JFs vorher)
+2026-10-29	I	[ ] @Babsi · Unterkunft & Fahrt buchen
+2026-10-29	I	[ ] @Nate · Reiseplan (ab 21.11. vor Ort)
+2026-10-29	I	[ ] @alle · Tickets/GL checken
+2026-11-12	H	Begrüßungs-WE By.on · 20.–22.11. (1 JF vorher)
+2026-11-12	I	[x] @Babsi · Buchungen final
+2026-11-12	I	[ ] @alle · Anreise & Ablauf final
+2026-11-12	H	Gig „Duo Techno & Punsch" · 12.12. (3 JFs vorher)
+2026-11-12	I	[ ] @Daniel · Generalprobe-Termin festlegen
+2026-11-12	I	[ ] @Nate · Rider-Anfrage an die Venue
+2026-11-26	H	Gig „Duo Techno & Punsch" · 12.12. (2 JFs vorher)
+2026-11-26	I	[ ] @Daniel · Setlist & Übergänge fixen
+2026-11-26	I	[ ] @Nate · Rider bestätigen · Filmer anfragen
+2026-11-26	I	[ ] @Babsi · Posting/Story-Plan
+2026-11-26	H	ByON-Woche · 11.–15.01.2027 (3 JFs vorher)
+2026-11-26	I	[ ] @Babsi · Coachings-Termine checken
+2026-12-10	H	Gig „Duo Techno & Punsch" · 12.12. (1 JF vorher)
+2026-12-10	I	[x] @Daniel · Generalprobe bestätigt
+2026-12-10	I	[x] @Nate · Rider raus
+2026-12-10	I	[ ] @Babsi · Sticker/Merch-Ecke vorbereiten
+2026-12-10	I	[ ] @Daniel · Soundcheck-Plan
+2026-12-10	H	ByON-Woche · 11.–15.01.2027 (2 JFs vorher)
+2026-12-10	I	[ ] @Babsi · Termine & Unterkunft buchen
+2027-01-07	H	ByON-Woche · 11.–15.01.2027 (1 JF vorher)
+2027-01-07	I	[x] @Babsi · Coachings-Slots bestätigt
+2027-01-07	I	[ ] @alle · Zeitplan in den Kalender eintragen
+2027-01-07	I	[ ] @Daniel · Anreise klären
