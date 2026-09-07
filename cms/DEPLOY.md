@@ -1,6 +1,6 @@
 # SCTTRD CMS · Go-Live (nächste Woche)
 
-Website-Stand: **Astro (Vercel) + Payload-CMS (VPS)**. Die Startseite liest die Shows beim Build
+Website-Stand: **Astro + Payload-CMS + Docmost auf dem VPS**. Die Startseite liest die Shows beim Build
 über `PAYLOAD_URL` aus dem CMS; schlägt der Fetch fehl, nutzt sie weiter die lokalen Markdown-Fallback
 (`src/content`). Damit kann die Website niemals durch das CMS brechen.
 
@@ -46,16 +46,15 @@ node scripts/seed-payload.mjs   # sofern scripts/ mitkopiert wurde
    Alternativ Shows manuell im Admin anlegen (Media-Hochladen + Shows).
 3. Schema wird beim Start automatisch gepusht (`PAYLOAD_PUSH=true`).
 
-## 4 · Vercel (Website) anbinden
+## 4 · Website auf dem VPS bauen
 
-In Vercel → Projekt `scttrd-website` → **Environment Variables**:
+Der All-in-one-Compose-Build setzt `PAYLOAD_URL=https://cms.scttrd.de` als Build-Argument.
+Nach CMS-Änderungen die Website neu bauen:
 
-| Variable | Wert |
-|---|---|
-| `PAYLOAD_URL` | `https://cms.scttrd.de` |
-
-Danach einmal neu deployen — die Startseite baut dann mit den Shows aus dem CMS.
-(Ohne Variable bleibt sie auf den Markdown-Fallback — kein Risiko.)
+```bash
+cd /opt/scttrd/all-inclusive
+docker compose -f compose.all.yaml up -d --build web
+```
 
 ## 5 · Backup (wöchentlich)
 
