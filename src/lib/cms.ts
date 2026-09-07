@@ -66,7 +66,7 @@ export async function getShows() {
     const r = await fetch(`${base}/api/shows?limit=100&sort=-order`, { signal: AbortSignal.timeout(1500) } as any)
     if (r.ok) {
       const j: any = await r.json()
-      if (j.docs?.length) return j.docs.map((d: any) => ({ id: d.id, collection: 'shows', data: { venue: d.venue, city: d.city, date: d.date, status: d.status, order: d.order ?? 10, link: d.link || undefined, image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : ''), imageAlt: d.imageAlt || d.image?.alt || '', srcset: undefined } }))
+      if (j.docs?.length) return j.docs.map((d: any) => ({ id: d.id, collection: 'shows', data: { venue: d.venue, city: d.city, date: d.date, status: d.status, order: d.order ?? 10, link: d.link || undefined, image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : ''), imageAlt: d.imageAlt || d.image?.alt || '', srcset: undefined, lineup: Array.isArray(d.lineup) ? d.lineup : [] } }))
     }
   } catch {}
   return await getCollection('shows')
