@@ -29,3 +29,12 @@ Payload soll als verlässliche Quelle für Home-Inhalte dienen. Die Startseite b
    - Website-Image mit `PAYLOAD_URL` neu bauen.
    - HTTPS-Website, Galerie, Video-URLs, CMS und Docmost prüfen.
    - Änderungen und bekannte Einschränkung des statischen Builds dokumentieren.
+
+6. **Lightweight Smoke-Test-CI/CD ergänzen**
+   - GitHub Actions Workflow für Push auf `main` und manuellen Start anlegen.
+   - CI: `npm ci`, `npm run build`, Galerie-Route und Video-Dateien im `dist`-Output prüfen.
+   - Live-Smoke-Test: `curl -fsS` auf `/`, `/gallery/`, `/admin` und Docmost; Video-URL mit `curl -fsSI` auf `200`/`206` prüfen.
+   - Nur nach erfolgreicher CI per SSH deployen: `git archive`/SCP der freigegebenen Dateien, dann `docker compose up -d --build` auf dem Server.
+   - GitHub-Secrets verwenden: `SERVER_HOST`, `SERVER_USER`, `SERVER_SSH_KEY`, `SERVER_KNOWN_HOSTS`, `DEPLOY_PATH`; niemals das Serverpasswort im Repository speichern.
+   - Nach dem Deploy erneut Smoke-Tests ausführen und bei Fehlern den Workflow fehlschlagen lassen.
+   - CMS-Änderungen bleiben statisch: Nach Payload-Änderungen muss ein Web-Build ausgelöst werden; ein Payload-Webhook kann später als separater Trigger ergänzt werden.
