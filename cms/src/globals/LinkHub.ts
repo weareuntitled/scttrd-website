@@ -60,6 +60,23 @@ export const LinkHub: GlobalConfig = {
       ],
     },
     {
+      name: 'featuredRelease',
+      type: 'group',
+      label: 'Neuester Track / Release',
+      admin: {
+        description: 'Wird oben auf der Links-Seite als groesste Kachel angezeigt.',
+      },
+      fields: [
+        { name: 'title', type: 'text', label: 'Titel', required: true },
+        { name: 'type', type: 'text', label: 'Typ', admin: { description: 'z. B. Single, EP, Album' } },
+        { name: 'cover', type: 'upload', relationTo: 'media', label: 'Cover' },
+        { name: 'spotify', type: 'text', label: 'Spotify URL' },
+        { name: 'soundcloud', type: 'text', label: 'SoundCloud URL' },
+        { name: 'youtube', type: 'text', label: 'YouTube URL' },
+        { name: 'applemusic', type: 'text', label: 'Apple Music URL' },
+      ],
+    },
+    {
       name: 'bookingEmail',
       type: 'email',
       label: 'Booking E-Mail',
