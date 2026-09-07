@@ -3,6 +3,7 @@ const baseUrl = (process.env.SMOKE_BASE_URL || 'https://scttrd.de').replace(/\/$
 const checks = [
   ['website', `${baseUrl}/`],
   ['gallery', `${baseUrl}/gallery/`],
+  ['links', `${baseUrl}/links/`],
   ['cms', 'https://cms.scttrd.de/admin'],
   ['docmost', 'https://docs.scttrd.de/'],
 ]

@@ -20,6 +20,15 @@ export async function getPage(slug: string) {
   return null
 }
 
+export async function getLinkHub() {
+  const base = cmsBase()
+  try {
+    const r = await fetch(`${base}/api/globals/link-hub?depth=1`, { signal: AbortSignal.timeout(1500) } as any)
+    if (r.ok) return await r.json()
+  } catch {}
+  return null
+}
+
 export async function getGallery() {
   const page: any = await getPage('about')
   if (page?.gallery?.length) {
@@ -31,6 +40,19 @@ export async function getGallery() {
   }
   const [fallback] = await getCollection('aboutPageImages')
   return (fallback?.data.gallery ?? []).map((src) => ({ src, alt: 'SCTTRD' }))
+}
+
+export async function getLinks() {
+  const base = cmsBase()
+  try {
+    const r = await fetch(`${base}/api/links?sort=order&limit=100`, { signal: AbortSignal.timeout(1500) } as any)
+    if (r.ok) {
+      const docs = ((await r.json()) as any).docs ?? []
+      if (docs.length) return docs.map((d: any) => ({ label: d.label, platform: d.platform, url: d.url, target: d.target || '_blank' }))
+    }
+  } catch {}
+  const local = await getCollection('links')
+  return local.sort((a, b) => a.data.order - b.data.order).map((item) => item.data)
 }
 
 export async function getShows() {

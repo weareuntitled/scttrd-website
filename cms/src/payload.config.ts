@@ -10,6 +10,7 @@ import { Media } from './collections/Media'
 import { Shows } from './collections/Shows'
 import { Pages } from './collections/Pages'
 import { Links } from './collections/Links'
+import { LinkHub } from './globals/LinkHub'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -22,6 +23,7 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, Pages, Shows, Links],
+  globals: [LinkHub],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-change-me',
   typescript: {
