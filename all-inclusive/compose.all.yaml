@@ -39,9 +39,9 @@ services:
       DATABASE_URL: postgresql://${CMS_DB_USER:-cms}:${CMS_DB_PASSWORD}@cms-db:5432/${CMS_DB_NAME:-scttrd_cms}
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
       PAYLOAD_PUBLIC_SERVER_URL: https://cms.scttrd.de
-      # Das Schema wurde beim initialen Bootstrap gepusht. Produktion nutzt keine
-      # destruktiven Schemaänderungen beim Start.
-      PAYLOAD_PUSH: "false"
+      # Schema beim Start pushen, damit neue Collections/Globals automatisch
+      # angelegt werden (sonst 500 auf /api/globals/link-hub nach Schemaänderungen).
+      PAYLOAD_PUSH: "true"
       PORT: "3000"
     volumes:
       - cms_media:/app/media
