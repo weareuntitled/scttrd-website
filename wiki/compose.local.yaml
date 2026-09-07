@@ -1,0 +1,8 @@
+# Lokale Overrides — nur für den Entwicklungs-Laptop.
+# Auf dem VPS NICHT verwenden (dort übernimmt Caddy).
+# Start: docker compose -f compose.prod.yaml -f compose.local.yaml up -d
+
+services:
+  docmost:
+    ports:
+      - "127.0.0.1:3100:3000"

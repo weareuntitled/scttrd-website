@@ -69,8 +69,9 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    folders: Folder;
-    tags: Tag;
+    pages: Page;
+    shows: Show;
+    links: Link;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,20 +81,21 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    folders: FoldersSelect<false> | FoldersSelect<true>;
-    tags: TagsSelect<false> | TagsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    shows: ShowsSelect<false> | ShowsSelect<true>;
+    links: LinksSelect<false> | LinksSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'en' | 'en'[];
+  fallbackLocale: null;
   globals: {};
   globalsSelect: {};
-  locale: 'en';
+  locale: null;
   widgets: {
     collections: CollectionsWidget;
   };
@@ -121,8 +123,12 @@ export interface UserAuthOperations {
     password: string;
   };
 }
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
 export interface User {
-  id: string;
+  id: number;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -147,10 +153,8 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
-  _h_folders?: (string | null) | Folder;
-  _h_tags?: (string | Tag)[] | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -164,33 +168,157 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Home & About: alle Texte und Bilder einer Seite
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "folders".
+ * via the `definition` "pages".
  */
-export interface Folder {
-  id: string;
-  _h_folders?: (string | null) | Folder;
-  name: string;
+export interface Page {
+  id: number;
+  title: string;
+  slug: string;
+  section: 'home' | 'about' | 'other';
+  /**
+   * Überschrift der Seite (z. B. SCTTRD)
+   */
+  headline?: string | null;
+  /**
+   * Untertitel (z. B. LIVE Techno mit Vocals)
+   */
+  subtitle?: string | null;
+  /**
+   * Bio deutsch (Home)
+   */
+  bio_de?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Bio englisch (Home/About)
+   */
+  bio_en?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Subheading (About)
+   */
+  subheading?: string | null;
+  /**
+   * Claim/Slogan (z. B. Punk, aber schön)
+   */
+  text?: string | null;
+  /**
+   * Kontakt-E-Mail (Footer/Nav)
+   */
+  email?: string | null;
+  /**
+   * CTA-Überschrift (z. B. Want to book us?)
+   */
+  ctaHeadline?: string | null;
+  /**
+   * CTA-Button-Text
+   */
+  ctaButton?: string | null;
+  /**
+   * Betreff der Booking-Mail
+   */
+  ctaButtonEmailSubject?: string | null;
+  /**
+   * Hero-Bild der Seite
+   */
+  image?: (number | null) | Media;
+  imageAlt?: string | null;
+  /**
+   * Galerie (About-Bilder etc.)
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        alt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  order?: number | null;
+  status?: ('draft' | 'published') | null;
   updatedAt: string;
   createdAt: string;
-  _h_slugPath?: string | null;
-  _h_titlePath?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tags".
+ * via the `definition` "shows".
  */
-export interface Tag {
-  id: string;
-  _h_tags?: (string | null) | Tag;
-  name: string;
+export interface Show {
+  id: number;
+  venue: string;
+  city: string;
+  /**
+   * Format: DD.MM.YYYY
+   */
+  date: string;
+  status: 'upcoming' | 'past';
+  image?: (number | null) | Media;
+  imageAlt?: string | null;
+  link?: string | null;
+  order?: number | null;
+  /**
+   * Zuordnung: auf welcher Seite erscheint die Show (z. B. Home)
+   */
+  page?: (number | null) | Page;
   updatedAt: string;
   createdAt: string;
-  _h_slugPath?: string | null;
-  _h_titlePath?: string | null;
 }
+/**
+ * Links im Menü/Footer (Instagram, Spotify, SoundCloud …)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "links".
+ */
+export interface Link {
+  id: number;
+  title: string;
+  /**
+   * Anzeigename, z. B. Instagram
+   */
+  label: string;
+  platform?: ('instagram' | 'tiktok' | 'spotify' | 'soundcloud' | 'youtube' | 'other') | null;
+  /**
+   * https://…
+   */
+  url: string;
+  target?: ('_blank' | '_self') | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv".
+ */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -207,28 +335,32 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
       } | null)
     | ({
-        relationTo: 'folders';
-        value: string | Folder;
+        relationTo: 'pages';
+        value: number | Page;
       } | null)
     | ({
-        relationTo: 'tags';
-        value: string | Tag;
+        relationTo: 'shows';
+        value: number | Show;
+      } | null)
+    | ({
+        relationTo: 'links';
+        value: number | Link;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -238,10 +370,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -261,7 +393,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -295,8 +427,6 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  _h_folders?: T;
-  _h_tags?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -311,28 +441,71 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "folders_select".
+ * via the `definition` "pages_select".
  */
-export interface FoldersSelect<T extends boolean = true> {
-  _h_folders?: T;
-  name?: T;
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  section?: T;
+  headline?: T;
+  subtitle?: T;
+  bio_de?: T;
+  bio_en?: T;
+  subheading?: T;
+  text?: T;
+  email?: T;
+  ctaHeadline?: T;
+  ctaButton?: T;
+  ctaButtonEmailSubject?: T;
+  image?: T;
+  imageAlt?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        id?: T;
+      };
+  order?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
-  _h_slugPath?: T;
-  _h_titlePath?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tags_select".
+ * via the `definition` "shows_select".
  */
-export interface TagsSelect<T extends boolean = true> {
-  _h_tags?: T;
-  name?: T;
+export interface ShowsSelect<T extends boolean = true> {
+  venue?: T;
+  city?: T;
+  date?: T;
+  status?: T;
+  image?: T;
+  imageAlt?: T;
+  link?: T;
+  order?: T;
+  page?: T;
   updatedAt?: T;
   createdAt?: T;
-  _h_slugPath?: T;
-  _h_titlePath?: T;
 }
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "links_select".
+ */
+export interface LinksSelect<T extends boolean = true> {
+  title?: T;
+  label?: T;
+  platform?: T;
+  url?: T;
+  target?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv_select".
+ */
 export interface PayloadKvSelect<T extends boolean = true> {
   key?: T;
   data?: T;

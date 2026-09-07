@@ -1,0 +1,13 @@
+# Lokale Overrides — nur für den Dev-Laptop. Nicht auf dem VPS.
+# Im Container läuft der DEV-Modus (Payload pusht das Schema beim Start).
+# Prod-Deployment (VPS) nutzt compose.prod.yaml mit "npm run start" + Migrationen.
+# Start: docker compose -f compose.prod.yaml -f compose.local.yaml up -d --build db
+services:
+  cms:
+    ports:
+      - "127.0.0.1:3001:3000"
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./src:/app/src

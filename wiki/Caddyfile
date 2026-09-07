@@ -1,0 +1,13 @@
+# Caddy serves Docmost on docs.scttrd.de with automatic HTTPS (Let's Encrypt).
+# APP_DOMAIN comes from .env (see compose.prod.yaml).
+# reverse_proxy transparently passes through WebSocket upgrades (Docmost Kollaboration).
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		-Server
+		X-Forwarded-Proto https
+	}
+
+	reverse_proxy docmost:3000
+}

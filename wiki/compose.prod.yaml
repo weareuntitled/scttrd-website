@@ -1,0 +1,85 @@
+# Docmost — SCTTRD Wiki Stack (docs.scttrd.de)
+#
+#   Selbst-gehostetes Wiki (AGPL) mit Postgres + Redis + Caddy (auto-HTTPS).
+#
+#   Schritte:
+#     1. .env anlegen:    cp .env.example .env
+#     2. Secrets setzen:  APP_SECRET  (openssl rand -hex 32)
+#                         POSTGRES_PASSWORD
+#     3. DNS:             docs.scttrd.de  ->  A Record auf die VPS-IP
+#     4. Starten:         docker compose -f compose.prod.yaml up -d
+#     5. Erster Login:    https://docs.scttrd.de  -> Admin-Account + Workspace anlegen
+
+services:
+  docmost:
+    image: docmost/docmost:latest
+    container_name: scttrd-docmost
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_URL: https://docs.scttrd.de
+      DATABASE_URL: postgresql://${POSTGRES_USER:-docmost}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-docmost}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - docmost_data:/app/data/storage
+    # Kein Host-Port-Mapping: In Produktion ist Docmost nur über Caddy erreichbar
+    # (Docker-Netz). Für lokale Läufe siehe compose.local.yaml.
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: postgres:18
+    container_name: scttrd-docmost-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-docmost}
+      POSTGRES_USER: ${POSTGRES_USER:-docmost}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-docmost} -d ${POSTGRES_DB:-docmost}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8
+    container_name: scttrd-docmost-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Reverse Proxy mit automatischem HTTPS (Let's Encrypt).
+  # DNS muss vorher auf diese Maschine zeigen.
+  caddy:
+    image: caddy:2-alpine
+    container_name: scttrd-docmost-caddy
+    restart: unless-stopped
+    profiles: [proxy]
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - docmost
+
+volumes:
+  docmost_data:
+  db_data:
+  redis_data:
+  caddy_data:
+  caddy_config:

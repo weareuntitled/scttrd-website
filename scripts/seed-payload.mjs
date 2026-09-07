@@ -14,7 +14,7 @@ for(const f of fs.readdirSync(dir).filter(x=>x.endsWith('.md'))){
   if(data.image){
     try{
       const p='public'+data.image;if(fs.existsSync(p)){
-        const blob=await fetch(`${PAYLOAD_URL}/api/media`,{method:'POST',headers:{Authorization:`JWT ${token}`},body:(()=>{const fd=new FormData();fd.append('file',new Blob([fs.readFileSync(p)]),path.basename(p));fd.append('_payload','{}');fd.append('alt',data.imageAlt||data.venue||'show');return fd})()});
+        const blob=await fetch(`${PAYLOAD_URL}/api/media`,{method:'POST',headers:{Authorization:`JWT ${token}`},body:(()=>{const fd=new FormData();fd.append('file',new Blob([fs.readFileSync(p)]),path.basename(p));fd.append('_payload',JSON.stringify({alt:data.imageAlt||data.venue||'show'}));return fd})()});
         const mj=await blob.json();mediaId=mj.doc?.id;console.log(f,'media',blob.status,mediaId||mj.errors?.[0]?.message||'')
       }
     }catch(e){console.log(f,'media err',e.message)}

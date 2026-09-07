@@ -1,0 +1,13 @@
+# Caddy serves the SCTTRD CMS (Payload 3) on cms.scttrd.de with auto-HTTPS.
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		-Server
+	}
+
+	# Payload Admin + REST/GraphQL + Media-Files + Next-Necessary small uploads
+	reverse_proxy cms:3000 {
+		header_up X-Forwarded-Proto {scheme}
+	}
+}
