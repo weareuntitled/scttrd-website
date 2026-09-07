@@ -62,18 +62,19 @@ export const LinkHub: GlobalConfig = {
     {
       name: 'featuredRelease',
       type: 'group',
-      label: 'Neuester Track / Release',
+      label: 'Neuester Track',
       admin: {
-        description: 'Wird oben auf der Links-Seite als groesste Kachel angezeigt.',
+        description: 'Nur die Spotify-Track-URL eintragen. Titel, Cover und Kuenstler werden automatisch geladen.',
       },
       fields: [
-        { name: 'title', type: 'text', label: 'Titel', required: true },
-        { name: 'type', type: 'text', label: 'Typ', admin: { description: 'z. B. Single, EP, Album' } },
-        { name: 'cover', type: 'upload', relationTo: 'media', label: 'Cover' },
-        { name: 'spotify', type: 'text', label: 'Spotify URL' },
-        { name: 'soundcloud', type: 'text', label: 'SoundCloud URL' },
-        { name: 'youtube', type: 'text', label: 'YouTube URL' },
-        { name: 'applemusic', type: 'text', label: 'Apple Music URL' },
+        {
+          name: 'spotify',
+          type: 'text',
+          label: 'Spotify Track URL',
+          admin: {
+            placeholder: 'https://open.spotify.com/track/…',
+          },
+        },
       ],
     },
     {

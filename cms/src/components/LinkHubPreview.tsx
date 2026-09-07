@@ -10,7 +10,7 @@ export const LinkHubPreview: React.FC = () => {
     description: formFields['profile.description']?.value as string,
     theme: formFields['appearance.theme']?.value as string,
     showUpcoming: formFields['appearance.showUpcoming']?.value as boolean,
-    releaseTitle: formFields['featuredRelease.title']?.value as string,
+    releaseUrl: formFields['featuredRelease.spotify']?.value as string,
   }))
 
   return (
@@ -20,7 +20,7 @@ export const LinkHubPreview: React.FC = () => {
         <strong>{fields.handle || '@scttrd_ofc'}</strong>
         <small>{fields.description || 'Profilbeschreibung'}</small>
         <div className="link-hub-preview__socials">spotify&nbsp;&nbsp; soundcloud&nbsp;&nbsp; instagram</div>
-        <div className="link-hub-preview__release">{fields.releaseTitle || 'Neuester Track'}</div>
+        <div className="link-hub-preview__release">{fields.releaseUrl ? 'Spotify Track ↗' : 'Spotify Track URL eintragen'}</div>
         {fields.showUpcoming !== false && <div className="link-hub-preview__section">UPCOMING SHOWS</div>}
         <div className="link-hub-preview__link">Spotify <span>↗</span></div>
         <div className="link-hub-preview__link">SoundCloud <span>↗</span></div>
