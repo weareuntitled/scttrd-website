@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCTTRD Meeting · 26.08.2026</title><style>
+:root{
+  --bg:#0b0d10;--panel:#12161b;--panel2:#171c22;--text:#edf0f3;--muted:#aab2bd;
+  --line:#2a313a;--accent:#d7ff3f;--accent2:#8be9fd;--warn:#ffcc66;--danger:#ff7b7b;--good:#7ee787;
+  --max:900px;--gap:14px;--radius:13px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+.wrap{max-width:var(--max);margin:0 auto;padding:40px 28px 100px}
+
+/* ── Toolbar ─────────────────────────────── */
+.toolbar{position:sticky;top:0;z-index:30;margin:-40px -28px 32px;padding:12px 28px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:rgba(11,13,16,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.toolbar button,.toolbar label{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}
+.toolbar button:hover,.toolbar label:hover{border-color:#59636f}
+.toolbar .primary{background:var(--accent);color:#111;border-color:var(--accent);font-weight:800}
+.toolbar .status{margin-left:auto;color:var(--muted);font-size:12px}
+.hidden{display:none}
+
+/* ── Meta ─────────────────────────────────── */
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.field label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;margin-bottom:4px}
+.field input,.field textarea{width:100%;border:1px solid var(--line);background:#0e1216;color:var(--text);border-radius:9px;padding:9px 11px;font:inherit;line-height:1.4;resize:vertical}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.field textarea{min-height:56px}
+
+/* ── Sections ────────────────────────────── */
+.section{margin-bottom:48px}
+.section-title{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:800;margin-bottom:6px}
+h1{font-size:clamp(22px,4vw,34px);line-height:1.12;letter-spacing:-.02em;margin:0 0 10px}
+h2{font-size:18px;margin:24px 0 8px;letter-spacing:-.01em}
+h3{font-size:16px;margin:0 0 6px}
+p{color:#d3d8de;max-width:740px;font-size:15px}
+.muted{color:var(--muted)}
+
+/* ── Checklist ───────────────────────────── */
+.checklist{list-style:none;padding:0;margin:10px 0}
+.checklist li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(42,49,58,.5)}
+.checklist li:last-child{border-bottom:none}
+.check{width:20px;height:20px;border:2px solid var(--line);border-radius:5px;flex:none;cursor:pointer;display:grid;place-items:center;margin-top:1px;transition:all .15s}
+.check:hover{border-color:var(--accent)}
+.check.on{background:var(--accent);border-color:var(--accent)}
+.check.on::after{content:"✓";color:#111;font-size:12px;font-weight:900}
+.checklist .text{flex:1;font-size:14px}
+.checklist .text.done{text-decoration:line-through;color:var(--muted)}
+
+/* ── Grid ─────────────────────────────────── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin:12px 0}
+
+/* ── Card ─────────────────────────────────── */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.card h3{margin:0 0 6px}
+.card p{margin:4px 0;font-size:14px;color:#d3d8de}
+.card .muted{color:var(--muted);font-size:13px}
+
+/* ── Flow ─────────────────────────────────── */
+.flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;margin:14px 0}
+.step{flex:1 1 100px;min-width:100px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);text-align:center}
+.step b{display:block;color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.step span{font-size:13px;color:#d3d8de}
+.arrow{display:flex;align-items:center;color:#64707d;font-size:20px}
+
+/* ── Quote ────────────────────────────────── */
+.quote{margin:14px 0;padding:12px 16px;border-left:3px solid var(--accent);font-size:15px;color:#d3d8de}
+
+/* ── Box (Calm neutral surface for callout / warn / parking / next) ── */
+.box,.callout,.warn,.parking,.next-meeting{margin:14px 0;padding:13px 15px;border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);font-size:14px;line-height:1.5}
+.box b,.callout b,.warn b,.parking b,.next-meeting b{color:var(--text)}
+
+/* ── Table ────────────────────────────────── */
+.table-wrap{overflow-x:auto;margin:12px 0}
+.table-wrap table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.table-wrap th,.table-wrap td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}
+.table-wrap th{background:var(--panel2);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.table-wrap td:first-child{font-weight:600}
+
+/* ── Docbox (Live-Dokumentation) ──────────── */
+.docbox{margin:16px 0 20px;padding:16px;border:1px solid var(--line);background:var(--panel);border-radius:var(--radius)}
+.docbox-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.docbox-head h3{margin:0;font-size:15px}
+.docbox-badge{font-size:11px;color:var(--accent);border:1px solid #4d5e24;padding:3px 8px;border-radius:999px}
+.docbox .note-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.docbox .note-field{display:flex;flex-direction:column;gap:5px}
+.docbox .note-field.wide{grid-column:1/-1}
+.docbox .note-field label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:800}
+.docbox .note-field input,.docbox .note-field textarea{width:100%;border:1px solid var(--line);background:#0e1216;color:var(--text);border-radius:8px;padding:8px 10px;font:inherit;line-height:1.4;resize:vertical}
+.docbox .note-field textarea{min-height:56px}
+.docbox .note-field input:focus,.docbox .note-field textarea:focus{outline:none;border-color:var(--accent)}
+
+/* ── Roles Grid ───────────────────────────── */
+.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin:12px 0}
+.role-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.role-card h3{margin:0 0 2px;font-size:16px;font-weight:700}
+.role-card .role-sub{font-size:12px;color:#777;margin:0 0 10px;font-style:italic}
+.role-card ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}
+.role-card li{margin-bottom:2px}
+.role-card .note{margin-top:10px;font-size:11px;color:#666;font-style:italic}
+
+/* ── Rule (numbered) ─────────────────────── */
+.rule{display:flex;gap:12px;align-items:flex-start;margin:10px 0;padding:10px 0;border-bottom:1px solid var(--line)}
+.rule:last-child{border-bottom:none}
+.rule .num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#111;font-weight:900;flex:none;font-size:13px}
+
+/* ── Tags / Pills ─────────────────────────── */
+.tag{display:inline-block;padding:4px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px;margin:3px 4px 3px 0}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 12px;margin:4px 6px 4px 0;font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* ── Notes ────────────────────────────────── */
+.notes{margin:12px 0;padding:14px;border:1px solid var(--line);background:var(--panel);border-radius:var(--radius)}
+.notes label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;margin-bottom:6px}
+.notes textarea{width:100%;border:0;background:transparent;color:var(--text);font:inherit;resize:vertical;min-height:48px;line-height:1.5}
+.notes textarea:focus{outline:none}
+.notes textarea::placeholder{color:#555e6a}
+
+/* ── Link Field ───────────────────────────── */
+.link-field{margin:8px 0}
+.link-field label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;margin-bottom:4px}
+.link-field input{width:100%;border:1px solid var(--line);background:#0e1216;color:var(--accent2);border-radius:9px;padding:8px 11px;font:inherit;font-size:14px}
+.link-field input:focus{outline:none;border-color:var(--accent)}
+
+/* ── Decision Log ─────────────────────────── */
+.log-table{width:100%;border-collapse:collapse;margin:10px 0;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.log-table th,.log-table td{padding:9px 11px;border-bottom:1px solid var(--line);text-align:left}
+.log-table th{background:var(--panel2);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.log-table input,.log-table textarea{width:100%;border:0;background:transparent;color:var(--text);font:inherit;padding:2px}
+.log-table textarea{min-height:28px;resize:vertical}
+.log-table input:focus,.log-table textarea:focus{outline:1px solid var(--accent);border-radius:3px}
+.add-row{border:1px dashed #56606c;background:transparent;color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;margin-top:6px}
+
+/* ── Parking ──────────────────────────────── */
+.parking label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;margin-bottom:6px}
+.parking textarea{width:100%;border:0;background:transparent;color:var(--text);font:inherit;resize:vertical;min-height:48px;line-height:1.5}
+.parking textarea:focus{outline:none}
+.parking textarea::placeholder{color:#555e6a}
+
+/* ── Next Meeting ─────────────────────────── */
+.next-meeting label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;margin-bottom:6px}
+.next-meeting input{width:100%;border:1px solid var(--line);background:#0e1216;color:var(--text);border-radius:9px;padding:8px 11px;font:inherit}
+.next-meeting input:focus{outline:none;border-color:var(--accent)}
+
+/* ── Footer ───────────────────────────────── */
+.footer{margin-top:50px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+
+/* ── Responsive ───────────────────────────── */
+@media(max-width:700px){
+  .wrap{padding:24px 16px 60px}
+  .meta,.grid2,.grid3,.roles-grid{grid-template-columns:1fr}
+  .toolbar{margin:-24px -16px 24px;padding:10px 16px}
+  .flow{flex-direction:column}
+  .arrow{transform:rotate(90deg);justify-content:center}
+  .docbox .note-grid{grid-template-columns:1fr}
+}
+
+/* ── Print ────────────────────────────────── */
+@media print{
+  .toolbar,.add-row{display:none!important}
+  body{background:white;color:black}
+  input,textarea{border:0!important;padding:0!important;background:white!important;color:black!important}
+  textarea{min-height:40px}
+  .card,.table-wrap table,.quote,.callout,.warn,.flow,.step,.role-card,.docbox{break-inside:avoid;background:white;color:black;border-color:#bbb}
+  p,.lead,.muted{color:#222}
+}
+</style></head>
+<body>
+
+<div class="wrap">
+
+<div class="toolbar">
+  <button class="primary" onclick="saveNow()">Speichern</button>
+  <button onclick="exportJSON()">JSON</button>
+  <label for="importFile">Import</label><input class="hidden" id="importFile" type="file" accept=".json" onchange="importJSON(event)">
+  <button onclick="exportMD()">Markdown</button>
+  <button onclick="window.print()">Drucken</button>
+  <button onclick="newMeeting()">Neues Meeting</button>
+  <span class="status" id="st">Bereit</span>
+</div>
+
+<!-- META -->
+<div class="section">
+  <div class="meta">
+    <div class="field"><label>Meeting-Datum</label><input data-save="date" type="date" value="2026-08-26"></div>
+    <div class="field"><label>Teilnehmende</label><input data-save="people" placeholder="Daniel, Babsi, Nate …"></div>
+  </div>
+  <div class="field"><label>Ziel dieses Meetings</label><textarea data-save="goal" placeholder="Was soll heute entschieden werden?">BYON schließen, Engpass klären, nächste Schritte verbindlich terminieren</textarea></div>
+</div>
+
+<div class="callout"><b>So benutzt ihr die Datei:</b> Während des Calls direkt in die Felder schreiben. Alles wird lokal im Browser zwischengespeichert. Am Ende „Markdown" oder „Drucken" für ein Protokoll. Für den nächsten Termin „Neues Meeting" — Struktur bleibt, Dokumentationsfelder werden geleert.</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- AGENDA                                      -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Agenda · 2 Stunden · harte Timeboxes</div>
+  <h1>BYON schließen. Zeit schützen. Bottleneck lösen.</h1>
+  <p>Jeder Punkt hat eine feste maximale Dauer. Zeit vorbei = Punkt stoppen. Offene Punkte wandern in einen Follow-up-Termin.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:12%">Zeit</th><th style="width:10%">Max.</th><th style="width:28%">Thema</th><th style="width:50%">Output</th></tr></thead>
+      <tbody>
+        <tr><td>00–12</td><td><b>12 Min</b></td><td><b>BYON</b></td><td>Termine prüfen, blocken, Rückmeldung festlegen.</td></tr>
+        <tr><td>12–27</td><td><b>15 Min</b></td><td><b>„Wo du bist"</b></td><td>11.09. verwerfen, aktuellen Stand festhalten, nächster realistischer Schritt.</td></tr>
+        <tr><td>27–52</td><td><b>25 Min</b></td><td><b>Retrospektive</b></td><td>Start / Stop / Continue, max. 2–3 Schwerpunkte priorisieren.</td></tr>
+        <tr><td>52–77</td><td><b>25 Min</b></td><td><b>Bottleneck & Lösung</b></td><td>Was bleibt bei Daniel? Was wird abgegeben? Was extern?</td></tr>
+        <tr><td>77–94</td><td><b>17 Min</b></td><td><b>Rollen & Arbeitsmodell</b></td><td>Owner bestätigen, Produktionstage, Calls, Probenlogik.</td></tr>
+        <tr><td>94–116</td><td><b>22 Min</b></td><td><b>Booking Ops / Nate</b></td><td>Rider, Drive, Homepage, Lichtplan, FOH, Kontaktlisten — Ownership + nächster Schritt bestätigen.</td></tr>
+        <tr><td>116–120</td><td><b>4 Min</b></td><td><b>Decision Recap</b></td><td>Entscheidung + Owner + Deadline + Kalendertermin.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn"><b>Stop-Regel:</b> Timebox vorbei = Punkt stoppen. Keine Verlängerung im Raum. Wenn nötig: separaten Termin mit Owner und klarer Fragestellung anlegen.</div>
+  <div class="box"><b>Start-Blocker:</b> Ein Release-/Content-Push kann nicht starten, solange die <b>Trial-Reels (Test-Reels)</b> nicht funktionieren. Reels sind Voraussetzung für den Start, nicht Nacharbeit — erst wenn sie laufen, geht der Push live.</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 01 · BYON                                   -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">01 · BYON — 12 Minuten</div>
+  <h1>Termine blocken und Rückmeldung vorbereiten</h1>
+  <p class="muted">BYON hat bereits Termine geschickt. Morgen geht es um schnelle Entscheidung: Welche passen, welche werden geblockt, was antworten wir?</p>
+
+  <div class="docbox">
+    <div class="docbox-head"><h3>BYON — Ergebnis festhalten</h3><span class="docbox-badge">Live-Dokumentation</span></div>
+    <div class="note-grid">
+      <div class="note-field wide"><label>Vorgeschlagene Termine von BYON</label><textarea data-save="byon_offered" placeholder="Termine eintragen / hineinkopieren …"></textarea></div>
+      <div class="note-field wide"><label>Geblockte / bestätigte Termine</label><textarea data-save="byon_blocked" placeholder="Welche Termine kommen direkt in den Kalender?"></textarea></div>
+      <div class="note-field wide"><label>Rückmeldung an BYON</label><textarea data-save="byon_reply" placeholder="Was soll in die Mail?"></textarea></div>
+      <div class="note-field"><label>Owner Mail</label><input data-save="byon_owner" placeholder="Name"></div>
+      <div class="note-field"><label>Follow-up</label><input data-save="byon_deadline" placeholder="Datum / Termin"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>In 12 Minuten klären</h3>
+      <ul class="checklist" id="cl_byon">
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Alle vorgeschlagenen Termine sichtbar auf den Tisch</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Verfügbarkeiten gemeinsam prüfen</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Passende Termine direkt in den Kalender blocken</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Rückmeldung formulieren & raus</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Definition of Done</h3>
+      <ul class="checklist">
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Termine sind entschieden und im Kalender</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Interner Stand ist abgeglichen</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Rückmeldung an BYON ist klar</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Mail kann direkt nach dem Meeting raus</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 02 · WO DU BIST                             -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">02 · „Wo du bist" — 15 Minuten</div>
+  <h1>11.09. ist nicht mehr realistisch</h1>
+
+  <div class="docbox">
+    <div class="docbox-head"><h3>„Wo du bist" — Ergebnis festhalten</h3><span class="docbox-badge">Live-Dokumentation</span></div>
+    <div class="note-grid">
+      <div class="note-field wide"><label>Aktueller Stand</label><textarea data-save="wdb_status" placeholder="Produktion / Mix / Master / Cover / Content …"></textarea></div>
+      <div class="note-field wide"><label>Größter Blocker</label><textarea data-save="wdb_blocker" placeholder="Was verhindert gerade den nächsten Schritt?"></textarea></div>
+      <div class="note-field wide"><label>Entscheidung</label><textarea data-save="wdb_decision" placeholder="Was wurde heute entschieden?"></textarea></div>
+      <div class="note-field wide"><label>Nächster konkreter Schritt</label><textarea data-save="wdb_next" placeholder="Nur der unmittelbar nächste Schritt"></textarea></div>
+      <div class="note-field"><label>Owner</label><input data-save="wdb_owner" placeholder="Name"></div>
+      <div class="note-field"><label>Neuer Release-Termin?</label><input data-save="wdb_release" placeholder="Nur wenn wirklich belastbar"></div>
+    </div>
+  </div>
+
+  <div class="warn"><b>Fenster für den 11.09. längst verpasst:</b> Bei Release am 11.09. musste der finale Mix spätestens am <b>07.08.</b> stehen — damit Mastering (2 Wochen) bis ~21.08. fertig ist und DistroKid 3 Wochen vor Release live sein kann. Schon der Mix-Deadline war vorbei, bevor das Meeting terminiert wurde.</div>
+
+  <h2>Was der verpasste Termin sichtbar macht</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Kapazitätsproblem</h3>
+      <p>Daniel hatte kaum freie Produktionszeit. Mixing, Mastering, Videos und Release-Aufgaben hängen an derselben Person.</p>
+    </div>
+    <div class="card">
+      <h3>Planungsproblem</h3>
+      <p>Ein Release-Datum wurde behandelt, als wäre die Produktion schon weiter. Künftig: kein Release-Termin ohne realistischen Mix/Master-Puffer.</p>
+    </div>
+  </div>
+
+  <h2>Neue Release-Regel (mit echten Puffern)</h2>
+  <div class="flow">
+    <div class="step"><b>1</b><span>Finaler Mix abgegeben</span></div><div class="arrow">→</div>
+    <div class="step"><b>2</b><span>Mastering <i>2 Wochen</i></span></div><div class="arrow">→</div>
+    <div class="step"><b>3</b><span>Finale Dateien an DistroKid</span></div><div class="arrow">→</div>
+    <div class="step"><b>4</b><span>DistroKid live <i>3 Wochen vor Release</i></span></div><div class="arrow">→</div>
+    <div class="step"><b>5</b><span>Release</span></div>
+  </div>
+
+  <div class="box"><b>Harte Formel:</b> Release = Mix-Deadline <b>+ 2 Wochen</b> (Mastering) <b>+ 3 Wochen</b> (DistroKid-Lead) = Mix-Deadline <b>+ 5 Wochen</b>. Ein Release-Termin ohne fixen Mix-Deadline ist wertlos.<br><br><b>Production Freeze nach abgegebenem Mix — gilt nur für Song-Revisionen:</b> Lyrics tauschen, Verse umbauen, „soll anders als die alte Version klingen". Jede davon wirft <b>4 Tage</b> zurück, Mastering & Release verschieben sich 1:1 (1 Song-Revision = Release 10.10. statt 06.10.).<br><br><b>Erlaubtes Mix-Feedback zählt nicht:</b> „Gesang lauter", „hier mehr Reverb", Pegel/Lautstärke — das ist normaler Teil des Mixings, kostet keine 4 Tage und bricht den Freeze nicht.</div>
+
+  <h2>Rechenbeispiel — Fix: Mix fertig Mo 01.09.</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:34%">Meilenstein</th><th style="width:22%">Datum</th><th style="width:44%">Abhängigkeit</th></tr></thead>
+      <tbody>
+        <tr><td>Finaler Mix abgegeben</td><td><b>Mo 01.09.</b></td><td>Anchor — entscheidet alles danach</td></tr>
+        <tr><td>Mastering zurück</td><td><b>Mo 15.09.</b></td><td>+ 2 Wochen nach finalem Mix</td></tr>
+        <tr><td>DistroKid live</td><td>ab ~17.09.</td><td>sofort nach Erhalt hochladen</td></tr>
+        <tr><td><b>Frühester Release</b></td><td><b>Mo 06.10.</b></td><td>+ 3 Wochen nach DistroKid-Live</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box"><b>Entscheidung:</b> 11.09. streichen. Stattdessen zuerst den realistischen <b>Mix-Deadline</b> festlegen — der Kalendertermin für den Release ergibt sich automatisch daraus (+5 Wochen). Wird der Mix später, verschiebt sich alles.</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 03 · RETROSPEKTIVE                          -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">03 · Retrospektive — 25 Minuten</div>
+  <h1>Was funktioniert, was nicht, was ändern?</h1>
+
+  <div class="docbox">
+    <div class="docbox-head"><h3>Retrospektive — Ergebnis festhalten</h3><span class="docbox-badge">Live-Dokumentation</span></div>
+    <div class="note-grid">
+      <div class="note-field wide"><label>Retro-Board (retrosensei.io · ohne Anmeldung)</label><a href="https://retrosensei.io/board/3493f5d5-4002-4cf0-b240-0a4e0ace89a0" target="_blank" rel="noopener" style="color:var(--accent2);text-decoration:none;font-size:14px;word-break:break-all">https://retrosensei.io/board/3493f5d5-4002-4cf0-b240-0a4e0ace89a0 ↗</a></div>
+      <div class="note-field wide"><label>Top-Themen (nach Dot Voting)</label><textarea data-save="retro_top" placeholder="Die 2–3 wichtigsten Probleme …"></textarea></div>
+      <div class="note-field wide"><label>Entscheidungen / Maßnahmen</label><textarea data-save="retro_actions" placeholder="Was wurde beschlossen?"></textarea></div>
+    </div>
+  </div>
+
+  <div class="link-field"><label>Retro-Board-Link (ohne Anmeldung)</label><a href="https://retrosensei.io/board/3493f5d5-4002-4cf0-b240-0a4e0ace89a0" target="_blank" rel="noopener" style="color:var(--accent2);text-decoration:none;font-size:14px;word-break:break-all">https://retrosensei.io/board/3493f5d5-4002-4cf0-b240-0a4e0ace89a0 ↗</a></div>
+
+  <div class="grid3">
+    <div class="card">
+      <h3>Continue · beibehalten</h3>
+      <ul class="checklist" id="cl_retro_cont">
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Hoher Qualitätsanspruch an Musik & Live-Technicalities</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Proben funktionieren gut bei konkretem Zweck</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">GEMA / Release-Administration funktioniert in Teilen</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Kurze direkte Feedbackfenster</span></li>
+      </ul>
+      <div class="notes"><label>Eigene Punkte</label><textarea data-save="retro_cont" placeholder="Weitere Continue-Punkte …"></textarea></div>
+    </div>
+    <div class="card">
+      <h3>Stop · nicht mehr so machen</h3>
+      <ul class="checklist" id="cl_retro_stop">
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Daniel als automatisches Quality Gate für alles</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Unbegrenzte Mix-/Master-Revisionsschleifen</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Späte Änderungen nach Freeze</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Proben ohne anstehenden Gig</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Mehrere Personen schreiben parallel denselben Kontakt</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Schwammige Startzeiten & spontane Verlängerungen</span></li>
+      </ul>
+      <div class="notes"><label>Eigene Punkte</label><textarea data-save="retro_stop" placeholder="Weitere Stop-Punkte …"></textarea></div>
+    </div>
+    <div class="card">
+      <h3>Start · neu einführen</h3>
+      <ul class="checklist" id="cl_retro_start">
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Geschützte Produktionstage mit klarem Output</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Festivalbewerbungen 2027 ab jetzt</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Feste Owner für Booking, Release, Technik</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Mix/Master mit Budget auslagern</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Kurze regelmäßige Calls für Blocker</span></li>
+        <li><div class="check" onclick="toggle(this)"></div><span class="text">Verbindliche Kalendertermine mit Start- und Endzeit</span></li>
+      </ul>
+      <div class="notes"><label>Eigene Punkte</label><textarea data-save="retro_start" placeholder="Weitere Start-Punkte …"></textarea></div>
+    </div>
+  </div>
+
+  <h2>Ablauf im Miro</h2>
+  <div class="flow">
+    <div class="step"><b>0–5 Min</b><span>Jede Person schreibt still</span></div><div class="arrow">→</div>
+    <div class="step"><b>5–12 Min</b><span>Clustern & kurz erklären</span></div><div class="arrow">→</div>
+    <div class="step"><b>12–17 Min</b><span>Dot Voting: top 2–3</span></div><div class="arrow">→</div>
+    <div class="step"><b>17–25 Min</b><span>Lösung / Owner / nächster Schritt</span></div>
+  </div>
+  <div class="warn"><b>Miro-Regel:</b> Keine 10-minütigen Rechtfertigungen pro Sticky. Erst sammeln, dann clustern, dann priorisieren.</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 04 · BOTTLENECK & LÖSUNG                    -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">04 · Bottleneck & Lösung — 25 Minuten</div>
+  <h1>Was bleibt bei Daniel, was geht?</h1>
+
+  <div class="warn">⚠ <b>Das Problem:</b> Daniel ist der zentrale Knoten — Produktion, Content, Technik, Quality Gate. Ohne Transfer blockiert er alles, was nicht in seiner Hand ist.</div>
+
+  <div class="docbox">
+    <div class="docbox-head"><h3>Bottleneck — Entscheidung</h3><span class="docbox-badge">Live-Dokumentation</span></div>
+    <div class="note-grid">
+      <div class="note-field wide"><label>Bleibt bei Daniel</label><textarea data-save="bn_daniel" placeholder="Nur Aufgaben, die seine Expertise wirklich brauchen …"></textarea></div>
+      <div class="note-field wide"><label>Wird abgegeben / eingelernt</label><textarea data-save="bn_delegate" placeholder="Wer übernimmt was?"></textarea></div>
+      <div class="note-field wide"><label>Optionale externe Vergabe</label><textarea data-save="bn_external" placeholder="Mix/Master, Content etc."></textarea></div>
+      <div class="note-field wide"><label>Entscheidung Geld-Einsatz</label><textarea data-save="bn_mixdecision" placeholder="Option A Mastering/Mixing / Option B Content / Option C nichts ausgeben …"></textarea></div>
+      <div class="note-field"><label>Budget / Rahmen</label><input data-save="bn_budget" placeholder="falls entschieden"></div>
+      <div class="note-field"><label>Owner Umsetzung</label><input data-save="bn_owner" placeholder="Name"></div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th style="width:33%;background:#2a1a10;color:#e8a060">🔴 Blockiert — bei Daniel</th>
+        <th style="width:33%;background:#1a2a10;color:#a0d870">🟢 Transfer — muss abgegeben werden</th>
+        <th style="width:33%;background:#1a1a2a;color:#80a0e8">🔵 Optional — extern oder Babsi/Nate</th>
+      </tr></thead>
+      <tbody><tr>
+        <td>Produktion, Arrangement, Sounddesign, Rough Mix, Live-Set, finales kreatives Quality Gate</td>
+        <td>Metricool, Social Posting, Figma, Distribution, Dateiablage, Release-Checklisten</td>
+        <td>Final Mixing & Mastering, Cover/Design, spezialisierte Content-Produktion</td>
+      </tr></tbody>
+    </table>
+  </div>
+
+  <h2>Drei ehrliche Optionen — wo das Geld (oder die Zeit) hin geht</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Option A · Geld für Mastering / Mixing</h3>
+      <p>Mixing/Mastering extern vergeben. Daniel früher aus dem technischen Endprozess.</p>
+      <p class="muted"><b>Trade-off:</b> Kostet Budget, braucht klare Revisionsgrenzen.</p>
+    </div>
+    <div class="card">
+      <h3>Option B · Geld für Content-Produktion</h3>
+      <p>Social, Distribution, Cover & Reels auslagern. Daniel aus der Content-Pipeline nehmen.</p>
+      <p class="muted"><b>Trade-off:</b> Kostet Budget — Inhalt muss gut geschnitten und getestet funktionieren (Qualitätspunkt), relativ teuer.</p>
+    </div>
+    <div class="card">
+      <h3>Option C · Nichts ausgeben</h3>
+      <p>Alles intern. Releases brauchen deutlich länger.</p>
+      <p class="muted"><b>Beschleuniger:</b> Hoher Aufwand für Mixing/Mastering selbst — oder alte/bestehende Sachen wiederverwenden — hilft, es schneller zu machen.</p>
+    </div>
+  </div>
+  <div class="warn"><b>Wichtig:</b> Nur eine Option konsequent — oder ein bewusster Mix. Wer nichts ausgibt (C), akzeptiert den längeren Zeithorizont und den Daniel-Flaschenhals.</div>
+
+  <div class="callout"><b>Kapazitäts-Prinzip:</b> Ein zweistündiger Termin ist nicht nur zwei Stunden Arbeit. Anfahrt, Vorbereitung, Nachbereitung und Kontextwechsel zählen mit.</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 05 · ROLLEN & OWNERSHIP                     -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">05 · Rollen & Ownership — 17 Minuten</div>
+  <h1>Eine Aufgabe. Ein Owner. Eine Stimme nach außen.</h1>
+
+  <div class="docbox">
+    <div class="docbox-head"><h3>Rollen — Beschluss</h3><span class="docbox-badge">Live-Dokumentation</span></div>
+    <div class="note-grid">
+      <div class="note-field wide"><label>Anpassungen / Offene Fragen</label><textarea data-save="roles_notes" placeholder="Rollen neu verteilt? Jemand übernimmt was? …"></textarea></div>
+    </div>
+  </div>
+
+  <div class="roles-grid">
+    <div class="role-card" style="border-color:var(--accent)">
+      <h3>Daniel</h3>
+      <p class="role-sub">Creative & Technical Lead</p>
+      <p class="note" style="margin-bottom:10px"><b>Kernbereich:</b></p>
+      <ul>
+        <li>Produktion, Arrangement, Sounddesign</li>
+        <li>Rough Mix & finales kreatives Quality Gate</li>
+        <li>Live-Set & technische Konzeption</li>
+        <li>Technische Rider-Inhalte (Licht, Technik, FOH)</li>
+        <li>Content von A bis Z, inkl. Videos außerhalb von Handy-Videos</li>
+        <li>Finale Entscheidung Mixing & Mastering</li>
+      </ul>
+      <div style="margin-top:14px;padding:12px 14px;border-left:3px solid var(--accent);background:var(--panel2);border-radius:0 10px 10px 0">
+        <p style="margin:0 0 6px;font-size:14px;color:var(--accent)"><b>Die entscheidende Frage:</b></p>
+        <p style="margin:0 0 6px;font-size:14px"><b>Option A — Geld für Mastering/Mixing:</b> Mixing / Mastering extern vergeben.</p>
+        <p style="margin:0 0 6px;font-size:14px"><b>Option B — Geld für Content-Produktion:</b> Social, Distribution, Cover & Reels auslagern.</p>
+        <p style="margin:0 0 6px;font-size:14px"><b>Option C — Nichts ausgeben:</b> Alles intern, ggf. über eigenen Mixing/Mastering-Aufwand oder altes Material beschleunigt.</p>
+        <p style="margin:0;font-size:13px;opacity:.7">Nur eine Option konsequent — oder ein bewusster Mix. Nicht beides gleichzeitig.</p>
+      </div>
+    </div>
+    <div class="role-card">
+      <h3>Babsi</h3>
+      <p class="role-sub">Vocals & Release Operations</p>
+      <p class="note" style="margin-bottom:10px"><b>Kernbereich:</b></p>
+      <ul>
+        <li>Vocals & Lyrics</li>
+        <li>Release-Timeline & Distribution / Upload</li>
+        <li>GEMA / Admin</li>
+        <li>Cover-Organisation & Figma-Templates</li>
+        <li>Metricool / Social Posting</li>
+        <li>Rechnungen & Buchhaltung</li>
+        <li>Asset-Check pro Release</li>
+      </ul>
+      <p class="note" style="margin-top:10px"><b>Technische Umsetzung:</b></p>
+      <ul style="opacity:0.7">
+        <li>Homepage: Technische Änderungen umsetzen (Inhalte von Nate)</li>
+        <li>Figma-Templates: Design-Vorlagen pflegen & bereitstellen</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <h3>Nate</h3>
+      <p class="role-sub">Booking & Live Operations</p>
+      <p class="note" style="margin-bottom:10px"><b>Kernbereich:</b></p>
+      <ul>
+        <li>Booking-Mails & Festivalbewerbungen</li>
+        <li>Follow-ups & Terminabsprachen</li>
+        <li>Rider: Pflege & Organisation (Entwurf → Review → finalisieren)</li>
+        <li>Zentraler Drive / Ablage</li>
+        <li>Lichtplan & FOH-Plan pro Track</li>
+        <li>Kontaktlisten für Licht, Ton & Video</li>
+        <li>Konditionen & Verfügbarkeiten</li>
+        <li>Dokumentation der Kommunikation</li>
+      </ul>
+      <p class="note" style="margin-top:10px"><b>Inhalte bereitstellen für:</b></p>
+      <ul style="opacity:0.7">
+        <li>Homepage: Aktualisierungsbedarf erfassen, Inhalte liefern → Babsi setzt um</li>
+        <li>Rider: Technische Inhalte sammeln → Daniel liefert Tech-Input</li>
+      </ul>
+      <p class="note" style="margin-top:10px;border-top:1px dashed var(--line);padding-top:10px">Nate ist Owner für ALLE externen Kommunikation</p>
+    </div>
+  </div>
+
+  <div class="quote">Externe Kommunikation läuft über den jeweiligen Owner. Technische Fragen werden intern an Daniel eskaliert — Daniel übernimmt aber nicht automatisch den kompletten Kommunikationsprozess.</div>
+
+  <h2>Arbeitsmodell</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Produktion</h3>
+      <p><b>Produktionstage statt Produktionswochen.</b> Geschützte Zeit mit klarem Output, ohne parallele operative Aufgaben.</p>
+    </div>
+    <div class="card">
+      <h3>Proben</h3>
+      <p><b>Keine regelmäßigen Proben ohne konkreten Gig.</b> Live-Set erst konkretisieren wenn Booking steht.</p>
+    </div>
+    <div class="card">
+      <h3>Booking</h3>
+      <p><b>Festival-Saison 2027 beginnt jetzt.</b> Bewerbungen, Follow-ups, Rider — Nate als Owner.</p>
+    </div>
+    <div class="card">
+      <h3>Calls</h3>
+      <p>Kurze feste Calls für Status, Blocker, Entscheidungen. Wenn nichts ansteht: kurz halten.</p>
+    </div>
+  </div>
+
+  <h2>Termin- und Kalenderregel</h2>
+  <ul class="checklist">
+    <li><div class="check" onclick="toggle(this)"></div><span class="text">Jeder gemeinsame Termin kommt mit Start- und Endzeit in den Kalender</span></li>
+    <li><div class="check" onclick="toggle(this)"></div><span class="text">Wenn ein Termin nicht im Kalender steht, wird nicht mit ihm geplant</span></li>
+    <li><div class="check" onclick="toggle(this)"></div><span class="text">Treffzeit heißt tatsächlicher Start, nicht ungefähre Ankunft</span></li>
+    <li><div class="check" onclick="toggle(this)"></div><span class="text">Verschiebungen aktiv kommunizieren, nicht stillschweigend annehmen</span></li>
+    <li><div class="check" onclick="toggle(this)"></div><span class="text">Endzeit bleibt bestehen, außer alle stimmen aktiver Verlängerung zu</span></li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 06 · BOOKING OPERATIONS / NATE              -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">06 · Booking Operations / Nate — 22 Minuten</div>
+  <h1>Ownership + nächster Schritt bestätigen</h1>
+
+  <h2>Kommunikationsflow</h2>
+  <div class="flow">
+    <div class="step"><b>Extern</b><span>Venue / Booker</span></div><div class="arrow">→</div>
+    <div class="step"><b>Owner</b><span>Nate</span></div><div class="arrow">→</div>
+    <div class="step"><b>Bei Bedarf</b><span>Daniel liefert Tech-Input</span></div><div class="arrow">→</div>
+    <div class="step"><b>Extern</b><span>Nate antwortet</span></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:30%">Thema</th><th style="width:70%">Owner & Arbeitsweise</th></tr></thead>
+      <tbody>
+        <tr><td>Rider</td><td><b>Nate:</b> Entwurf erstellen → Squad-Review → finalisieren & zentral ablegen.</td></tr>
+        <tr><td>Drive</td><td><b>Nate:</b> Zentrale Ablage aufsetzen, Migration strukturieren, Ordnerlogik vorlegen.</td></tr>
+        <tr><td>Homepage</td><td><b>Babsi:</b> Aktualisierungsbedarf erfassen, technische Änderungen umsetzen, Content pflegen.</td></tr>
+        <tr><td>Lichtplan</td><td><b>Nate:</b> Ersten vollständigen Plan erstellen → Daniel liefert Tech-Input → Review.</td></tr>
+        <tr><td>FOH-Plan pro Track</td><td><b>Nate:</b> Struktur vorbereiten → technische Inhalte bei Daniel einholen → finalisieren.</td></tr>
+        <tr><td>Kontaktlisten</td><td><b>Nate:</b> Listen für Licht, Ton & Video selbst anlegen, pflegen, Updates geben.</td></tr>
+        <tr><td>Rack / Merch</td><td><b>Aktuell keine Priorität.</b> Erst wieder aufmachen wenn Releases & Booking stabil laufen.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warn"><b>Ownership-Regel:</b> „Ich kümmere mich" bedeutet: selbstständig Entwurf erstellen, offene Punkte identifizieren, gezielt Input einholen, finalisieren, Update geben. Nicht: auf einen gemeinsamen Vier-Stunden-Call warten.</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- DECISION LOG                                -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Decision Log</div>
+  <h1>Das eigentliche Meeting-Protokoll</h1>
+  <p class="muted">Am Ende sollten hier nur die Entscheidungen stehen, die nach dem Call noch relevant sind.</p>
+  <table class="log-table" id="decisionTable">
+    <thead><tr><th>Entscheidung / Task</th><th>Owner</th><th>Deadline</th><th>Status / Follow-up</th></tr></thead>
+    <tbody id="logRows">
+      <tr>
+        <td><textarea data-save="d0_what" placeholder="Was wurde entschieden?"></textarea></td>
+        <td><input data-save="d0_who" placeholder="Name"></td>
+        <td><input data-save="d0_when" placeholder="Datum"></td>
+        <td><textarea data-save="d0_status" placeholder="Nächster Schritt"></textarea></td>
+      </tr>
+      <tr>
+        <td><textarea data-save="d1_what"></textarea></td>
+        <td><input data-save="d1_who"></td>
+        <td><input data-save="d1_when"></td>
+        <td><textarea data-save="d1_status"></textarea></td>
+      </tr>
+      <tr>
+        <td><textarea data-save="d2_what"></textarea></td>
+        <td><input data-save="d2_who"></td>
+        <td><input data-save="d2_when"></td>
+        <td><textarea data-save="d2_status"></textarea></td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="add-row" onclick="addRow()">+ Entscheidung hinzufügen</button>
+
+  <div class="callout"><b>Meeting-Regel:</b> Kein Punkt endet mit „müssen wir mal". Jeder relevante Punkt endet mit <b>Entscheidung · Owner · Deadline · nächstem konkreten Schritt.</b></div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- PARKING LOT                                 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Parking Lot</div>
+  <h1>Bewusst nicht heute lösen</h1>
+  <div class="parking">
+    <label>Themen für später</label>
+    <textarea data-save="parking" placeholder="Alles, was heute die Timebox sprengen würde — Rack, Merch, Detailarbeit, operative Themen …"></textarea>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- NÄCHSTER TERMIN                             -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section">
+  <div class="next-meeting">
+    <label>Nächster Termin</label>
+    <input data-save="next_meeting" placeholder="Datum / Uhrzeit / Teilnehmende">
+  </div>
+</div>
+
+<div class="footer">SCTTRD Meeting Template · 26.08.2026 · Offline nutzbar, localStorage-basiert.</div>
+
+</div><!-- .wrap -->
+
+<script>
+(function(){
+  const P="scttrd_mt4_";
+  const fields=()=>Array.from(document.querySelectorAll("[data-save]"));
+  const setStatus=t=>{const s=document.getElementById("st");if(s)s.textContent=t};
+
+  window.saveNow=function(){
+    try{
+      fields().forEach(e=>localStorage.setItem(P+e.dataset.save,e.value||""));
+      localStorage.setItem(P+"saved_at",new Date().toISOString());
+      setStatus("Gespeichert "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}));
+    }catch(e){ setStatus("⚠ Speichern fehlgeschlagen (Browser blockiert lokalen Speicher)"); console.error(e); }
+  };
+
+  function restore(){
+    try{
+      fields().forEach(e=>{const v=localStorage.getItem(P+e.dataset.save);if(v!==null)e.value=v});
+      const t=localStorage.getItem(P+"saved_at");
+      if(t)setStatus("Letzter Stand: "+new Date(t).toLocaleString());
+    }catch(e){ setStatus("Bereit")}
+  }
+
+  function restoreChecks(){
+    document.querySelectorAll(".check").forEach(c=>{
+      const li=c.closest("li");if(!li)return;
+      const sec=li.closest(".section");
+      const title=sec?sec.querySelector(".section-title")?.textContent?.trim():"";
+      const idx=Array.from(li.parentElement.children).indexOf(li);
+      const key="check_"+title.replace(/[^a-zA-Z0-9]/g,"_")+"_"+idx;
+      if(localStorage.getItem(P+key)==="1"){
+        c.classList.add("on");
+        const t=c.nextElementSibling;if(t)t.classList.add("done");
+      }
+    });
+  }
+
+  window.toggle=function(el){
+    el.classList.toggle("on");
+    const t=el.nextElementSibling;if(t)t.classList.toggle("done");
+    const li=el.closest("li");if(!li)return;
+    const sec=li.closest(".section");
+    const title=sec?sec.querySelector(".section-title")?.textContent?.trim():"";
+    const idx=Array.from(li.parentElement.children).indexOf(li);
+    const key="check_"+title.replace(/[^a-zA-Z0-9]/g,"_")+"_"+idx;
+    try{localStorage.setItem(P+key,el.classList.contains("on")?"1":"0")}catch(e){};
+  };
+
+  let timer;
+  document.addEventListener("input",e=>{
+    if(e.target.matches("[data-save]")){
+      clearTimeout(timer);
+      timer=setTimeout(saveNow,600);
+    }
+  });
+
+  function collect(){
+    const d={template:"SCTTRD_Meeting",version:4,exported_at:new Date().toISOString(),fields:{}};
+    fields().forEach(e=>d.fields[e.dataset.save]=e.value||"");
+    return d;
+  }
+
+  function dl(name,content,type){
+    const b=new Blob([content],{type});const a=document.createElement("a");
+    a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},400);
+  }
+
+  const val=k=>{const e=document.querySelector('[data-save="'+CSS.escape(k)+'"]');return e?(e.value||"").trim():""};
+
+  window.exportJSON=function(){
+    saveNow();dl("SCTTRD_Meeting_"+val("date")+".json",JSON.stringify(collect(),null,2),"application/json");
+  };
+
+  window.importJSON=function(ev){
+    const f=ev.target.files&&ev.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=function(){
+      try{const d=JSON.parse(r.result);
+        Object.entries(d.fields||{}).forEach(([k,v])=>{const e=document.querySelector('[data-save="'+CSS.escape(k)+'"]');if(e)e.value=v==null?"":v});
+        saveNow();setStatus("Geladen");
+      }catch(e){alert("JSON konnte nicht gelesen werden.")}ev.target.value="";
+    };r.readAsText(f);
+  };
+
+  window.exportMD=function(){
+    saveNow();const d=val("date");
+    let md="# SCTTRD Meeting – "+d+"\n\n";
+    if(val("people"))md+="**Teilnehmende:** "+val("people")+"\n\n";
+    if(val("goal"))md+="**Agenda:** "+val("goal")+"\n\n";
+
+    md+="## 01 · BYON\n\n";
+    ["byon_offered","byon_blocked","byon_reply"].forEach(k=>{const v=val(k);if(v)md+=v+"\n\n";});
+    if(val("byon_owner"))md+="**Owner:** "+val("byon_owner")+"\n";
+    if(val("byon_deadline"))md+="**Follow-up:** "+val("byon_deadline")+"\n\n";
+
+    md+="## 02 · „Wo du bist"\n\n";
+    ["wdb_status","wdb_blocker","wdb_decision","wdb_next"].forEach(k=>{const v=val(k);if(v)md+=v+"\n\n";});
+    if(val("wdb_release"))md+="**Release:** "+val("wdb_release")+"\n\n";
+
+    md+="## 03 · Retrospektive\n\n";
+    md+="**Retro-Board:** https://retrosensei.io/board/3493f5d5-4002-4cf0-b240-0a4e0ace89a0\n\n";
+    ["retro_cont","retro_stop","retro_start","retro_top","retro_actions"].forEach(k=>{const v=val(k);if(v)md+=v+"\n\n";});
+
+    md+="## 04 · Bottleneck\n\n";
+    ["bn_daniel","bn_delegate","bn_external","bn_mixdecision"].forEach(k=>{const v=val(k);if(v)md+=v+"\n\n";});
+    if(val("bn_budget"))md+="**Budget:** "+val("bn_budget")+"\n";
+    if(val("bn_owner"))md+="**Owner:** "+val("bn_owner")+"\n\n";
+
+    md+="## 05 · Rollen\n\n";
+    const rolesN=val("roles_notes");if(rolesN)md+=rolesN+"\n\n";
+
+    md+="## 06 · Booking Ops\n\n";
+
+    md+="## Decision Log\n\n| Was | Owner | Bis | Status |\n|---|---|---|---|\n";
+    document.querySelectorAll("#logRows tr").forEach(tr=>{
+      const a=Array.from(tr.querySelectorAll("input,textarea")).map(x=>(x.value||"").replace(/\n/g," ").replace(/\|/g,"/"));
+      if(a.some(Boolean))md+="| "+a.join(" | ")+" |\n";
+    });
+
+    const pk=val("parking");if(pk)md+="\n## Parking Lot\n\n"+pk+"\n";
+    const nm=val("next_meeting");if(nm)md+="\n## Nächster Termin\n\n"+nm+"\n";
+    dl("SCTTRD_Meeting_"+d+".md",md,"text/markdown;charset=utf-8");
+  };
+
+  window.newMeeting=function(){
+    if(!confirm("Alle Felder leeren? Vorher exportieren!"))return;
+    try{Object.keys(localStorage).filter(k=>k.startsWith(P)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    fields().forEach(e=>e.value="");
+    document.querySelectorAll(".check").forEach(c=>{c.classList.remove("on");const t=c.nextElementSibling;if(t)t.classList.remove("done")});
+    const d=document.querySelector('[data-save="date"]');if(d)d.value=new Date().toISOString().slice(0,10);
+    setStatus("Neues Meeting");
+  };
+
+  window.addRow=function(){
+    const b=document.getElementById("logRows");const i=b.querySelectorAll("tr").length;
+    const tr=document.createElement("tr");
+    tr.innerHTML='<td><textarea data-save="d'+i+'_what" placeholder="Entscheidung"></textarea></td><td><input data-save="d'+i+'_who" placeholder="Name"></td><td><input data-save="d'+i+'_when" placeholder="Datum"></td><td><textarea data-save="d'+i+'_status" placeholder="Nächster Schritt"></textarea></td>';
+    b.appendChild(tr);
+  };
+
+  restore();restoreChecks();
+})();
+</script>
+</body></html>
