@@ -11,6 +11,7 @@ import { Shows } from './collections/Shows'
 import { Pages } from './collections/Pages'
 import { Links } from './collections/Links'
 import { LinkHub } from './globals/LinkHub'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -33,9 +34,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    // Schema beim Start pushen (Dev + frischer Prod-Server ohne Migrationen).
-    // Setze PAYLOAD_PUSH=false, wenn Migrations gewünscht sind.
-    push: process.env.PAYLOAD_PUSH !== 'false',
+     push: process.env.NODE_ENV !== 'production' && process.env.PAYLOAD_PUSH !== 'false',
+     prodMigrations: migrations,
   }),
   sharp,
 })
