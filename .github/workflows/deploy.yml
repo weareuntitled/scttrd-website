@@ -1,0 +1,57 @@
+name: Build, Smoke Test and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: test -f dist/gallery/index.html
+      - run: test -f public/videos/radio-rudina/clip.mp4
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+      - name: Configure SSH trust
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' '${{ secrets.SERVER_KNOWN_HOSTS }}' > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Upload tracked files
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          git archive --format=tar.gz HEAD | ssh "$SERVER_USER@$SERVER_HOST" "tar -xzf - -C '$DEPLOY_PATH'"
+      - name: Rebuild services
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml up -d --build"
+      - name: Live smoke test
+        run: |
+          sleep 20
+          SMOKE_BASE_URL=https://scttrd.de node scripts/smoke.mjs
