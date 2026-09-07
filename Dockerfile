@@ -9,4 +9,5 @@ RUN npm run build
 EXPOSE 4321
 ENV HOST=0.0.0.0
 ENV PORT=4321
+ENV ASTRO_NODE_LOGGING=disabled
 CMD ["node", "./dist/server/entry.mjs"]
