@@ -1,7 +1,7 @@
 # SCTTRD Wiki — Docmost auf docs.scttrd.de
 
 Selbst-gehostetes Squad-/Band-Wiki (Docmost, open source AGPL) auf einem eigenen Server/VPS.
-Eure Statische Seite bleibt auf Vercel — **docs.scttrd.de** zeigt nur auf das Wiki.
+Website, CMS und Wiki laufen gemeinsam auf dem eigenen Server.
 
 ```
 docs.scttrd.de
@@ -29,7 +29,7 @@ Beim Registrar/DNS-Anbieter von `scttrd.de` einen Eintrag anlegen:
 |---|---|---|
 | `A` | `docs` | `<VPS-IP-Adresse>` |
 
-(Da die Hauptseite auf Vercel läuft, ist das *definitive* Herzstück nur dieser eine Eintrag — alles andere auf Vercel bleibt unberührt.)
+Zusätzlich zeigen `scttrd.de` und `cms.scttrd.de` per A-Record auf denselben Server.
 
 Danach prüfen:
 ```bash

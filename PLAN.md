@@ -2,7 +2,7 @@
 
 ## Ziel
 
-Payload soll als verlässliche Quelle für Home-Inhalte dienen. Die Startseite braucht eine kompaktere Show-Liste, eine pflegbare Galerie und funktionierende Video-Assets im Server-Deployment.
+Payload soll als verlässliche Quelle für Home-Inhalte dienen. Website, CMS und Wiki laufen direkt auf dem Server. Die Startseite braucht eine kompaktere Show-Liste, eine pflegbare Galerie und funktionierende Video-Assets im Server-Deployment.
 
 ## Schritte
 
@@ -38,3 +38,8 @@ Payload soll als verlässliche Quelle für Home-Inhalte dienen. Die Startseite b
    - GitHub-Secrets verwenden: `SERVER_HOST`, `SERVER_USER`, `SERVER_SSH_KEY`, `SERVER_KNOWN_HOSTS`, `DEPLOY_PATH`; niemals das Serverpasswort im Repository speichern.
    - Nach dem Deploy erneut Smoke-Tests ausführen und bei Fehlern den Workflow fehlschlagen lassen.
    - CMS-Änderungen bleiben statisch: Nach Payload-Änderungen muss ein Web-Build ausgelöst werden; ein Payload-Webhook kann später als separater Trigger ergänzt werden.
+
+7. **Vercel vollständig entfernen**
+   - `vercel.json` und CMS-Vercel-Konfiguration löschen.
+   - Apex-Domain und Subdomains auf den Server zeigen lassen.
+   - Vercel-Projekt im Dashboard deaktivieren/löschen, sobald die Live-Prüfung grün ist.

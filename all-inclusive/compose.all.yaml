@@ -1,12 +1,13 @@
 # SCTTRD ALL-INCLUSIVE — Website + CMS + Wiki auf EINEM Docker-Host.
 #
-#   Ein Stack für CMS + Wiki auf dem Server. Die Website bleibt auf Vercel.
+#   Ein Stack für Website, CMS und Wiki auf dem Server.
+#     scttrd.de      -> Astro Website
 #     cms.scttrd.de  -> Payload CMS
 #     docs.scttrd.de -> Docmost Wiki
 #
 #   Schritte:
 #     1. cp .env.example .env   (Secrets setzen: alle "change" ersetzen)
-#     2. DNS:  cms / docs -> A-Record auf die VPS-IP
+#     2. DNS:  @ / cms / docs -> A-Record auf die VPS-IP
 #     3. docker compose -f compose.all.yaml up -d --build
 #     4. Websites:  https://scttrd.de  https://cms.scttrd.de/admin  https://docs.scttrd.de
 #
