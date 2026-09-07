@@ -1,0 +1,88 @@
+---
+import { getLinkHub, getLinks, getShows, showSlug } from '../lib/cms.ts';
+
+const hub: any = await getLinkHub();
+const links: any[] = await getLinks();
+const shows: any[] = await getShows();
+const upcoming = shows.filter((show) => show.data.status === 'upcoming');
+const profileName = hub?.profile?.handle || '@scttrd_ofc';
+const profileTitle = hub?.profile?.title || 'SCTTRD Official Music';
+const profileDescription = hub?.profile?.description || 'Brutal, aber schoen. Live zwischen Post-Punk, Techno und Trance.';
+const profileImage = hub?.profile?.image?.url || 'https://scttrd.de/images/00_scttrd_graded_-29.jpg';
+const seoTitle = hub?.seo?.title || `${profileTitle} | ${profileName}`;
+const seoDescription = hub?.seo?.description || profileDescription;
+const socialLinks = links.filter((link) => ['spotify', 'soundcloud', 'instagram', 'youtube'].includes(link.platform));
+const sameAs = socialLinks.map((link) => link.url);
+const profileSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  '@id': 'https://scttrd.de/links/#profile',
+  url: 'https://scttrd.de/links/',
+  mainEntity: { '@type': 'Person', name: profileName, description: profileDescription, image: profileImage, sameAs },
+};
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{seoTitle}</title>
+    <meta name="description" content={seoDescription} />
+    <meta property="og:title" content={seoTitle} />
+    <meta property="og:description" content={seoDescription} />
+    <meta property="og:url" content="https://scttrd.de/links/" />
+    <meta property="og:image" content={profileImage} />
+    <meta property="og:type" content="profile" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://scttrd.de/links/" />
+    <script type="application/ld+json" set:html={JSON.stringify(profileSchema)}></script>
+  </head>
+  <body>
+    <main class="hub">
+      <header>
+        <img class="avatar" src={profileImage} alt="SCTTRD" />
+        <div class="mark">{profileName}</div>
+        <p>{profileDescription}</p>
+        <div class="socials" aria-label="SCTTRD auf Social Media">
+          {socialLinks.map((link) => <a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.platform}>{link.platform}</a>)}
+        </div>
+      </header>
+      {hub?.appearance?.showUpcoming !== false && upcoming.length > 0 && <section aria-labelledby="shows-title">
+        <div class="section-heading"><h1 id="shows-title">Upcoming Shows</h1><span>{upcoming.length}</span></div>
+        {upcoming.map((show) => {
+          const date = new Date(`${show.data.date}T12:00:00`);
+          const day = date.toLocaleDateString('de-DE', { day: '2-digit' });
+          const month = date.toLocaleDateString('de-DE', { month: 'short' }).replace('.', '');
+          return <article class="show-link">
+            <time datetime={show.data.date}><strong>{day}</strong><span>{month}</span></time>
+            <a href={`/shows/${showSlug(show.data.venue, show.data.date)}/`} class="show-copy"><strong>{show.data.venue}</strong><span>{show.data.city} · {show.data.date}</span></a>
+            {show.data.link ? <a class="ticket" href={show.data.link} target="_blank" rel="noopener noreferrer">Tickets</a> : <span class="ticket muted">Info</span>}
+          </article>;
+        })}
+      </section>}
+      <nav aria-label="SCTTRD Links">
+        <div class="section-heading"><h1>Listen / Follow</h1></div>
+        {links.map((link) => <a class="main-link" href={link.url} target={link.target} rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}><span>{link.label}</span><span class="arrow">↗</span></a>)}
+      </nav>
+      <footer><a href="/">scttrd.de</a><a href="mailto:info@scttrd.de">booking</a></footer>
+    </main>
+  </body>
+</html>
+
+<style>
+  :global(*) { box-sizing: border-box; }
+  :global(body) { margin: 0; background: #f00000; color: #111; font-family: Arial, sans-serif; }
+  .hub { width: min(100% - 28px, 680px); margin: auto; padding: 24px 0 28px; min-height: 100vh; display: flex; flex-direction: column; }
+  header { text-align: center; margin: 8px 0 36px; } .avatar { width: 112px; height: 112px; object-fit: cover; border: 3px solid #111; border-radius: 50%; margin-bottom: 18px; } .mark { font-size: clamp(38px, 11vw, 72px); line-height: .8; letter-spacing: -.08em; font-weight: 900; } header p { max-width: 420px; margin: 16px auto 14px; font-size: 14px; font-weight: 700; line-height: 1.4; }
+  .socials { display: flex; justify-content: center; gap: 14px; } .socials a { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid #111; }
+  h1 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .16em; } .section-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; } .section-heading span { font-size: 12px; font-weight: 900; }
+  section, nav { display: grid; gap: 10px; margin-bottom: 28px; } a { color: inherit; text-decoration: none; }
+  .show-link, .main-link { border: 2px solid #111; background: #f4f1ea; min-height: 62px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+  time { width: 42px; flex: 0 0 42px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 24px; } time span { margin-top: 5px; font-size: 10px; text-transform: uppercase; font-weight: 900; }
+  .show-copy { min-width: 0; flex: 1; display: grid; gap: 5px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .show-copy span { opacity: .55; font-size: 12px; }
+  .ticket { border: 1px solid #111; padding: 8px 10px; font-size: 10px; font-weight: 900; text-transform: uppercase; } .ticket.muted { opacity: .45; }
+  .main-link { justify-content: space-between; font-size: 16px; font-weight: 800; } .arrow { font-size: 20px; }
+  .show-link:hover, .main-link:hover { transform: translate(-3px, -3px); background: #fff; box-shadow: 5px 5px 0 #111; }
+  footer { margin-top: auto; padding-top: 36px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); } .show-link { padding-inline: 10px; gap: 8px; } .ticket { padding-inline: 7px; } }
+</style>
