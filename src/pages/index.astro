@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Customers from '../components/Customers.astro';
 import * as Termin from '../lib/termin.js';
-import { getPage, getShows } from '../lib/cms.ts';
+import { getPage, getShows, showSlug } from '../lib/cms.ts';
 import '../styles/tokens.css';
 
 const shows = (await getShows()) as any;
@@ -16,6 +16,11 @@ const homeHeroImage1 = homeImages?.data.heroImage1 ?? '/images/about_04.jpg';
 const homeHeroImage2 = homeImages?.data.heroImage2 ?? '/images/about_01.jpg';
 const upcomingShows = Termin.upcoming(shows);
 const pastShows = Termin.past(shows);
+const socialLinks = navLinks.filter((link) => ['spotify', 'soundcloud', 'instagram'].includes(link.data.label.toLowerCase()));
+const nextShow = upcomingShows
+  .filter((s) => !Number.isNaN(Termin.toTs(s.data.date)))
+  .sort((a, b) => Termin.toTs(a.data.date) - Termin.toTs(b.data.date))[0];
+const nextShowHref = nextShow ? `/shows/${showSlug(nextShow.data.venue, nextShow.data.date)}/` : null;
 ---
 <!DOCTYPE html><!--  This site was created in Webflow. https://webflow.com  --><!--  Last Published: Sun Aug 16 2026 20:20:30 GMT+0000 (Coordinated Universal Time)  -->
 <html data-wf-page="6729da1e7ab5d6b5269f9a25" data-wf-site="6729da1e7ab5d6b5269f99bb" lang="en">
@@ -38,22 +43,31 @@ const pastShows = Termin.past(shows);
   <link href="images/webclip.png" rel="apple-touch-icon">
 </head>
 <body class="body-container">
-  <div data-animation="default" class="nav w-nav" data-easing2="ease-in-out-quad" data-easing="ease-in-out-quad" data-collapse="medium" role="banner" data-no-scroll="1" data-duration="700" data-doc-height="1">
-    <div class="nav-flex">
-      <a href="index.html" aria-current="page" class="brand-mobile-link-container w-inline-block w--current"><div class="brand-mobile"><img width="45" sizes="45px" alt="" src="images/Frame-179-2.png" loading="lazy" srcset="images/Frame-179-2-p-500.png 500w, images/Frame-179-2.png 1003w"></div></a>
-      <nav role="navigation" class="nav-menu w-nav-menu">
-        <div class="nav-menu-llinks">
-          <div class="nav-link-el-outer-wrapper logo"><a href="index.html" aria-current="page" class="nav-link-el-container w-inline-block w--current"><img width="66" sizes="(max-width: 991px) 100vw, 66px" alt="" src="images/Frame-179-2.png" loading="lazy" srcset="images/Frame-179-2-p-500.png 500w, images/Frame-179-2.png 1003w"></a></div>
-          <div class="nav-link-el-outer-wrapper musiclinks">
-            {navLinks.map((l) => (<a href={l.data.url} class="nav-link-el-container w-inline-block"><div class="link-list-el">{l.data.label}</div></a>))}
-          </div>
-          <div class="nav-link-el-outer-wrapper info"><div class="link-list-el">{homeText?.data.email ?? 'info@scttrd.de'}</div></div>
-          <div class="nav-link-el-outer-wrapper"><a href="other-pages/about.html" class="nav-link-el-container w-inline-block"><div class="link-list-el">about</div></a><a href="/gallery/" class="nav-link-el-container w-inline-block"><div class="link-list-el">gallery</div></a><a href="https://www.linktree.com/scttrd_ofc" class="nav-link-el-container w-inline-block"><div class="link-list-el">music</div></a><a href="other-pages/contacts.html" class="nav-link-el-container w-inline-block"><div class="link-list-el">contact</div></a></div>
-        </div>
-      </nav>
-      <div class="nav-mobile-button w-nav-button"><div class="w-icon-nav-menu"></div></div>
-    </div>
-  </div>
+  <header class="home-site-header">
+    <a class="home-brand" href="/" aria-label="SCTTRD Startseite"><img width="66" height="66" alt="SCTTRD" src="images/Frame-179-2.png" loading="eager"></a>
+    <nav class="home-social-nav" aria-label="SCTTRD Navigation">
+      <a href="#shows">Alle Shows</a>
+      {socialLinks.map((link) => <a href={link.data.url} target="_blank" rel="noopener noreferrer">{link.data.platform}</a>)}
+    </nav>
+    {nextShowHref && <a class="home-next-show" href={nextShowHref} target={/^https?:/i.test(nextShowHref) ? '_blank' : undefined} rel={/^https?:/i.test(nextShowHref) ? 'noopener noreferrer' : undefined}>Next Show ↗</a>}
+  </header>
+  <style is:global>
+    .home-site-header { position: relative; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 80px; padding: 0 max(18px, calc((100vw - 1180px) / 2)); border-bottom: 2px solid #0c0c0c; background: #f00000; }
+    .home-brand { display: block; width: 66px; height: 66px; }
+    .home-brand img { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .home-social-nav { display: flex; gap: clamp(18px, 3vw, 36px); }
+    .home-social-nav a { color: #0c0c0c; font-size: 11px; font-weight: 900; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; }
+    .home-social-nav a:hover, .home-social-nav a:focus-visible { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+    .home-next-show { justify-self: end; padding: 12px 15px; border: 2px solid #0c0c0c; background: #0c0c0c; color: #f00000; box-shadow: 4px 4px 0 rgba(12, 12, 12, .25); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+    .home-next-show:hover, .home-next-show:focus-visible { background: transparent; color: #0c0c0c; box-shadow: 2px 2px 0 #0c0c0c; transform: translate(2px, 2px); }
+    @media (max-width: 767px) {
+      .home-site-header { display: flex; flex-wrap: wrap; gap: 14px; min-height: 64px; padding-block: 12px; }
+      .home-brand { width: 45px; height: 45px; }
+      .home-next-show { margin-left: auto; padding: 10px 12px; }
+      .home-social-nav { order: 3; width: 100%; justify-content: space-between; padding-top: 12px; border-top: 1px solid rgba(12, 12, 12, .35); }
+      .home-social-nav a { font-size: 10px; }
+    }
+  </style>
   <div class="custom-cursor-container"><div class="custom-cursor"><div class="custom-cursor-text">see project</div></div></div>
   <div class="body-content-wrapper">
     <section class="section-home-hero">
