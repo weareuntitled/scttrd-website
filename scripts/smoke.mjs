@@ -31,7 +31,7 @@ console.log(`index-html-redirect: ${indexHtml.status}`)
 
 const showChecks = [
   ['singoldsand-show', '/shows/singoldsand-21-08-2026/', ['Singoldsand', 'Google Maps']],
-  ['komfortrauschen-show', '/shows/kulturhaus-milbertshofen-06-12-2025/', ['Eventbrite', 'Ort in Google Maps öffnen']],
+  ['komfortrauschen-show', '/shows/kulturhaus-milbertshofen-06-12-2025/', ['eventbrite.de', 'Ort in Google Maps öffnen']],
 ]
 for (const [name, path, markers] of showChecks) {
   const page = await fetch(`${baseUrl}${path}`, { signal: AbortSignal.timeout(15000) })
