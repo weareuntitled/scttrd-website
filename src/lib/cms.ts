@@ -5,6 +5,12 @@ const cmsBase = () => {
   return url.replace(/\/$/, '')
 }
 
+export const showSlug = (venue: string, date: string) => `${venue}-${date}`
+  .toLowerCase()
+  .normalize('NFKD')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '')
+
 export async function getPage(slug: string) {
   const base = cmsBase()
   try {

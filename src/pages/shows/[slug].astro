@@ -1,0 +1,45 @@
+---
+import { getShows, showSlug } from '../../lib/cms.ts';
+
+const shows: any[] = await getShows();
+const show = shows.find((item) => showSlug(item.data.venue, item.data.date) === Astro.params.slug);
+if (!show) return Astro.redirect('/');
+const { venue, city, date, status, image, imageAlt, link } = show.data;
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{venue} | SCTTRD</title>
+  </head>
+  <body>
+    <main class="show-page">
+      <a class="back" href="/">SCTTRD</a>
+      <div class="show-layout">
+        {image && <img src={image} alt={imageAlt || venue} />}
+        <section>
+          <p class="eyebrow">{status === 'upcoming' ? 'upcoming show' : 'past show'}</p>
+          <h1>{venue}</h1>
+          <p class="meta">{city} · {date}</p>
+          {status === 'upcoming' && link ? <a class="ticket" href={link} target="_blank" rel="noopener noreferrer">Tickets sichern ↗</a> : <p class="muted">Ticketlink folgt.</p>}
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  :global(*) { box-sizing: border-box; }
+  :global(body) { margin: 0; background: #f4f1ea; color: #111; font-family: Arial, sans-serif; }
+  .show-page { max-width: 1180px; margin: auto; padding: 28px clamp(18px, 5vw, 70px) 80px; }
+  .back { color: inherit; font-weight: 800; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }
+  .show-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr); gap: clamp(28px, 7vw, 100px); align-items: end; min-height: 78vh; }
+  img { width: 100%; max-height: 70vh; object-fit: cover; border-radius: 8px; }
+  .eyebrow { color: #f00000; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  h1 { margin: 0 0 14px; font-size: clamp(48px, 8vw, 120px); line-height: .86; letter-spacing: -.08em; text-transform: uppercase; }
+  .meta { font-size: 18px; opacity: .6; }
+  .ticket { display: inline-block; margin-top: 28px; padding: 14px 18px; background: #f00000; color: #111; font-weight: 800; text-decoration: none; }
+  .muted { opacity: .5; }
+  @media (max-width: 700px) { .show-layout { grid-template-columns: 1fr; min-height: auto; margin-top: 56px; } img { max-height: 55vh; } }
+</style>

@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { getInteraction } from '../lib/showCard.js';
+import { showSlug } from '../lib/cms.ts';
 
 interface Props {
   shows: CollectionEntry<'shows'>[];
@@ -23,10 +24,8 @@ const { shows, kind } = Astro.props;
       ? { 'data-w-id': interaction.image }
       : {};
 
-    const Tag = show.data.link ? 'a' : 'div';
-    const linkAttrs = show.data.link
-      ? { href: show.data.link, target: '_blank', rel: 'noopener noreferrer' }
-      : {};
+    const Tag = 'a';
+    const linkAttrs = { href: `/shows/${showSlug(show.data.venue, show.data.date)}/` };
 
     return (
       <Tag {...itemAttrs} {...linkAttrs} data-cms-show class:list={['customers-el', `customers-el-${kind}`]}>
