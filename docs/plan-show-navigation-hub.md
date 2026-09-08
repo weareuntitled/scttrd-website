@@ -204,6 +204,12 @@ Integrationsrisiken (Rest): U9-CMS-Build ungeprüft (DB nötig); `cover`-Feld f�
 - Website: `getLinks` mapped `cover` aus CMS-Docs, `content.config.ts` links-Schema kennt optionales `cover`, `links.astro` rendert 40px-Thumb im Button.
 - Tests: Scrape-Suite 5/5 (Cover-Regel), Gesamt 40/40, Build grün, CMS-Typcheck Exit 0.
 
+## 18 · Boot-Migration hing → expliziter CI-Schritt (2026-09-08)
+
+- `prodMigrations`-Verdrahtung im Boot ließ `scttrd-all-cms` nie healthy werden (kein Crash, keine Logs remote einsehbar) → Deploy schlug fehl, CMS down.
+- Lehre: Migrationen NIE im Container-Boot (blockiert Healthcheck unsichtbar), sondern als expliziter Deploy-Schritt mit Timeout + sichtbaren Logs.
+- Umsetzung: `prodMigrations`-Wiring aus `payload.config.ts` entfernt (Dateien bleiben liegen), neuer CI-Step `Run CMS migrations` (`docker compose run --rm cms npm run payload -- migrate`, `timeout 180`) zwischen Rebuild und Smoke.
+
 ## 17 · Deploy (automatisch, CI-rot→grün)
 
 - Erster Push (`7e2745f`) ließ CI rot werden: CMS-Docker-Context enthält nur `cms/` — der Website-Import `../../../src/lib/linkScrape` schlug fehl (`Can't resolve … in '/app/src/collections'`).
