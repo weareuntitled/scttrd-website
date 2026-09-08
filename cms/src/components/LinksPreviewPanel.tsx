@@ -40,8 +40,7 @@ export const LinksPreviewPanel: React.FC = () => {
     load()
   }, [load])
 
-  const add = async (event: React.FormEvent) => {
-    event.preventDefault()
+  const add = async () => {
     const value = url.trim()
     if (!value) return
     if (!/^https?:\/\//i.test(value)) {
@@ -69,24 +68,32 @@ export const LinksPreviewPanel: React.FC = () => {
     }
   }
 
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      add()
+    }
+  }
+
   return (
     <div className="links-preview" aria-label="Links verwalten">
       <div className="links-preview__heading">Links — Linktree-artig einfügen</div>
 
-      <form className="links-add" onSubmit={add}>
+      <div className="links-add">
         <input
           ref={inputRef}
           value={url}
           onChange={(e) => setUrl(e.target.value)}
+          onKeyDown={onKeyDown}
           placeholder="https://… einfügen"
           aria-label="Link-URL einfügen"
         />
-        <button type="submit" disabled={saving || !url.trim()}>
+        <button type="button" onClick={add} disabled={saving || !url.trim()}>
           {saving ? 'Fügt hinzu…' : 'Hinzufügen'}
         </button>
         <p className="links-add__hint">Titel &amp; Cover werden automatisch übernommen. Nach dem Hinzufügen kannst du direkt den nächsten einfügen.</p>
         {status && <p className="links-add__status">{status}</p>}
-      </form>
+      </div>
 
       <div className="links-list">
         {loading && <div className="links-preview__row">Lädt …</div>}
