@@ -6,6 +6,9 @@ export const LinkHub: GlobalConfig = {
   admin: {
     group: 'Seiten',
     description: 'Profil, SEO und Anzeigeeinstellungen fuer die ArtisTree-/Linktree-Seite.',
+    livePreview: {
+      url: () => 'https://scttrd.de/links/',
+    },
   },
   access: {
     read: () => true,
@@ -13,11 +16,12 @@ export const LinkHub: GlobalConfig = {
   },
   fields: [
     {
-      name: 'preview',
+      name: 'linksManager',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         components: {
-          Field: '/components/LinkHubPreview#LinkHubPreview',
+          Field: '/components/LinksPreviewPanel#LinksPreviewPanel',
         },
       },
     },

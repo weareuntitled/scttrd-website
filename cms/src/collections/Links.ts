@@ -22,6 +22,9 @@ export const Links: CollectionConfig = {
     defaultColumns: ['label', 'platform', 'url', 'order'],
     group: 'Seiten',
     description: 'Links im Menü/Footer (Instagram, Spotify, SoundCloud …)',
+    livePreview: {
+      url: () => 'https://scttrd.de/links/',
+    },
   },
   access: {
     read: () => true,
@@ -35,6 +38,16 @@ export const Links: CollectionConfig = {
     ],
   },
   fields: [
+    {
+      name: 'linksManager',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '/components/LinksPreviewPanel#LinksPreviewPanel',
+        },
+      },
+    },
     {
       name: 'title',
       type: 'text',
