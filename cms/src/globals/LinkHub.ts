@@ -6,9 +6,6 @@ export const LinkHub: GlobalConfig = {
   admin: {
     group: 'Seiten',
     description: 'Profil, SEO und Anzeigeeinstellungen fuer die ArtisTree-/Linktree-Seite.',
-    livePreview: {
-      url: () => 'https://scttrd.de/links/',
-    },
   },
   access: {
     read: () => true,
