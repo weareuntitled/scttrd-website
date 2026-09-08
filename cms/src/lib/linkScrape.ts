@@ -76,11 +76,12 @@ export async function scrapeLink(
 }
 
 export function applyScrapedLink(
-  data: { label?: string; platform?: string; cover?: string; scrapedAt?: string },
+  data: { title?: string; label?: string; platform?: string; cover?: string; scrapedAt?: string },
   scraped: ScrapedLink | null
-): { label?: string; platform?: string; cover?: string; scrapedAt?: string } {
+): { title?: string; label?: string; platform?: string; cover?: string; scrapedAt?: string } {
   if (!scraped) return { ...data };
   const next = { ...data };
+  if (!next.title?.trim() && scraped.title) next.title = scraped.title;
   if (!next.label?.trim() && scraped.title) next.label = scraped.title;
   if ((!next.platform || next.platform === 'other') && scraped.platform !== 'web') {
     next.platform = scraped.platform;

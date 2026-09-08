@@ -9,9 +9,10 @@ const fillFromScrape = async (data: any) => {
   try {
     const { scrapeLink, applyScrapedLink } = await import('../lib/linkScrape');
     const scraped = await scrapeLink(String(data.url));
-    return { ...data, ...applyScrapedLink(data, scraped) };
+    const merged = applyScrapedLink(data, scraped);
+    return { ...merged, title: merged.title || merged.label || String(data.url) };
   } catch {
-    return data;
+    return { ...data, title: data.title || data.label || String(data.url) };
   }
 };
 
@@ -51,13 +52,12 @@ export const Links: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
-      required: true,
+      admin: { description: 'Automatisch aus dem Link übernommen' },
     },
     {
       name: 'label',
       type: 'text',
-      required: true,
-      admin: { description: 'Anzeigename, z. B. Instagram' },
+      admin: { description: 'Anzeigename — automatisch aus dem Link übernommen' },
     },
     {
       name: 'platform',
