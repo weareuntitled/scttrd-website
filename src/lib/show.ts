@@ -123,6 +123,18 @@ export function showAction(show: any): ShowAction {
     : { href: link, label: 'Veranstaltungsseite ↗', kind: 'page' };
 }
 
+export function adjacentShows(shows: any[], current: any): { prev: any | null; next: any | null } {
+  const timeline = (shows ?? [])
+    .filter((show: any) => Number.isFinite(timeOf(show?.data?.date)))
+    .sort(compareByDate);
+  const index = timeline.indexOf(current);
+  if (index === -1) return { prev: null, next: null };
+  return {
+    prev: index > 0 ? timeline[index - 1] : null,
+    next: index < timeline.length - 1 ? timeline[index + 1] : null,
+  };
+}
+
 const SOCIAL_PLATFORMS = ['spotify', 'soundcloud', 'instagram'];
 
 export function socialNavLinks(links: any[]): { label: string; url: string }[] {

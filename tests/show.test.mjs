@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { nextShow, parseDate, formatDate, isoDate, compareByDate, upcoming, past, orderedUpcoming, showSlug, showUrl, showAction, socialNavLinks } from '../src/lib/show.ts';
+import { nextShow, parseDate, formatDate, isoDate, compareByDate, upcoming, past, orderedUpcoming, showSlug, showUrl, showAction, socialNavLinks, adjacentShows } from '../src/lib/show.ts';
 
 const show = (o) => ({ data: o });
 
@@ -138,6 +138,28 @@ describe('Show-Hub Identität', () => {
     assert.deepEqual(showAction(dead), { href: null, label: 'Veranstaltungsseite ↗', kind: 'none' });
     const deadExplicit = show({ status: 'past', venue: 'K', date: '06.12.2025', link: 'https://www.eventbrite.de/e/x-tickets-1', linkKind: 'ticket' });
     assert.deepEqual(showAction(deadExplicit), { href: null, label: 'Veranstaltungsseite ↗', kind: 'none' });
+  });
+});
+
+describe('Show-Hub Verlinkung', () => {
+  it('adjacentShows: prev = frühere, next = spätere Show (nur gültige Daten)', () => {
+    const a = show({ status: 'past', date: '06.08.2023', order: 10 });
+    const b = show({ status: 'past', date: '06.12.2025', order: 10 });
+    const c = show({ status: 'upcoming', date: '17.10.2026', order: 10 });
+    const d = show({ status: 'upcoming', date: '12.12.2026', order: 10 });
+    const tba = show({ status: 'upcoming', date: 't.b.a.', order: 1 });
+    const all = [c, tba, a, d, b];
+
+    assert.equal(adjacentShows(all, c).prev, b);
+    assert.equal(adjacentShows(all, c).next, d);
+    assert.equal(adjacentShows(all, a).prev, null);
+    assert.equal(adjacentShows(all, d).next, null);
+  });
+
+  it('adjacentShows: unbekannte Show / leere Liste → prev+next null', () => {
+    const s = show({ status: 'upcoming', date: '17.10.2026', order: 10 });
+    assert.deepEqual(adjacentShows([], s), { prev: null, next: null });
+    assert.deepEqual(adjacentShows([show({ status: 'past', date: '06.12.2025', order: 10 })], s), { prev: null, next: null });
   });
 });
 
