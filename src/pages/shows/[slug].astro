@@ -9,21 +9,12 @@ const nextShow = hubNextShow(shows);
 const nextShowHref = nextShow ? showUrl(nextShow) : null;
 const show = shows.find((item) => showSlug(item.data.venue, item.data.date) === Astro.params.slug);
 if (!show) return Astro.redirect('/');
-const { venue, city, date, status, image, imageAlt, link, lineup = [] } = show.data;
+const { venue, city, date, status, image, imageAlt, lineup = [] } = show.data;
 const { prev, next } = adjacentShows(shows, show);
 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue}, ${city}`)}`;
 const action = showAction(show);
 const ctaLabel = action.label;
 const ctaHref = trackedTicketUrl(show, { source: 'homepage', medium: 'ticket-button' }) ?? action.href;
-const platformLabel = (url: string) => {
-  const host = url.replace(/^https?:\/\//, '').replace(/^www\./, '');
-  if (host.startsWith('instagram.com')) return 'Instagram';
-  if (host.startsWith('open.spotify.com')) return 'Spotify';
-  if (host.startsWith('soundcloud.com')) return 'SoundCloud';
-  if (host.startsWith('youtube.com') || host.startsWith('youtu.be')) return 'YouTube';
-  if (host.startsWith('tiktok.com')) return 'TikTok';
-  return 'Webseite';
-};
 ---
 <BaseLayout
   title={`${venue} | SCTTRD`}
@@ -44,23 +35,22 @@ const platformLabel = (url: string) => {
         <div class:list={['actions', status === 'upcoming' && ctaHref ? 'actions-sticky-dupe' : '']} id="tickets">
           {ctaHref ? <a class="ticket" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a> : status === 'upcoming' && <p class="muted">{ctaLabel}</p>}
         </div>
-        {lineup.length > 0 && <div class="lineup" id="lineup">
-          <div class="lineup-head"><h2>Line-up</h2><span>{lineup.length} Acts</span></div>
-          <ul>
-            {lineup.map((artist) => <li>
-              <strong>{artist.name}</strong>
-              <span class="lineup-links">
-                {artist.url && <a href={artist.url} target="_blank" rel="noopener noreferrer">{platformLabel(artist.url)} ↗</a>}
-                {artist.sourceUrl && <a class="lineup-source" href={artist.sourceUrl} target="_blank" rel="noopener noreferrer">Quelle</a>}
-              </span>
-            </li>)}
+      </section>
+      <div class="show-extra">
+        {(prev || next) && <nav class="show-pager" aria-label="Weitere Shows">
+          {prev ? <a class="pager-link" href={showUrl(prev)}><span class="pager-dir">← früher</span><strong>{prev.data.venue}</strong><span class="pager-meta">{prev.data.city} · {prev.data.date}</span></a> : <span class="pager-link pager-empty"></span>}
+          {next ? <a class="pager-link pager-next" href={showUrl(next)}><span class="pager-dir">später →</span><strong>{next.data.venue}</strong><span class="pager-meta">{next.data.city} · {next.data.date}</span></a> : <span class="pager-link pager-empty"></span>}
+        </nav>}
+        {lineup.length > 0 && <div class="lineup-acts" id="lineup">
+          <div class="lineup-acts-head"><h2>Weitere Acts</h2><span>{lineup.length}</span></div>
+          <ul class="lineup-acts-list">
+            {lineup.map((artist) => {
+              const href = artist.url || artist.sourceUrl;
+              return href ? <li><a href={href} target="_blank" rel="noopener noreferrer">{artist.name} ↗</a></li> : <li>{artist.name}</li>;
+            })}
           </ul>
         </div>}
-      </section>
-      {(prev || next) && <nav class="show-pager" aria-label="Weitere Shows">
-        {prev ? <a class="pager-link" href={showUrl(prev)}><span class="pager-dir">← früher</span><strong>{prev.data.venue}</strong><span class="pager-meta">{prev.data.city} · {prev.data.date}</span></a> : <span class="pager-link pager-empty"></span>}
-        {next ? <a class="pager-link pager-next" href={showUrl(next)}><span class="pager-dir">später →</span><strong>{next.data.venue}</strong><span class="pager-meta">{next.data.city} · {next.data.date}</span></a> : <span class="pager-link pager-empty"></span>}
-      </nav>}
+      </div>
     </main>
     {status === 'upcoming' && ctaHref && <a class="ticket-sticky" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a>}
     <footer><strong>SCTTRD</strong><span>Brutal, aber schön.</span></footer>
@@ -81,36 +71,32 @@ const platformLabel = (url: string) => {
   .meta { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; padding: 16px 0; border-block: 2px solid #0c0c0c; }
   .meta strong { font-size: 18px; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
   .meta a { color: inherit; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; text-underline-offset: 4px; }
-  .lineup { width: 100%; margin-top: 28px; border-block: 2px solid #0c0c0c; text-align: left; scroll-margin-top: 20px; }
-  .lineup-head { display: flex; justify-content: space-between; align-items: center; padding: 13px 15px; border-bottom: 2px solid #0c0c0c; }
-  .lineup h2, .lineup-head span { margin: 0; font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
-  .lineup ul { margin: 0; padding: 0 15px; list-style: none; }
-  .lineup li { display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 48px; padding: 10px 0; border-bottom: 1px solid rgba(12, 12, 12, .35); }
-  .lineup li:last-child { border-bottom: 0; }
-  .lineup li > strong { font-size: 18px; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
-  .lineup-links { display: flex; flex: 0 0 auto; gap: 13px; }
-  .lineup-links a { color: inherit; font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; text-underline-offset: 3px; }
-  .lineup-source { opacity: .58; }
   .actions { width: 100%; margin-top: 28px; scroll-margin-top: 20px; }
   .ticket { display: block; padding: 17px 20px; border: 2px solid #0c0c0c; background: #0c0c0c; color: #f00000; font-size: 14px; font-weight: 900; letter-spacing: .04em; text-decoration: none; text-transform: uppercase; box-shadow: 5px 5px 0 rgba(12, 12, 12, .25); transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease; }
   .ticket:hover, .ticket:focus-visible { background: transparent; color: #0c0c0c; box-shadow: 3px 3px 0 #0c0c0c; transform: translate(2px, 2px); }
   .muted { opacity: .55; }
   .ticket-sticky { display: none; }
-  .show-pager { display: flex; flex-direction: column; gap: 16px; width: 100%; margin-top: clamp(40px, 6vw, 64px); }
+  .show-extra { display: flex; flex-direction: column; gap: clamp(28px, 4vw, 48px); width: 100%; margin-top: clamp(40px, 6vw, 64px); }
+  .show-pager { display: flex; flex-direction: column; gap: 16px; width: 100%; }
   .pager-link { display: grid; gap: 5px; padding: 20px 22px; border: 2px solid #0c0c0c; background: transparent; color: #0c0c0c; text-decoration: none; box-shadow: 5px 5px 0 rgba(12, 12, 12, .22); transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease; }
   .pager-link:hover, .pager-link:focus-visible { background: #0c0c0c; color: #f00000; box-shadow: 2px 2px 0 #0c0c0c; transform: translate(2px, 2px); }
   .pager-dir { font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
   .pager-link strong { font-size: clamp(18px, 2.4vw, 26px); line-height: 1.02; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: anywhere; }
   .pager-meta { font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
   .pager-empty { visibility: hidden; pointer-events: none; }
+  .lineup-acts { width: 100%; border: 2px solid #0c0c0c; padding: 16px 18px 18px; scroll-margin-top: 20px; }
+  .lineup-acts-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .lineup-acts-head h2, .lineup-acts-head span { margin: 0; font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+  .lineup-acts-head span { opacity: .55; }
+  .lineup-acts-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .lineup-acts-list li { display: inline; }
+  .lineup-acts-list a { display: inline-block; padding: 4px 9px; border: 1px solid rgba(12, 12, 12, .45); color: inherit; font-size: 11px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; }
+  .lineup-acts-list a:hover, .lineup-acts-list a:focus-visible { background: #0c0c0c; color: #f00000; border-color: #0c0c0c; }
   footer { display: flex; justify-content: space-between; align-items: end; padding: 40px max(18px, calc((100vw - 1180px) / 2)); background: #0c0c0c; color: #f4f1ea; text-transform: uppercase; }
   footer strong { font-size: clamp(32px, 5vw, 52px); line-height: .8; letter-spacing: -.06em; }
   footer span { color: #f00000; font-size: 11px; font-weight: 900; letter-spacing: .15em; }
   @media (max-width: 767px) {
     h1 { margin-bottom: 18px; font-size: clamp(42px, 13vw, 58px); line-height: .88; letter-spacing: -.055em; }
-    .lineup li { align-items: flex-start; }
-    .lineup li > strong { max-width: 55%; font-size: 16px; }
-    .lineup-links { flex-direction: column; align-items: flex-end; gap: 5px; }
     .actions-sticky-dupe { display: none; }
     .ticket-sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 2px solid #0c0c0c; background: #0c0c0c; color: #f00000; font-size: 13px; font-weight: 900; letter-spacing: .06em; text-decoration: none; text-transform: uppercase; }
     .ticket-sticky:hover, .ticket-sticky:focus-visible { background: #f00000; color: #0c0c0c; }
@@ -125,10 +111,10 @@ const platformLabel = (url: string) => {
     h1 { font-size: clamp(54px, 7vw, 92px); }
     .meta { border-block-width: 4px; }
     .meta strong { font-size: clamp(24px, 3vw, 36px); }
-    .lineup { margin-top: 30px; border: 2px solid #0c0c0c; }
     .actions { display: flex; gap: 16px; }
     .ticket { flex: 1; }
-    .show-pager { flex: 1 1 100%; flex-direction: row; }
+    .show-extra { flex: 1 1 100%; }
+    .show-pager { flex-direction: row; }
     .pager-next { text-align: right; }
   }
 </style>
