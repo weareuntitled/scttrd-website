@@ -1,5 +1,20 @@
 import type { CollectionConfig } from 'payload'
 
+const fillFromScrape = async (data: any) => {
+  const complete =
+    data?.label?.trim() && data?.platform && data.platform !== 'other' && data?.cover?.trim();
+  if (!data?.url || complete) {
+    return data;
+  }
+  try {
+    const { scrapeLink, applyScrapedLink } = await import('../../../src/lib/linkScrape');
+    const scraped = await scrapeLink(String(data.url));
+    return { ...data, ...applyScrapedLink(data, scraped) };
+  } catch {
+    return data;
+  }
+};
+
 export const Links: CollectionConfig = {
   slug: 'links',
   admin: {
@@ -13,6 +28,11 @@ export const Links: CollectionConfig = {
     create: ({ req }) => Boolean(req.user),
     update: ({ req }) => Boolean(req.user),
     delete: ({ req }) => Boolean(req.user),
+  },
+  hooks: {
+    beforeChange: [
+      async ({ data }) => fillFromScrape(data),
+    ],
   },
   fields: [
     {
@@ -44,6 +64,16 @@ export const Links: CollectionConfig = {
       type: 'text',
       required: true,
       admin: { description: 'https://…' },
+    },
+    {
+      name: 'cover',
+      type: 'text',
+      admin: { description: 'Cover-URL — automatisch via Link-Scrape, manuell überschreibbar' },
+    },
+    {
+      name: 'scrapedAt',
+      type: 'date',
+      admin: { description: 'Letzter erfolgreicher Scrape', readOnly: true },
     },
     {
       name: 'target',

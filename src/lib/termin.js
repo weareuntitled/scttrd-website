@@ -1,6 +1,9 @@
+import { parseDate } from './show.ts';
+
+// Shim: identische Semantik wie bisher, Implementierung aus dem Show-Hub.
 export const toTs = (d) => {
-  const m = d.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-  return m ? Date.parse(`${m[3]}-${m[2]}-${m[1]}`) : NaN;
+  const parsed = parseDate(d);
+  return parsed ? Date.UTC(parsed.year, parsed.month - 1, parsed.day) : NaN;
 };
 
 export const byDate = (a, b) => {

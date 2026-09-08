@@ -1,10 +1,14 @@
 ---
-import { getLinkHub, getLinks, getShows, showSlug } from '../lib/cms.ts';
+import { getLinkHub, getLinks, getShows } from '../lib/cms.ts';
+import { upcoming as hubUpcoming, nextShow as hubNextShow, showUrl, parseDate, isoDate } from '../lib/show.ts';
+import { trackedTicketUrl } from '../lib/tracking.ts';
 
 const hub: any = await getLinkHub();
 const links: any[] = await getLinks();
 const shows: any[] = await getShows();
-const upcoming = shows.filter((show) => show.data.status === 'upcoming');
+const upcoming = hubUpcoming(shows);
+const next = hubNextShow(shows);
+const monthShort = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 const profileName = hub?.profile?.handle || '@scttrd_ofc';
 const profileTitle = hub?.profile?.title || 'SCTTRD Official Music';
 const profileDescription = hub?.profile?.description || 'Brutal, aber schoen. Live zwischen Post-Punk, Techno und Trance.';
@@ -24,10 +28,6 @@ if (spotifyUrl) {
     }
   } catch {}
 }
-const parseShowDate = (value: string) => {
-  const german = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-  return german ? new Date(`${german[3]}-${german[2]}-${german[1]}T12:00:00`) : new Date(`${value}T12:00:00`);
-};
 const profileSchema = {
   '@context': 'https://schema.org',
   '@type': 'ProfilePage',
@@ -70,19 +70,25 @@ const profileSchema = {
       {hub?.appearance?.showUpcoming !== false && upcoming.length > 0 && <section aria-labelledby="shows-title">
         <div class="section-heading"><h2 id="shows-title">Upcoming Shows</h2></div>
         {upcoming.map((show) => {
-          const date = parseShowDate(show.data.date);
-          const dateLabel = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-          const day = date.toLocaleDateString('de-DE', { day: '2-digit' });
-          const month = date.toLocaleDateString('de-DE', { month: 'short' }).replace('.', '');
-          return <a class="link-btn show-btn" href={`/shows/${showSlug(show.data.venue, show.data.date)}/`}>
-            <time datetime={show.data.date}><strong>{day}</strong><span>{month}</span></time>
-            <span class="show-copy"><strong>{show.data.venue}</strong><span>{show.data.city}</span></span>
-            <span class="ticket">Show ansehen ↗</span>
-          </a>;
+          const parsed = parseDate(show.data.date);
+          const day = parsed ? String(parsed.day).padStart(2, '0') : '—';
+          const month = parsed ? monthShort[parsed.month - 1] : 'tba';
+          const machineDate = isoDate(show.data.date) ?? undefined;
+          const showHref = showUrl(show);
+          const hasTicket = Boolean(show.data.link);
+          const chipHref = trackedTicketUrl(show, { source: 'linkhub', medium: 'show-card' }) ?? (hasTicket ? show.data.link : showHref);
+          return <div class="show-row">
+            <a class="show-main link-btn" href={showHref} aria-label={show === next ? `Nächste Show: ${show.data.venue}, ${show.data.city}` : undefined}>
+              {show === next && <span class="show-next-badge">Next</span>}
+              <time datetime={machineDate}><strong>{day}</strong><span>{month}</span></time>
+              <span class="show-copy"><strong>{show.data.venue}</strong><span>{show.data.city}</span></span>
+            </a>
+            <a class="ticket-btn" href={chipHref} target={hasTicket ? '_blank' : undefined} rel={hasTicket ? 'noopener noreferrer' : undefined} aria-label={`Tickets für ${show.data.venue}`}>{hasTicket ? 'Tickets ↗' : 'Details ↗'}</a>
+          </div>;
         })}
       </section>}
       <nav aria-label="SCTTRD Links">
-        {links.map((link) => <a class="link-btn" href={link.url} target={link.target} rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}>{link.label}<span class="arrow">↗</span></a>)}
+        {links.map((link) => <a class="link-btn" href={link.url} target={link.target} rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}>{link.cover && <img class="link-cover" src={link.cover} alt="" loading="lazy" />}{link.label}<span class="arrow">↗</span></a>)}
       </nav>
       <footer><a href="/">scttrd.de</a><a href="mailto:info@scttrd.de">booking</a></footer>
     </main>
@@ -107,10 +113,15 @@ const profileSchema = {
   .link-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 14px 20px; background: #111; border: 1px solid #2a2a2a; border-radius: 4px; font-size: 16px; font-weight: 700; text-align: center; text-decoration: none; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
   .link-btn:hover { background: #f00000; border-color: #f00000; color: #000; transform: translateY(-2px); }
   .link-btn .arrow { font-size: 13px; opacity: .5; }
+  .link-cover { width: 40px; height: 40px; flex: 0 0 40px; object-fit: cover; border-radius: 2px; }
   .show-btn { justify-content: flex-start; text-align: left; }
+  .show-next-badge { flex: 0 0 auto; padding: 4px 8px; background: #f00000; color: #000; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; border-radius: 2px; }
+  .show-row { display: flex; gap: 10px; }
+  .show-row .show-main { flex: 1; min-width: 0; justify-content: flex-start; text-align: left; }
+  .ticket-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 128px; min-height: 56px; padding: 0 18px; background: #f00000; color: #000; border: 1px solid #f00000; border-radius: 4px; font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
+  .ticket-btn:hover, .ticket-btn:focus-visible { background: #fff; border-color: #fff; transform: translateY(-2px); }
   time { width: 44px; flex: 0 0 44px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 20px; font-weight: 800; } time span { margin-top: 4px; font-size: 9px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,.6); }
   .show-copy { min-width: 0; flex: 1; display: grid; gap: 3px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; } .show-copy span { font-size: 12px; color: rgba(255,255,255,.6); }
-  .ticket { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 2px; background: #f00000; color: #000; }
   footer { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); } footer a { color: inherit; text-decoration: none; }
-  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); padding-top: 28px; } .release-card { gap: 14px; } .release-cover { width: 80px; height: 80px; flex-basis: 80px; } }
+  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); padding-top: 28px; } .release-card { gap: 14px; } .release-cover { width: 80px; height: 80px; flex-basis: 80px; } .show-row { flex-wrap: wrap; } .ticket-btn { flex: 1 1 100%; min-height: 48px; } }
 </style>

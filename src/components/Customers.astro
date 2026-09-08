@@ -1,14 +1,15 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { getInteraction } from '../lib/showCard.js';
-import { showSlug } from '../lib/cms.ts';
+import { showUrl } from '../lib/show.ts';
 
 interface Props {
   shows: CollectionEntry<'shows'>[];
   kind: 'upcoming' | 'past';
+  pinFirst?: boolean;
 }
 
-const { shows, kind } = Astro.props;
+const { shows, kind, pinFirst = false } = Astro.props;
 ---
 
 {
@@ -25,10 +26,15 @@ const { shows, kind } = Astro.props;
       : {};
 
     const Tag = 'a';
-    const linkAttrs = { href: `/shows/${showSlug(show.data.venue, show.data.date)}/` };
+    const isNext = pinFirst && kind === 'upcoming' && index === 0;
+    const linkAttrs = { href: showUrl(show) };
+    const a11yAttrs = isNext
+      ? { 'aria-label': `Nächste Show: ${show.data.venue}, ${show.data.city}, ${show.data.date}` }
+      : {};
 
     return (
-      <Tag {...itemAttrs} {...linkAttrs} data-cms-show class:list={['customers-el', `customers-el-${kind}`]}>
+      <Tag {...itemAttrs} {...linkAttrs} {...a11yAttrs} data-cms-show class:list={['customers-el', `customers-el-${kind}`]}>
+        {isNext && <span class="customers-el-next">Next</span>}
         <div id={interaction?.nameNode} class="customers-el-name">
           <h6 class="heading-7">{show.data.venue}</h6>
         </div>
@@ -36,7 +42,7 @@ const { shows, kind } = Astro.props;
           <h6 class="heading-8">{show.data.city}</h6>
         </div>
         <div id={interaction?.dateNode} class="customers-el-date">
-          <h6>{show.data.date}</h6>
+          <h6>{show.data.date}{kind === 'upcoming' && <span class="customers-el-arrow">→</span>}</h6>
         </div>
         <div {...wrapAttrs} class="customers-el-img">
           <img
@@ -67,6 +73,9 @@ const { shows, kind } = Astro.props;
   .customers-el { padding: var(--space-4) var(--space-4) var(--space-4) var(--space-6) !important; border-bottom: 1px solid #000 !important; gap: var(--space-4) !important; color: #000 !important; text-decoration: none !important; }
   .customers-el:visited { color: #000 !important; }
   .customers-el:focus-visible { outline: 3px solid #000; outline-offset: 3px; }
+  .customers-el-arrow { display: inline-block; margin-left: 9px; font-size: 16px !important; font-weight: 800; transition: transform .2s ease; }
+  .customers-el:hover .customers-el-arrow { transform: translateX(4px); }
+  .customers-el-next { display: inline-block; padding: 4px 8px; background: #000; color: #f00000; font-size: 10px !important; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
   .customers-el h6 { font-size: var(--text-show) !important; line-height: 1.3 !important; }
   .customers-el-name { grid-column: span 3 !important; }
   .customers-el-service { grid-column: span 3 !important; }
