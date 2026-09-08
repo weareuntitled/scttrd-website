@@ -19,7 +19,6 @@ export const LinkHub: GlobalConfig = {
       name: 'linksManager',
       type: 'ui',
       admin: {
-        position: 'sidebar',
         components: {
           Field: '/components/LinksPreviewPanel#LinksPreviewPanel',
         },

@@ -54,26 +54,38 @@ export async function getLinks() {
 
 export async function getShows() {
   const base = cmsBase()
-  const localShows = await getCollection('shows')
-  const localBySlug = new Map(localShows.map((show) => [showSlug(show.data.venue, show.data.date), show]))
   const abs = (u: any) => {
     if (!u) return ''
     if (/^https?:\/\//i.test(String(u))) return String(u)
     try { return new URL(String(u), base).href } catch { return String(u) }
   }
   try {
-    const r = await fetch(`${base}/api/shows?limit=100&sort=-order`, { signal: AbortSignal.timeout(1500) } as any)
+    const r = await fetch(`${base}/api/shows?limit=100&sort=-order`, { signal: AbortSignal.timeout(3000) } as any)
     if (r.ok) {
       const j: any = await r.json()
       if (j.docs?.length) {
-        const cmsShows = j.docs.map((d: any) => {
-          const local = localBySlug.get(showSlug(d.venue, d.date))
-          return { id: d.id, collection: 'shows', data: { venue: d.venue, city: d.city, date: d.date, status: d.status, order: d.order ?? 10, link: d.link || local?.data.link, linkKind: d.linkKind || local?.data.linkKind, image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : local?.data.image ?? ''), imageAlt: d.imageAlt || d.image?.alt || local?.data.imageAlt || '', srcset: undefined, lineup: Array.isArray(d.lineup) && d.lineup.length ? d.lineup : local?.data.lineup ?? [] } }
-        })
-        const cmsSlugs = new Set(cmsShows.map((show: any) => showSlug(show.data.venue, show.data.date)))
-        return [...cmsShows, ...localShows.filter((show) => !cmsSlugs.has(showSlug(show.data.venue, show.data.date)))]
+        // Nur CMS-Shows — kein lokaler Merge/Status-Override mehr.
+        return j.docs.map((d: any) => ({
+          id: d.id,
+          collection: 'shows',
+          data: {
+            venue: d.venue,
+            city: d.city,
+            date: d.date,
+            status: d.status,
+            order: d.order ?? 10,
+            link: d.link || '',
+            linkKind: d.linkKind || undefined,
+            image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : ''),
+            imageAlt: d.imageAlt || d.image?.alt || '',
+            srcset: undefined,
+            lineup: Array.isArray(d.lineup) && d.lineup.length ? d.lineup : [],
+          },
+        }))
       }
     }
   } catch {}
-  return await getCollection('shows')
+  // Letzte Rettung nur wenn das CMS gar nicht erreichbar ist (keine Doppel/Status-Inkonsistenz).
+  const localShows = await getCollection('shows')
+  return localShows.map((show) => ({ ...show }))
 }
