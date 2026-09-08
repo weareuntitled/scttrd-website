@@ -36,9 +36,9 @@ if (indexHtml.status !== 308 || indexHtml.headers.get('location') !== '/') {
 console.log(`index-html-redirect: ${indexHtml.status}`)
 
 const showChecks = [
-  ['singoldsand-show', '/shows/singoldsand-21-08-2026/', ['Singoldsand', 'Google Maps'], []],
-  // Past-Show: kein Ticket-CTA mehr (kein eventbrite-Link im HTML)
-  ['komfortrauschen-show', '/shows/kulturhaus-milbertshofen-06-12-2025/', ['Kulturhaus Milbertshofen', 'Ort in Google Maps öffnen'], ['eventbrite.de']],
+  ['singoldsand-show', '/shows/singoldsand-21-08-2026/', ['Singoldsand', 'Ort in Google Maps öffnen'], []],
+  // Nur-CMS: Kneipenfestival ist im CMS vorhanden.
+  ['koe-show', '/shows/kneipenfestival-baarrauschen-koe-17-10-2026/', ['Kneipenfestival', 'Ort in Google Maps öffnen'], []],
 ]
 for (const [name, path, markers, forbidden = []] of showChecks) {
   const page = await fetch(`${baseUrl}${path}`, { signal: AbortSignal.timeout(15000) })
