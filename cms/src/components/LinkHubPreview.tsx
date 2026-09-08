@@ -117,6 +117,7 @@ export const LinkHubPreview: React.FC = () => {
             <button type="button" onClick={() => setReloadKey((key) => key + 1)}>Vorschau neu laden</button>
           </div>
         </div>
+        <a className="link-hub-preview__manage" href="/admin/collections/links">Links verwalten →</a>
         <p>Live-Vorschau aus den Collections. Nach dem Speichern ggf. neu laden.</p>
       </details>
       <style>{`
@@ -142,6 +143,7 @@ export const LinkHubPreview: React.FC = () => {
         .link-hub-preview__qr { display: flex; gap: 12px; align-items: center; margin: 12px 4px 0; }
         .link-hub-preview__qr a { font-size: 11px; word-break: break-all; }
         .link-hub-preview__qr button { margin-top: 8px; font-size: 11px; cursor: pointer; }
+        .link-hub-preview__manage { display: block; margin: 12px 4px 0; padding: 10px 12px; border: 1px solid var(--theme-elevation-150); border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none; }
         .link-hub-preview > details > p, .link-hub-preview__box > p { margin: 12px 4px; color: var(--theme-elevation-500); font-size: 11px; line-height: 1.35; }
         @media (max-width: 1180px) { .link-hub-preview { position: static; width: 100%; margin-bottom: 16px; } }
       `}</style>
