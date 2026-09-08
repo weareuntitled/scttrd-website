@@ -6,6 +6,7 @@ date: 21.08.2026
 image: /images/656080335_18402590875183080_2349387174786364507_n.webp
 imageAlt: Singoldsand Festival - SCTTRD live
 link: https://www.singoldsand-festival.de/
+linkKind: website
 lineup:
   - name: Sonic Heaven
     url: https://zeixdir.de/KuenstlerinnnenDetail/1064/Sonic%20Heaven

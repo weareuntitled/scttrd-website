@@ -128,6 +128,17 @@ describe('Show-Hub Identität', () => {
     const page = show({ status: 'past', venue: 'K', city: 'A', date: '02.08.2024', link: 'https://www.instagram.com/kontrastfestival.archive/' });
     assert.deepEqual(showAction(page), { href: page.data.link, label: 'Veranstaltungsseite ↗', kind: 'page' });
   });
+
+  it('showAction: explizites linkKind schlägt Regex, Past-Tickets werden unterdrückt', () => {
+    const explicit = show({ status: 'upcoming', venue: 'T', date: '12.12.2026', link: 'https://www.instagram.com/techno_punsch/', linkKind: 'ticket' });
+    assert.deepEqual(showAction(explicit), { href: explicit.data.link, label: 'Tickets sichern ↗', kind: 'ticket' });
+    const explicitPage = show({ status: 'upcoming', venue: 'S', date: '21.08.2026', link: 'https://tickets.example.com/x', linkKind: 'website' });
+    assert.deepEqual(showAction(explicitPage), { href: explicitPage.data.link, label: 'Event & Tickets ↗', kind: 'page' });
+    const dead = show({ status: 'past', venue: 'K', date: '06.12.2025', link: 'https://www.eventbrite.de/e/x-tickets-1' });
+    assert.deepEqual(showAction(dead), { href: null, label: 'Veranstaltungsseite ↗', kind: 'none' });
+    const deadExplicit = show({ status: 'past', venue: 'K', date: '06.12.2025', link: 'https://www.eventbrite.de/e/x-tickets-1', linkKind: 'ticket' });
+    assert.deepEqual(showAction(deadExplicit), { href: null, label: 'Veranstaltungsseite ↗', kind: 'none' });
+  });
 });
 
 describe('Show-Hub Navigation', () => {

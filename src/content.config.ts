@@ -15,6 +15,7 @@ const shows = defineCollection({
     title_en: z.string().optional(),
     srcset: z.string().optional(),
     link: z.string().url().optional(),
+    linkKind: z.enum(['ticket', 'website', 'video']).optional(),
     lineup: z.array(z.object({
       name: z.string(),
       url: z.string().url().optional(),

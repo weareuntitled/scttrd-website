@@ -6,5 +6,6 @@ date: 12.12.2026
 image: /images/00_SCTTRD_graded_-36.jpg
 imageAlt: "SCTTRD live"
 link: https://www.instagram.com/techno_punsch/
+linkKind: website
 order: 10
 ---

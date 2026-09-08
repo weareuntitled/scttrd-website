@@ -68,7 +68,7 @@ export async function getShows() {
       if (j.docs?.length) {
         const cmsShows = j.docs.map((d: any) => {
           const local = localBySlug.get(showSlug(d.venue, d.date))
-          return { id: d.id, collection: 'shows', data: { venue: d.venue, city: d.city, date: d.date, status: d.status, order: d.order ?? 10, link: d.link || local?.data.link, image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : local?.data.image ?? ''), imageAlt: d.imageAlt || d.image?.alt || local?.data.imageAlt || '', srcset: undefined, lineup: Array.isArray(d.lineup) && d.lineup.length ? d.lineup : local?.data.lineup ?? [] } }
+          return { id: d.id, collection: 'shows', data: { venue: d.venue, city: d.city, date: d.date, status: d.status, order: d.order ?? 10, link: d.link || local?.data.link, linkKind: d.linkKind || local?.data.linkKind, image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : local?.data.image ?? ''), imageAlt: d.imageAlt || d.image?.alt || local?.data.imageAlt || '', srcset: undefined, lineup: Array.isArray(d.lineup) && d.lineup.length ? d.lineup : local?.data.lineup ?? [] } }
         })
         const cmsSlugs = new Set(cmsShows.map((show: any) => showSlug(show.data.venue, show.data.date)))
         return [...cmsShows, ...localShows.filter((show) => !cmsSlugs.has(showSlug(show.data.venue, show.data.date)))]

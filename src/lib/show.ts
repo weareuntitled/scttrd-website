@@ -99,6 +99,8 @@ const YOUTUBE_HOSTS = /youtube\.com|youtu\.be/i;
 export type ShowActionKind = 'ticket' | 'video' | 'page' | 'none';
 export type ShowAction = { href: string | null; label: string; kind: ShowActionKind };
 
+const LINK_KINDS = ['ticket', 'website', 'video'];
+
 export function showAction(show: any): ShowAction {
   const link = show?.data?.link;
   const status = show?.data?.status;
@@ -107,13 +109,18 @@ export function showAction(show: any): ShowAction {
       ? { href: null, label: 'Ticketlink folgt.', kind: 'none' }
       : { href: null, label: 'Veranstaltungsseite ↗', kind: 'none' };
   }
-  if (YOUTUBE_HOSTS.test(link)) return { href: link, label: 'Video ansehen ↗', kind: 'video' };
-  if (status === 'upcoming') {
-    return TICKET_HOSTS.test(link)
-      ? { href: link, label: 'Tickets sichern ↗', kind: 'ticket' }
-      : { href: link, label: 'Event & Tickets ↗', kind: 'page' };
+  const explicit = LINK_KINDS.includes(show?.data?.linkKind) ? show.data.linkKind : null;
+  const kind: ShowActionKind =
+    explicit ?? (YOUTUBE_HOSTS.test(link) ? 'video' : TICKET_HOSTS.test(link) ? 'ticket' : 'page');
+  if (kind === 'video') return { href: link, label: 'Video ansehen ↗', kind };
+  if (kind === 'ticket') {
+    return status === 'upcoming'
+      ? { href: link, label: 'Tickets sichern ↗', kind }
+      : { href: null, label: 'Veranstaltungsseite ↗', kind: 'none' };
   }
-  return { href: link, label: 'Veranstaltungsseite ↗', kind: 'page' };
+  return status === 'upcoming'
+    ? { href: link, label: 'Event & Tickets ↗', kind: 'page' }
+    : { href: link, label: 'Veranstaltungsseite ↗', kind: 'page' };
 }
 
 const SOCIAL_PLATFORMS = ['spotify', 'soundcloud', 'instagram'];
