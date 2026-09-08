@@ -4,7 +4,7 @@
 
 ## 1 · Ziel (ein Satz)
 
-**Termin / Show** ist überall dieselbe Wahrheit: Menü-Punkte `Shows | Links | Galerie` + Logo behalten, ein primärer Button `Next Show ↗` zeigt immer auf die **nächste** kommende **Termin / Show** — aber auf deren **Veranstaltungsseite** (`/shows/<slug>/`), nicht direkt auf den Ticket-Link.
+**Termin / Show** ist überall dieselbe Wahrheit: Menü-Punkte `Shows | Linkhub | Galerie` + Logo behalten, ein primärer Button `Next Show ↗` zeigt immer auf die **nächste** kommende **Termin / Show** — aber auf deren **Veranstaltungsseite** (`/shows/<slug>/`), nicht direkt auf den Ticket-Link.
 
 ## 2 · Ist-Zustand — warum kein Hub
 
@@ -94,8 +94,9 @@ showAction(show)                 // { href, label, kind } — kapselt DESIGN.md:
 
 ```
 # SiteHeader
-Props { nextShowUrl: string|null, socialLinks: {label,platform,url}[] }
-Rendert: [Logo] [Shows] [Links] [Galerie] ... [Next Show ↗]
+Props { nextShowUrl: string|null } (keine Socials — nur Linkhub-Menüpunkt)
+Rendert: [Logo] [Shows] [Linkhub] [Galerie] ... [Next Show ↗]
+Layout: Flex-Zonen (Logo | Nav links | Next rechts), 1× Mobile-Media-Query
 
 # show.ts
 parseDate / formatDate / compareByDate / upcoming / past / nextShow / showSlug / showUrl / showAction
@@ -118,14 +119,14 @@ Kein `Bento`-, `Hero`- oder `Presse`-Begriff neu — alles bleibt `CONTEXT.md`.
 ## 9 · Verifikation
 
 - `npm run build` grün (heute grün trotz `termin.js` implizitem `any` — nachher typisiert sauber).
-- Manuell: `/` Header zeigt `Shows · Links · Galerie` + Logo; Button `Next Show ↗` → `/shows/<nächste-upcoming>/` (z. B. heute `singoldsand-21-08-2026`); `/shows/<past>/` zeigt `Event & Tickets` nur oberhalb Line-up; `/links/` Karten behalten roten `Tickets ↗` Chip.
+- Manuell: `/` Header zeigt `Shows · Linkhub · Galerie` + Logo; Button `Next Show ↗` → `/shows/<nächste-upcoming>/` (z. B. heute `singoldsand-21-08-2026`); `/shows/<past>/` zeigt `Event & Tickets` nur oberhalb Line-up; `/links/` Karten behalten roten `Tickets ↗` Chip.
 - Mobile: `@media(max-width:767px)` einmal in `SiteHeader.astro`, nicht 3× dupliziert.
 
 ## 10 · Entscheidungen aus Produktfragen (02.10.2026 — fixiert)
 
 1. **Nächste Show markiert:** `Badge „NEXT“ + oben fixiert` — früheste `upcoming` nach `compareByDate` ( `t.b.a.` ignoriert), visuell mit Badge + als erste Kachel gepinnt, Rest nach Datum. Quelle: `show.ts:nextShow`. Button immer zur **Veranstaltungsseite** (`showUrl`), nicht Ticket.
-2. **Menü „Alle Shows“ tolerant:** Link auf `#shows` ist okay — führt auf `/` zur Liste. Header bleibt `Shows | Links | Galerie` (nur diese 3, `CONTEXT.md` ergänzt).
-3. **Links/Galerie Reihenfolge:** `Shows | Links | Galerie` (funnel-absteigend).
+2. **Menü „Alle Shows“ tolerant:** Link auf `#shows` ist okay — führt auf `/` zur Liste. Header bleibt `Shows | Linkhub | Galerie` (nur diese 3, `CONTEXT.md` ergänzt).
+3. **Linkhub/Galerie Reihenfolge:** `Shows | Linkhub | Galerie` (funnel-absteigend).
 
 ## 11 · Zusatz-Module aus Produktfragen (gleicher Hub, kein Scope-Creep)
 
@@ -168,7 +169,7 @@ Diese 3 sind **eigene tiefe Module** hinter eigenen **Seams**, hängen aber am s
 2. **UTM = linkhub / show-card** — `utm_source=linkhub|homepage`, `utm_medium=show-card|ticket-button` (trennt Funnel-Quellen).
 3. **Scrape = nur leere Felder** — oEmbed/OpenGraph füllt `Titel/Cover/Typ` nur wenn Feld leer; Hand-Eingabe gewinnt.
 4. **Bento = Hybrid wie heute** — `BENTO_HARDCODED` (Radio Rudina + 2 Komod) + 3 `reels.slice(0,3)` aus CMS; kein Voll-CMS-Umbau.
-5. **Mobile = Hamburger** — Header zeigt Logo + Burger, Menü `Shows | Links | Galerie` klappt aus; `Next Show ↗` bleibt primärer Button im Header (rechts) + zusätzlich im aufgeklappten Menü.
+5. **Mobile = Hamburger** — Header zeigt Logo + Burger, Menü `Shows | Linkhub | Galerie` klappt aus; `Next Show ↗` bleibt primärer Button im Header (rechts) + zusätzlich im aufgeklappten Menü.
 
 ## 14 · RFC-Pipeline-Lauf (Ralph-Loop bis Ende — ausgeführt)
 
@@ -202,3 +203,10 @@ Integrationsrisiken (Rest): U9-CMS-Build ungeprüft (DB nötig); `cover`-Feld f�
 - `src/lib/linkScrape.ts` `applyScrapedLink`: füllt zusätzlich `cover` (nur wenn leer) + stempelt `scrapedAt`; Hook-Bedingung scrapt auch nach, wenn nur das Cover fehlt.
 - Website: `getLinks` mapped `cover` aus CMS-Docs, `content.config.ts` links-Schema kennt optionales `cover`, `links.astro` rendert 40px-Thumb im Button.
 - Tests: Scrape-Suite 5/5 (Cover-Regel), Gesamt 40/40, Build grün, CMS-Typcheck Exit 0.
+
+## 17 · Deploy (automatisch, CI-rot→grün)
+
+- Erster Push (`7e2745f`) ließ CI rot werden: CMS-Docker-Context enthält nur `cms/` — der Website-Import `../../../src/lib/linkScrape` schlug fehl (`Can't resolve … in '/app/src/collections'`).
+- Fix (`86ad2bc`): `cms/src/lib/linkScrape.ts` als eigenständige Kopie (Sync-Hinweis im Header), Hook-Import auf `../lib/linkScrape`.
+- CI-Run `34201482018` **success** (4m13s): Web+CMS gebaut, deployed, Live-Smoke grün.
+- Eigener Live-Check `https://scttrd.de`: `/`, `/links/`, `/gallery/`, Show-Seite je 200; Burger/Menu/NEXT-Badges/ISO-`datetime`/`aria-current` verifiziert.

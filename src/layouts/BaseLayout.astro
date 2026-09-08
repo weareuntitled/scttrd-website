@@ -6,12 +6,11 @@ interface Props {
   description: string;
   currentPath: string;
   nextShowUrl: string | null;
-  socialLinks: { label: string; url: string }[];
   bodyClass?: string;
   canonical?: string;
 }
 
-const { title, description, currentPath, nextShowUrl, socialLinks, bodyClass, canonical } = Astro.props;
+const { title, description, currentPath, nextShowUrl, bodyClass, canonical } = Astro.props;
 ---
 
 <!doctype html>
@@ -33,7 +32,7 @@ const { title, description, currentPath, nextShowUrl, socialLinks, bodyClass, ca
     <slot name="head" />
   </head>
   <body class={bodyClass}>
-    <SiteHeader currentPath={currentPath} nextShowUrl={nextShowUrl} socialLinks={socialLinks} />
+    <SiteHeader currentPath={currentPath} nextShowUrl={nextShowUrl} />
     <slot />
   </body>
 </html>

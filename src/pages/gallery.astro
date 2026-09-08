@@ -1,21 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getGallery, getLinks, getShows } from '../lib/cms.ts';
-import { nextShow as hubNextShow, showUrl, socialNavLinks } from '../lib/show.ts';
+import { getGallery, getShows } from '../lib/cms.ts';
+import { nextShow as hubNextShow, showUrl } from '../lib/show.ts';
 import '../styles/tokens.css';
 
 const images = await getGallery();
 const shows = await getShows();
 const next = hubNextShow(shows);
 const nextShowUrl = next ? showUrl(next) : null;
-const socialLinks = socialNavLinks(await getLinks());
 ---
 <BaseLayout
   title="Galerie | SCTTRD"
   description="SCTTRD Galerie: live, backstage und Pressebilder."
   currentPath="/gallery/"
   nextShowUrl={nextShowUrl}
-  socialLinks={socialLinks}
   canonical="https://scttrd.de/gallery/"
 >
     <main class="gallery-page">
