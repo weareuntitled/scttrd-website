@@ -2,13 +2,12 @@
 import { getCollection } from 'astro:content';
 import Customers from '../components/Customers.astro';
 import SiteHeader from '../components/SiteHeader.astro';
-import { past as hubPast, nextShow as hubNextShow, orderedUpcoming, showUrl, socialNavLinks } from '../lib/show.ts';
+import { past as hubPast, nextShow as hubNextShow, orderedUpcoming, showUrl } from '../lib/show.ts';
 import { getPage, getShows } from '../lib/cms.ts';
 import '../styles/tokens.css';
 
 const shows = (await getShows()) as any;
 const homePage = (await getPage('home')) as any;
-const navLinks = (await getCollection('links')).sort((a, b) => a.data.order - b.data.order);
 const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
 const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
 const [homeText] = await getCollection('homeText');
@@ -17,7 +16,6 @@ const homeHeroImage1 = homeImages?.data.heroImage1 ?? '/images/about_04.jpg';
 const homeHeroImage2 = homeImages?.data.heroImage2 ?? '/images/about_01.jpg';
 const upcomingShows = orderedUpcoming(shows);
 const pastShows = hubPast(shows);
-const socialLinks = socialNavLinks(navLinks);
 const nextShow = hubNextShow(shows);
 const nextShowHref = nextShow ? showUrl(nextShow) : null;
 ---
@@ -42,7 +40,7 @@ const nextShowHref = nextShow ? showUrl(nextShow) : null;
   <link href="images/webclip.png" rel="apple-touch-icon">
 </head>
 <body class="body-container">
-  <SiteHeader currentPath="/" nextShowUrl={nextShowHref} socialLinks={socialLinks} />
+  <SiteHeader currentPath="/" nextShowUrl={nextShowHref} />
   <div class="custom-cursor-container"><div class="custom-cursor"><div class="custom-cursor-text">see project</div></div></div>
   <div class="body-content-wrapper">
     <section class="section-home-hero">

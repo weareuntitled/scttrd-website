@@ -1,11 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getLinks, getShows, showSlug } from '../../lib/cms.ts';
-import { nextShow as hubNextShow, showUrl, showAction, socialNavLinks } from '../../lib/show.ts';
+import { getShows, showSlug } from '../../lib/cms.ts';
+import { nextShow as hubNextShow, showUrl, showAction } from '../../lib/show.ts';
 import { trackedTicketUrl } from '../../lib/tracking.ts';
 
 const shows: any[] = await getShows();
-const socialLinks = socialNavLinks(await getLinks());
 const nextShow = hubNextShow(shows);
 const nextShowHref = nextShow ? showUrl(nextShow) : null;
 const show = shows.find((item) => showSlug(item.data.venue, item.data.date) === Astro.params.slug);
@@ -30,7 +29,6 @@ const platformLabel = (url: string) => {
   description={`SCTTRD live: ${venue}, ${city} am ${date}.`}
   currentPath={Astro.url.pathname}
   nextShowUrl={nextShowHref}
-  socialLinks={socialLinks}
   canonical={`https://scttrd.de${showUrl(show)}`}
 >
     <main class="show-page">

@@ -28,9 +28,10 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     assert.match(src, /getShows\(\)/);
     assert.match(src, /from '\.\.\/lib\/cms\.ts'/);
     assert.match(src, /from '\.\.\/lib\/show\.ts'/);
-    for (const c of ['links', 'videos', 'reels', 'homeText', 'homeImages']) {
+    for (const c of ['videos', 'reels', 'homeText', 'homeImages']) {
       assert.match(src, new RegExp(`getCollection\\(['"]${c}['"]\\)`), `missing getCollection('${c}')`);
     }
+    assert.doesNotMatch(src, /getCollection\(['"]links['"]\)/, 'startseite lädt links nicht mehr (Socials sind raus)');
   });
 
   it('index.astro renders shows via Customers component (upcoming/past)', () => {
