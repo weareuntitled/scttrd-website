@@ -11,7 +11,9 @@ import { Shows } from './collections/Shows'
 import { Pages } from './collections/Pages'
 import { Links } from './collections/Links'
 import { LinkHub } from './globals/LinkHub'
-import { migrations } from './migrations'
+// NOTE: prodMigrations bewusst NICHT verdrahtet (2026-09-08): Boot-Migration
+// hing den CMS-Container auf (nie healthy, keine Logs remote einsehbar).
+// Schema-Updates laufen explizit als CI-Schritt (payload migrate, sichtbar + Timeout).
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -34,10 +36,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    // push läuft nur ausserhalb von Production (db-postgres connect.js) —
-    // live greifen prodMigrations, damit neue Felder/Collections ankommen.
     push: process.env.PAYLOAD_PUSH !== 'false',
-    prodMigrations: migrations,
   }),
   sharp,
 })
