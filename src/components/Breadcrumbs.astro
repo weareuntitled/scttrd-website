@@ -1,0 +1,62 @@
+---
+interface Crumb {
+  label: string;
+  url?: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="Brotkrumen-Navigation">
+  <ol>
+    {items.map((item, index) => {
+      const isLast = index === items.length - 1;
+      return (
+        <li>
+          {item.url && !isLast ? (
+            <a href={item.url}>{item.label}</a>
+          ) : (
+            <span aria-current={isLast ? 'page' : undefined}>{item.label}</span>
+          )}
+          {!isLast && <span class="crumb-sep" aria-hidden="true">›</span>}
+        </li>
+      );
+    })}
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+  }
+  .breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .breadcrumbs a {
+    color: inherit;
+    text-decoration: none;
+    text-underline-offset: 4px;
+  }
+  .breadcrumbs a:hover, .breadcrumbs a:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .breadcrumbs span[aria-current='page'] { opacity: .65; }
+  .crumb-sep { opacity: .4; }
+</style>
