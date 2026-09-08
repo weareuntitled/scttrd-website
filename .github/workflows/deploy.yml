@@ -56,8 +56,10 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        # payload migrate fragt bei dev-gepushten DBs interaktiv (y/N) — ohne Antwort hängt der Step bis zum Timeout (Exit 124).
+        # yes-pipe ist hier sicher: alle Migrationen im Repo sind rein additiv (IF NOT EXISTS, keine Drops).
         run: |
-          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && timeout 180 docker compose -f compose.all.yaml run --rm cms npm run payload -- migrate"
+          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && timeout 180 docker compose -f compose.all.yaml run --rm cms sh -c 'yes | npm run payload -- migrate'"
       - name: Live smoke test
         run: |
           for attempt in {1..15}; do
