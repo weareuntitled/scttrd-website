@@ -55,6 +55,16 @@ export const Shows: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'linkKind',
+      type: 'select',
+      admin: { description: 'Ticket = echter Ticketshop · Webseite = Venue-/Eventseite (kein Ticketverkauf) · Video = Recording' },
+      options: [
+        { label: 'Ticketshop', value: 'ticket' },
+        { label: 'Webseite (Location/Event)', value: 'website' },
+        { label: 'Video', value: 'video' },
+      ],
+    },
+    {
       name: 'lineup',
       type: 'array',
       admin: {
