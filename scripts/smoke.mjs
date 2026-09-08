@@ -23,6 +23,12 @@ if (!Array.isArray(cmsShowsBody.docs)) throw new Error('cms-shows-api: response 
 if (cmsShowsBody.docs.some((show) => !Array.isArray(show.lineup))) throw new Error('cms-shows-api: show has no lineup array')
 console.log(`cms-shows-api: ${cmsShows.status}`)
 
+const cmsLinks = await fetch(`${cmsUrl}/api/links?sort=order&limit=100`, { signal: AbortSignal.timeout(15000) })
+if (!cmsLinks.ok) throw new Error(`cms-links-api: ${cmsLinks.status} ${cmsUrl}/api/links?sort=order&limit=100`)
+const cmsLinksBody = await cmsLinks.json()
+if (!Array.isArray(cmsLinksBody.docs)) throw new Error('cms-links-api: response has no docs array')
+console.log(`cms-links-api: ${cmsLinks.status} docs=${cmsLinksBody.docs.length}`)
+
 const indexHtml = await fetch(`${baseUrl}/index.html`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
 if (indexHtml.status !== 308 || indexHtml.headers.get('location') !== '/') {
   throw new Error(`index-html-redirect: expected 308 to /, got ${indexHtml.status} ${indexHtml.headers.get('location') || ''}`)
@@ -30,14 +36,16 @@ if (indexHtml.status !== 308 || indexHtml.headers.get('location') !== '/') {
 console.log(`index-html-redirect: ${indexHtml.status}`)
 
 const showChecks = [
-  ['singoldsand-show', '/shows/singoldsand-21-08-2026/', ['Singoldsand', 'Google Maps']],
-  ['komfortrauschen-show', '/shows/kulturhaus-milbertshofen-06-12-2025/', ['eventbrite.de', 'Ort in Google Maps öffnen']],
+  ['singoldsand-show', '/shows/singoldsand-21-08-2026/', ['Singoldsand', 'Google Maps'], []],
+  // Past-Show: kein Ticket-CTA mehr (kein eventbrite-Link im HTML)
+  ['komfortrauschen-show', '/shows/kulturhaus-milbertshofen-06-12-2025/', ['Kulturhaus Milbertshofen', 'Ort in Google Maps öffnen'], ['eventbrite.de']],
 ]
-for (const [name, path, markers] of showChecks) {
+for (const [name, path, markers, forbidden = []] of showChecks) {
   const page = await fetch(`${baseUrl}${path}`, { signal: AbortSignal.timeout(15000) })
   const html = await page.text()
   if (!page.ok) throw new Error(`${name}: ${page.status} ${path}`)
   for (const marker of markers) if (!html.includes(marker)) throw new Error(`${name}: missing marker "${marker}"`)
+  for (const marker of forbidden) if (html.includes(marker)) throw new Error(`${name}: forbidden marker "${marker}" present`)
   console.log(`${name}: ${page.status}`)
 }
 
