@@ -1,15 +1,12 @@
 import { getCollection } from 'astro:content'
+import { showSlug } from './show.ts'
+
+export { showSlug }
 
 const cmsBase = () => {
   const url = import.meta.env.PAYLOAD_URL || (typeof process !== 'undefined' ? (process as any).env?.PAYLOAD_URL : undefined) || 'http://localhost:3000'
   return url.replace(/\/$/, '')
 }
-
-export const showSlug = (venue: string, date: string) => `${venue}-${date}`
-  .toLowerCase()
-  .normalize('NFKD')
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-|-$/g, '')
 
 export async function getPage(slug: string) {
   const base = cmsBase()
@@ -48,7 +45,7 @@ export async function getLinks() {
     const r = await fetch(`${base}/api/links?sort=order&limit=100`, { signal: AbortSignal.timeout(1500) } as any)
     if (r.ok) {
       const docs = ((await r.json()) as any).docs ?? []
-      if (docs.length) return docs.map((d: any) => ({ label: d.label, platform: d.platform, url: d.url, target: d.target || '_blank' }))
+      if (docs.length) return docs.map((d: any) => ({ label: d.label, platform: d.platform, url: d.url, target: d.target || '_blank', cover: d.cover || undefined }))
     }
   } catch {}
   const local = await getCollection('links')

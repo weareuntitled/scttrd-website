@@ -1,0 +1,39 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  currentPath: string;
+  nextShowUrl: string | null;
+  socialLinks: { label: string; url: string }[];
+  bodyClass?: string;
+  canonical?: string;
+}
+
+const { title, description, currentPath, nextShowUrl, socialLinks, bodyClass, canonical } = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="theme-color" content="#f00000" />
+    <link href="/images/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <link href="/images/webclip.png" rel="apple-touch-icon" />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <SiteHeader currentPath={currentPath} nextShowUrl={nextShowUrl} socialLinks={socialLinks} />
+    <slot />
+  </body>
+</html>

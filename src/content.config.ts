@@ -31,6 +31,7 @@ const links = defineCollection({
     label: z.string(),
     url: z.string().url(),
     order: z.number(),
+    cover: z.string().url().optional(),
   }),
 });
 

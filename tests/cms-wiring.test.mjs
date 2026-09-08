@@ -25,7 +25,9 @@ const fm = (s) => {
 describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
   it('index.astro loads shows via CMS (getShows) + all local collections', () => {
     const src = read('src/pages/index.astro');
-    assert.match(src, /import \{ getShows \} from '\.\.\/lib\/cms\.ts'/);
+    assert.match(src, /getShows\(\)/);
+    assert.match(src, /from '\.\.\/lib\/cms\.ts'/);
+    assert.match(src, /from '\.\.\/lib\/show\.ts'/);
     for (const c of ['links', 'videos', 'reels', 'homeText', 'homeImages']) {
       assert.match(src, new RegExp(`getCollection\\(['"]${c}['"]\\)`), `missing getCollection('${c}')`);
     }
