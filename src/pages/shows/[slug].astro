@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getShows, showSlug } from '../../lib/cms.ts';
 import { nextShow as hubNextShow, showUrl, showAction, adjacentShows } from '../../lib/show.ts';
 import { trackedTicketUrl } from '../../lib/tracking.ts';
+import '../../styles/show.css';
 
 const shows: any[] = await getShows();
 const nextShow = hubNextShow(shows);
@@ -22,20 +24,24 @@ const ctaHref = trackedTicketUrl(show, { source: 'homepage', medium: 'ticket-but
   currentPath={Astro.url.pathname}
   nextShowUrl={nextShowHref}
   canonical={`https://scttrd.de${showUrl(show)}`}
+  bodyClass="show-body"
 >
     <main class="show-page">
-      {image && <div class="show-media"><img src={image} alt={imageAlt || venue} /></div>}
-      <section class="show-copy">
-        <p class="eyebrow">SCTTRD Live // {status === 'upcoming' ? 'Upcoming' : 'Archive'}</p>
-        <h1>{venue}</h1>
-        <div class="meta">
-          <strong>{city} · {date}</strong>
-          <a href={mapUrl} target="_blank" rel="noopener noreferrer">Ort in Google Maps öffnen ↗</a>
-        </div>
-        <div class:list={['actions', status === 'upcoming' && ctaHref ? 'actions-sticky-dupe' : '']} id="tickets">
-          {ctaHref ? <a class="ticket" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a> : status === 'upcoming' && <p class="muted">{ctaLabel}</p>}
-        </div>
-      </section>
+      <div class="show-main">
+        {image && <div class="show-media"><img src={image} alt={imageAlt || venue} /></div>}
+        <section class="show-copy">
+          <Breadcrumbs items={[{ label: 'Home', url: '/' }, { label: 'Shows', url: '/#shows' }, { label: venue }]} />
+          <p class="show-eyebrow">SCTTRD Live // {status === 'upcoming' ? 'Upcoming' : 'Archive'}</p>
+          <h1 class="show-title">{venue}</h1>
+          <div class="show-meta">
+            <strong>{city} · {date}</strong>
+            <a href={mapUrl} target="_blank" rel="noopener noreferrer">Ort in Google Maps öffnen ↗</a>
+          </div>
+          <div class:list={['show-actions', status === 'upcoming' && ctaHref ? 'show-actions-sticky-dupe' : '']} id="tickets">
+            {ctaHref ? <a class="show-ticket" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a> : status === 'upcoming' && <p class="show-muted">{ctaLabel}</p>}
+          </div>
+        </section>
+      </div>
       <div class="show-extra">
         {(prev || next) && <nav class="show-pager" aria-label="Weitere Shows">
           {prev ? <a class="pager-link" href={showUrl(prev)}><span class="pager-dir">← früher</span><strong>{prev.data.venue}</strong><span class="pager-meta">{prev.data.city} · {prev.data.date}</span></a> : <span class="pager-link pager-empty"></span>}
@@ -52,69 +58,6 @@ const ctaHref = trackedTicketUrl(show, { source: 'homepage', medium: 'ticket-but
         </div>}
       </div>
     </main>
-    {status === 'upcoming' && ctaHref && <a class="ticket-sticky" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a>}
-    <footer><strong>SCTTRD</strong><span>Brutal, aber schön.</span></footer>
+    {status === 'upcoming' && ctaHref && <a class="show-ticket-sticky" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a>}
+    <footer class="show-footer"><strong>SCTTRD</strong><span>Brutal, aber schön.</span></footer>
 </BaseLayout>
-
-<style>
-  @font-face { font-family: Founders; src: url('/fonts/TestFoundersGrotesk-Medium.otf'); font-weight: 500; font-display: swap; }
-  @font-face { font-family: Founders; src: url('/fonts/TestFoundersGrotesk-Semibold.otf'); font-weight: 800 900; font-display: swap; }
-  :global(*) { box-sizing: border-box; border-radius: 0; }
-  :global(body) { margin: 0; background: #f00000; color: #0c0c0c; font-family: Founders, Arial, sans-serif; }
-  :global(body)::before { position: fixed; inset: 0; z-index: -1; pointer-events: none; content: ''; opacity: .12; background-image: linear-gradient(135deg, transparent 0 49%, #0c0c0c 49% 50%, transparent 50% 100%); background-size: 22px 22px; }
-  .show-page { display: flex; flex-direction: column; width: min(100% - 36px, 1180px); min-height: calc(100vh - 80px); margin: auto; padding: 24px 0 88px; }
-  .show-media { width: 100%; padding: 7px; border: 3px solid #0c0c0c; background: #0c0c0c; box-shadow: 8px 8px 0 #0c0c0c; }
-  img { display: block; width: 100%; height: clamp(280px, 82vw, 380px); object-fit: cover; filter: grayscale(1) contrast(1.25); }
-  .show-copy { width: 100%; margin-top: 30px; }
-  .eyebrow { display: inline-block; margin: 0 0 12px; padding: 6px 8px; background: #0c0c0c; color: #f00000; font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
-  h1 { margin: 0 0 32px; font-size: clamp(52px, 9vw, 108px); line-height: .8; letter-spacing: -.075em; overflow-wrap: anywhere; text-transform: uppercase; }
-  .meta { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; padding: 16px 0; border-block: 2px solid #0c0c0c; }
-  .meta strong { font-size: 18px; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
-  .meta a { color: inherit; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; text-underline-offset: 4px; }
-  .actions { width: 100%; margin-top: 28px; scroll-margin-top: 20px; }
-  .ticket { display: block; padding: 17px 20px; border: 2px solid #0c0c0c; background: #0c0c0c; color: #f00000; font-size: 14px; font-weight: 900; letter-spacing: .04em; text-decoration: none; text-transform: uppercase; box-shadow: 5px 5px 0 rgba(12, 12, 12, .25); transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease; }
-  .ticket:hover, .ticket:focus-visible { background: transparent; color: #0c0c0c; box-shadow: 3px 3px 0 #0c0c0c; transform: translate(2px, 2px); }
-  .muted { opacity: .55; }
-  .ticket-sticky { display: none; }
-  .show-extra { display: flex; flex-direction: column; gap: clamp(28px, 4vw, 48px); width: 100%; margin-top: clamp(40px, 6vw, 64px); }
-  .show-pager { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-  .pager-link { display: grid; gap: 5px; padding: 20px 22px; border: 2px solid #0c0c0c; background: transparent; color: #0c0c0c; text-decoration: none; box-shadow: 5px 5px 0 rgba(12, 12, 12, .22); transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease; }
-  .pager-link:hover, .pager-link:focus-visible { background: #0c0c0c; color: #f00000; box-shadow: 2px 2px 0 #0c0c0c; transform: translate(2px, 2px); }
-  .pager-dir { font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
-  .pager-link strong { font-size: clamp(18px, 2.4vw, 26px); line-height: 1.02; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: anywhere; }
-  .pager-meta { font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
-  .pager-empty { visibility: hidden; pointer-events: none; }
-  .lineup-acts { width: 100%; border: 2px solid #0c0c0c; padding: 16px 18px 18px; scroll-margin-top: 20px; }
-  .lineup-acts-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
-  .lineup-acts-head h2, .lineup-acts-head span { margin: 0; font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
-  .lineup-acts-head span { opacity: .55; }
-  .lineup-acts-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-  .lineup-acts-list li { display: inline; }
-  .lineup-acts-list a { display: inline-block; padding: 4px 9px; border: 1px solid rgba(12, 12, 12, .45); color: inherit; font-size: 11px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; }
-  .lineup-acts-list a:hover, .lineup-acts-list a:focus-visible { background: #0c0c0c; color: #f00000; border-color: #0c0c0c; }
-  footer { display: flex; justify-content: space-between; align-items: end; padding: 40px max(18px, calc((100vw - 1180px) / 2)); background: #0c0c0c; color: #f4f1ea; text-transform: uppercase; }
-  footer strong { font-size: clamp(32px, 5vw, 52px); line-height: .8; letter-spacing: -.06em; }
-  footer span { color: #f00000; font-size: 11px; font-weight: 900; letter-spacing: .15em; }
-  @media (max-width: 767px) {
-    h1 { margin-bottom: 18px; font-size: clamp(42px, 13vw, 58px); line-height: .88; letter-spacing: -.055em; }
-    .actions-sticky-dupe { display: none; }
-    .ticket-sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 2px solid #0c0c0c; background: #0c0c0c; color: #f00000; font-size: 13px; font-weight: 900; letter-spacing: .06em; text-decoration: none; text-transform: uppercase; }
-    .ticket-sticky:hover, .ticket-sticky:focus-visible { background: #f00000; color: #0c0c0c; }
-    .show-page { padding-bottom: 130px; }
-    footer { align-items: center; }
-  }
-  @media (min-width: 768px) {
-    .show-page { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: clamp(40px, 6vw, 88px); padding-block: clamp(48px, 7vw, 88px); }
-    .show-media { position: sticky; top: 32px; flex: 0 1 42%; }
-    img { height: auto; max-height: 72vh; }
-    .show-copy { flex: 1 1 58%; min-width: 0; margin-top: 0; }
-    h1 { font-size: clamp(54px, 7vw, 92px); }
-    .meta { border-block-width: 4px; }
-    .meta strong { font-size: clamp(24px, 3vw, 36px); }
-    .actions { display: flex; gap: 16px; }
-    .ticket { flex: 1; }
-    .show-extra { flex: 1 1 100%; }
-    .show-pager { flex-direction: row; }
-    .pager-next { text-align: right; }
-  }
-</style>

@@ -55,13 +55,14 @@ const nextShowHref = nextShow ? showUrl(nextShow) : null;
         <div class="home-hero-cta wrapper">
           <a class="home-hero-next" href={nextShowHref ?? '#'}>
             <span class="home-hero-next-label">Next Show</span>
-            <strong class="home-hero-next-show">{nextShow.data.venue} · {nextShow.data.city}</strong>
-            <span class="home-hero-next-date">{nextShow.data.date} →</span>
+            <strong class="home-hero-next-show">{nextShow.data.venue}</strong>
+            <span class="home-hero-next-meta">{nextShow.data.city} · {nextShow.data.date}</span>
+            <span class="home-hero-next-arrow" aria-hidden="true">→</span>
           </a>
         </div>
       )}
     </section>
-    <section class="section-about">
+    <section class="section-about" id="about">
       <div class="wrapper">
         <div class="about-grid">
           <div id="w-node-_529206b4-7da0-2990-4c60-98b86e7763c4-269f9a25" class="about-section-name"><div class="section-name"><p></p></div></div>
@@ -157,15 +158,77 @@ const nextShowHref = nextShow ? showUrl(nextShow) : null;
     .nav-link-el-container { min-height: 44px; display: flex; align-items: center; }
     @font-face { font-family: Founders; src: url('/fonts/TestFoundersGrotesk-Medium.otf'); font-weight: 500; font-display: swap; }
     @font-face { font-family: Founders; src: url('/fonts/TestFoundersGrotesk-Semibold.otf'); font-weight: 800 900; font-display: swap; }
-    .home-hero-cta { margin-top: clamp(24px, 5vw, 56px); }
-    .home-hero-next { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; padding: 18px 22px; border: 2px solid var(--dark, #0c0c0c); background: var(--dark, #0c0c0c); color: #f00000; text-decoration: none; box-shadow: 6px 6px 0 rgba(12, 12, 12, .25); font-family: Founders, Arial, sans-serif; transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease; }
-    .home-hero-next:hover, .home-hero-next:focus-visible { background: transparent; color: var(--dark, #0c0c0c); box-shadow: 3px 3px 0 #0c0c0c; transform: translate(3px, 3px); }
-    .home-hero-next-label { font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
-    .home-hero-next-show { font-size: clamp(20px, 3vw, 30px); line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
-    .home-hero-next-date { margin-left: auto; font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+    .home-hero-cta { margin-top: clamp(28px, 6vw, 72px); }
+    .home-hero-next {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      min-height: clamp(220px, 32vh, 320px);
+      padding: clamp(28px, 4vw, 48px);
+      border: 2px solid var(--dark, #0c0c0c);
+      background: var(--dark, #0c0c0c);
+      color: #f00000;
+      text-decoration: none;
+      box-shadow: 8px 8px 0 rgba(12, 12, 12, .28);
+      font-family: Founders, Arial, sans-serif;
+      overflow: hidden;
+      transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .home-hero-next::before {
+      position: absolute;
+      inset: 0;
+      content: '';
+      pointer-events: none;
+      opacity: .1;
+      background-image: linear-gradient(135deg, transparent 0 49%, #f00000 49% 50%, transparent 50% 100%);
+      background-size: 26px 26px;
+    }
+    .home-hero-next:hover, .home-hero-next:focus-visible {
+      background: transparent;
+      color: var(--dark, #0c0c0c);
+      box-shadow: 4px 4px 0 #0c0c0c;
+      transform: translate(4px, 4px);
+    }
+    .home-hero-next-label {
+      position: relative;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      opacity: .75;
+      margin-bottom: 18px;
+    }
+    .home-hero-next-show {
+      position: relative;
+      font-size: clamp(38px, 8vw, 84px);
+      line-height: .86;
+      letter-spacing: -.05em;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
+    .home-hero-next-meta {
+      position: relative;
+      margin-top: 18px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .85;
+    }
+    .home-hero-next-arrow {
+      position: absolute;
+      right: clamp(24px, 4vw, 48px);
+      bottom: clamp(20px, 3vw, 40px);
+      font-size: clamp(40px, 7vw, 72px);
+      line-height: 1;
+      transition: transform .2s ease;
+    }
+    .home-hero-next:hover .home-hero-next-arrow, .home-hero-next:focus-visible .home-hero-next-arrow { transform: translateX(10px); }
     @media (max-width: 767px) {
-      .home-hero-next { align-items: flex-start; }
-      .home-hero-next-date { margin-left: 0; }
+      .home-hero-next { min-height: 200px; }
+      .home-hero-next-arrow { right: 22px; bottom: 18px; }
     }
   </style>
   <script is:inline>

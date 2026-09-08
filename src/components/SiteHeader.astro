@@ -13,8 +13,9 @@ const { currentPath, nextShowUrl } = Astro.props;
 const showsHref = currentPath === '/' ? '#shows' : '/#shows';
 const menuLinks: NavLink[] = [
   { label: 'Shows', url: showsHref },
-  { label: 'Linkhub', url: '/links/' },
+  { label: 'Links', url: '/links/' },
   { label: 'Galerie', url: '/gallery/' },
+  { label: 'About', url: '/#about' },
 ];
 ---
 
@@ -22,7 +23,6 @@ const menuLinks: NavLink[] = [
   <a class="site-brand" href="/" aria-label="SCTTRD Startseite">
     <img width="66" height="66" alt="SCTTRD" src="/images/Frame-179-2.png" loading="eager" />
   </a>
-  {nextShowUrl && <a class="site-next" href={nextShowUrl}>Next Show ↗</a>}
   <button
     class="site-burger"
     type="button"
@@ -99,27 +99,26 @@ const menuLinks: NavLink[] = [
     text-decoration-thickness: 2px;
     text-underline-offset: 5px;
   }
-  .site-next {
-    flex: 0 0 auto;
-    margin-left: auto;
-    padding: 12px 15px;
+  .site-nav .site-nav-next {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 13px;
     border: 2px solid #0c0c0c;
     background: #0c0c0c;
     color: #f00000;
-    box-shadow: 4px 4px 0 rgba(12, 12, 12, .25);
+    box-shadow: 3px 3px 0 rgba(12, 12, 12, .25);
     font-size: 11px;
     font-weight: 900;
     letter-spacing: .08em;
-    text-decoration: none;
     text-transform: uppercase;
+    text-decoration: none;
   }
-  .site-next:hover, .site-next:focus-visible {
+  .site-nav .site-nav-next:hover, .site-nav .site-nav-next:focus-visible {
     background: transparent;
     color: #0c0c0c;
     box-shadow: 2px 2px 0 #0c0c0c;
     transform: translate(2px, 2px);
   }
-  .site-nav-next { display: none; }
   .site-burger {
     display: none;
     flex: 0 0 auto;
@@ -134,12 +133,11 @@ const menuLinks: NavLink[] = [
     cursor: pointer;
   }
   .site-burger span { display: block; width: 20px; height: 2px; background: #0c0c0c; }
-  .site-burger:focus-visible, .site-brand:focus-visible, .site-next:focus-visible { outline: 3px solid #0c0c0c; outline-offset: 3px; }
+  .site-burger:focus-visible, .site-brand:focus-visible, .site-nav-next:focus-visible { outline: 3px solid #0c0c0c; outline-offset: 3px; }
   @media (max-width: 767px) {
     .site-header { display: flex; flex-wrap: wrap; gap: 14px; min-height: 64px; padding-block: 12px; }
     .site-brand { width: 45px; height: 45px; }
-    .site-next { margin-left: auto; padding: 10px 12px; }
-    .site-burger { display: inline-flex; }
+    .site-burger { display: inline-flex; margin-left: auto; }
     .site-nav {
       display: none;
       order: 3;
@@ -153,6 +151,6 @@ const menuLinks: NavLink[] = [
     .site-header[data-open='true'] .site-nav { display: flex; }
     .site-nav a { padding: 12px 4px; font-size: 12px; border-bottom: 1px solid rgba(12, 12, 12, .18); }
     .site-nav a:last-child { border-bottom: 0; }
-    .site-nav-next { display: block; }
+    .site-nav-next { display: flex; justify-content: center; margin-top: 10px; }
   }
 </style>
