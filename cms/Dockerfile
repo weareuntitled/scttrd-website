@@ -6,6 +6,7 @@ RUN npm ci
 COPY . .
 ENV NODE_ENV=production
 RUN npm run generate:types || true
+RUN npm run generate:importmap || true
 RUN npm run build
 
 FROM node:20-alpine AS runner
