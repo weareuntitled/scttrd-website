@@ -7,7 +7,7 @@ const fillFromScrape = async (data: any) => {
     return data;
   }
   try {
-    const { scrapeLink, applyScrapedLink } = await import('../../../src/lib/linkScrape');
+    const { scrapeLink, applyScrapedLink } = await import('../lib/linkScrape');
     const scraped = await scrapeLink(String(data.url));
     return { ...data, ...applyScrapedLink(data, scraped) };
   } catch {
