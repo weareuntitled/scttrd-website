@@ -12,7 +12,9 @@ interface Props {
 const { shows, kind, pinFirst = false } = Astro.props;
 ---
 
-{
+{shows.length === 0 && kind === 'upcoming' ? (
+  <p class="customers-empty">Noch keine kommende Show veröffentlicht. Für Booking-Anfragen: <a href="mailto:info@scttrd.de">info@scttrd.de</a></p>
+) : (
   shows.map((show, index) => {
     const interaction = getInteraction(kind, index);
     const itemAttrs = interaction
@@ -57,7 +59,7 @@ const { shows, kind, pinFirst = false } = Astro.props;
       </Tag>
     );
   })
-}
+)}
 
 <style is:global>
   .section-customers { padding-bottom: var(--space-12) !important; }
