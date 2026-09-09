@@ -63,6 +63,9 @@ const menuLinks: NavLink[] = [
       button?.focus();
     }
   });
+  nav?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => setOpen(false));
+  });
 </script>
 
 <style>
@@ -133,7 +136,8 @@ const menuLinks: NavLink[] = [
     cursor: pointer;
   }
   .site-burger span { display: block; width: 20px; height: 2px; background: #0c0c0c; }
-  .site-burger:focus-visible, .site-brand:focus-visible, .site-nav-next:focus-visible { outline: 3px solid #0c0c0c; outline-offset: 3px; }
+   .site-burger:focus-visible, .site-brand:focus-visible, .site-nav-next:focus-visible { outline: 3px solid #0c0c0c; outline-offset: 3px; }
+   @media (prefers-reduced-motion: reduce) { .site-nav .site-nav-next { transition: none; } }
   @media (max-width: 767px) {
     .site-header { display: flex; flex-wrap: wrap; gap: 14px; min-height: 64px; padding-block: 12px; }
     .site-brand { width: 45px; height: 45px; }
