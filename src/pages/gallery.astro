@@ -31,12 +31,17 @@ const nextShowUrl = next ? showUrl(next) : null;
 <style>
   :global(*) { box-sizing: border-box; }
   :global(body) { margin: 0; background: #f4f1ea; color: #111; font-family: Poppins, system-ui, sans-serif; }
-  .gallery-page { max-width: 1440px; margin: auto; padding: 28px clamp(18px, 4vw, 64px) 72px; }
+  .gallery-page { max-width: 1440px; margin: auto; padding: 40px clamp(18px, 4vw, 64px) 80px; }
   .gallery-title { margin-bottom: 48px; border-bottom: 2px solid #111; padding-bottom: 14px; }
   h1 { margin: 0; font-size: clamp(42px, 9vw, 128px); line-height: .85; letter-spacing: -.08em; text-transform: uppercase; }
   .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   figure { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; background: #ddd; }
   img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
   figure:hover img { transform: scale(1.04); }
-  @media (max-width: 700px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } .gallery-title { margin-bottom: 28px; } }
+  @media (max-width: 700px) {
+    .gallery-page { padding: 40px 18px 72px; }
+    .gallery-title { margin-bottom: 32px; padding-bottom: 18px; }
+    h1 { font-size: clamp(46px, 15vw, 64px); line-height: .9; }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  }
 </style>

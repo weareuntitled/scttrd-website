@@ -50,6 +50,9 @@ const profileSchema = {
     <meta property="og:type" content="profile" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="https://scttrd.de/links/" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <script type="application/ld+json" set:html={JSON.stringify(profileSchema)}></script>
   </head>
   <body>
@@ -123,5 +126,20 @@ const profileSchema = {
   time { width: 44px; flex: 0 0 44px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 20px; font-weight: 800; } time span { margin-top: 4px; font-size: 9px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,.6); }
   .show-copy { min-width: 0; flex: 1; display: grid; gap: 3px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; } .show-copy span { font-size: 12px; color: rgba(255,255,255,.6); }
   footer { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); } footer a { color: inherit; text-decoration: none; }
-  @media (max-width: 480px) { .hub { width: min(100% - 20px, 680px); padding-top: 28px; } .release-card { gap: 14px; } .release-cover { width: 80px; height: 80px; flex-basis: 80px; } .show-row { flex-wrap: wrap; } .ticket-btn { flex: 1 1 100%; min-height: 48px; } }
+  @media (max-width: 600px) {
+    .hub { width: calc(100% - 36px); padding: 48px 0 36px; }
+    header { margin-bottom: 36px; }
+    .avatar { width: 108px; height: 108px; margin-bottom: 18px; }
+    .name { font-size: 27px; line-height: 1.1; }
+    .bio { margin-top: 12px; font-size: 15px; line-height: 1.55; }
+    .release-card { gap: 14px; margin-bottom: 36px; padding: 14px; }
+    .release-cover { width: 80px; height: 80px; flex-basis: 80px; }
+    .release-title { font-size: 18px; }
+    .section-heading { margin-bottom: 16px; }
+    section, nav { gap: 12px; margin-bottom: 36px; }
+    .link-btn { min-height: 60px; padding: 15px 16px; font-size: 15px; line-height: 1.3; }
+    .show-row { flex-wrap: wrap; gap: 8px; }
+    .ticket-btn { flex: 1 1 100%; min-height: 52px; }
+    footer { padding: 16px 0 24px; font-size: 12px; }
+  }
 </style>

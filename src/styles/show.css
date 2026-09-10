@@ -13,7 +13,7 @@
   margin: 0;
   background: var(--scttrd-red);
   color: var(--scttrd-black);
-  font-family: Founders, Arial, sans-serif;
+  font-family: Founders, Poppins, sans-serif;
 }
 .show-body::before {
   position: fixed;
@@ -215,7 +215,18 @@
 
 @media (max-width: 767px) {
   .show-main { flex-direction: column; }
-  .show-title { margin-bottom: 18px; font-size: clamp(42px, 13vw, 58px); line-height: .88; letter-spacing: -.055em; }
+  .show-page { width: calc(100% - 36px); padding-top: 32px; padding-bottom: 136px; }
+  .show-copy { margin-top: 36px; }
+  .show-title { margin-bottom: 24px; font-size: clamp(40px, 11.5vw, 54px); line-height: .9; letter-spacing: -.055em; }
+  .show-meta { gap: 12px; padding-block: 18px; }
+  .show-meta strong { font-size: 19px; line-height: 1.08; }
+  .show-meta a { font-size: 12px; line-height: 1.35; }
+  .show-actions { margin-top: 32px; }
+  .show-extra { gap: 24px; margin-top: 64px; }
+  .show-pager { gap: 18px; }
+  .pager-link { padding: 22px 18px; }
+  .pager-link strong { font-size: 20px; }
+  .lineup-acts { padding: 20px 18px 22px; }
   .show-actions-sticky-dupe { display: none; }
   .show-ticket-sticky {
     position: fixed;
@@ -238,8 +249,9 @@
     text-transform: uppercase;
   }
   .show-ticket-sticky:hover, .show-ticket-sticky:focus-visible { background: var(--scttrd-red); color: var(--scttrd-black); }
-  .show-page { padding-bottom: 130px; }
-  .show-footer { align-items: center; }
+  .show-footer { align-items: center; gap: 20px; padding: 36px 18px calc(92px + env(safe-area-inset-bottom, 0px)); }
+  .show-footer strong { font-size: 34px; }
+  .show-footer span { font-size: 10px; text-align: right; }
 }
 
 @media (min-width: 768px) {

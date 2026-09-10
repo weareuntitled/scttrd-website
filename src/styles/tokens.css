@@ -6,8 +6,11 @@
   --space-6: 24px;
   --space-8: 32px;
   --space-12: 48px;
+  --page-gutter: clamp(18px, 4vw, 64px);
+  --section-space: clamp(72px, 9vw, 120px);
+  --section-space-mobile: 64px;
   --text-heading: 28px;
   --text-show: 17px;
-  --text-show-mobile: 14px;
-  --text-show-mobile-sm: 13px;
+  --text-show-mobile: 16px;
+  --text-show-mobile-sm: 15px;
 }
