@@ -95,6 +95,10 @@
 
     footer{display:flex;justify-content:space-between;gap:24px;padding:28px 0;font-size:13px;font-weight:500}
     a{color:inherit}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;padding:18px 0 0}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid var(--ink);background:var(--ink);color:#fff;font:inherit;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+    .pill.ghost{background:transparent;color:var(--ink)}
+    .pill:hover{background:var(--red);border-color:var(--red);color:#fff}
 
     @media(max-width:720px){
       main{padding:24px 18px}
@@ -112,8 +116,9 @@
       footer{flex-direction:column;gap:6px}
     }
     @media print{
+      @page{size:A4;margin:12mm}
       body{background:#fff;font-size:10px}
-      main{max-width:none;padding:8mm}
+      main{max-width:none;padding:0}
       .brand{font-size:54px}
       section{padding:7mm 0;break-inside:avoid}
       .section-head{margin-bottom:4mm}
@@ -154,6 +159,10 @@
     <div class="brand">SCTTRD</div>
     <div class="meta">Technical Rider + Stage Plot<br>Version <b>2026-09</b><br>info@scttrd.de · +49 172 5231109</div>
   </header>
+  <div class="actions no-print">
+    <a class="pill" href="scttrd-foh-rider.pdf" download>PDF herunterladen ↓</a>
+    <button class="pill ghost" type="button" onclick="window.print()">Drucken</button>
+  </div>
 
   <section>
     <div class="section-head"><span class="number">00 / ÜBERBLICK</span><h2>Kurz erklärt</h2></div>
