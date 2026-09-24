@@ -42,6 +42,30 @@ async function logToCms(payload: ReturnType<typeof riderRequestPayload>) {
   }
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function notificationHtml(data: { name: string; venue: string; email: string }) {
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:10px 14px;border-bottom:1px solid #222;color:#888;font-size:12px;letter-spacing:.08em;text-transform:uppercase;width:140px;">${label}</td><td style="padding:10px 14px;border-bottom:1px solid #222;color:#fff;font-size:15px;">${escapeHtml(value)}</td></tr>`;
+  return `<!doctype html><html><body style="margin:0;background:#0c0c0c;color:#fff;font-family:Arial,sans-serif;">
+<div style="max-width:560px;margin:0 auto;padding:28px 20px;">
+<p style="margin:0 0 8px;color:#f00000;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;">SCTTRD</p>
+<h1 style="margin:0 0 18px;font-size:22px;line-height:1.2;">Neue Rider-Anfrage</h1>
+<table style="width:100%;border-collapse:collapse;background:#161616;border:2px solid #f00000;">
+${row('Name', data.name)}
+${row('Venue', data.venue)}
+${row('E-Mail', data.email)}
+</table>
+<p style="margin:18px 0 0;color:#aaa;font-size:13px;line-height:1.5;">Die Anfrage wurde zusätzlich im Payload CMS unter Rider-Anfragen gespeichert. Antworten gehen an ${escapeHtml(data.email)}.</p>
+</div></body></html>`;
+}
+
 async function sendNotification(data: { name: string; venue: string; email: string }) {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
@@ -51,18 +75,23 @@ async function sendNotification(data: { name: string; venue: string; email: stri
     return false;
   }
   try {
-    const port = Number(process.env.SMTP_PORT) || 465;
+    const port = Number(process.env.SMTP_PORT) || 587;
     const transport = nodemailer.createTransport({
       host,
       port,
       secure: port === 465,
       auth: { user, pass },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
+      dnsTimeout: 5000,
     });
     await transport.sendMail({
       from: `SCTTRD Website <${user}>`,
       to: process.env.RIDER_MAIL_TO || 'info@scttrd.de',
       replyTo: data.email,
       subject: `Neue Rider-Anfrage: ${data.venue}`,
+      html: notificationHtml(data),
       text: [
         'Eine neue Rider- und Hospitality-Anfrage ist eingegangen.',
         '',
