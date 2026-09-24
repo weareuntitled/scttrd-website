@@ -66,6 +66,11 @@ describe('Rider-Gate: Verdrahtung', () => {
     assert.match(src, /sendNotification/);
     assert.match(src, /SMTP_PASSWORD/);
     assert.match(src, /sendMail/);
+    assert.match(src, /html: notificationHtml/);
+    assert.match(src, /#f00000/);
+    assert.match(src, /connectionTimeout/);
+    assert.match(src, /socketTimeout/);
+    assert.match(read('all-inclusive/compose.all.yaml'), /SMTP_PORT: \$\{SMTP_PORT:-587\}/);
   });
 
   it('CMS kennt die Collection rider-requests inkl. Migration', () => {

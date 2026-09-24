@@ -51,7 +51,7 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         run: |
-          printf '%s\n' "$SMTP_PASSWORD" | ssh "$SERVER_USER@$SERVER_HOST" "read -r SMTP_PASSWORD && export SMTP_PASSWORD && cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml up -d --build"
+          printf '%s\n' "$SMTP_PASSWORD" | ssh "$SERVER_USER@$SERVER_HOST" "read -r SMTP_PASSWORD && export SMTP_PASSWORD SMTP_PORT=587 && cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml up -d --build"
       - name: Run CMS migrations (explicit, outside container boot)
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
