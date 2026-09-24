@@ -61,6 +61,13 @@ jobs:
         # yes-pipe ist hier sicher: alle Migrationen im Repo sind rein additiv (IF NOT EXISTS, keine Drops).
         run: |
           ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && timeout 180 docker compose -f compose.all.yaml run --rm cms sh -c 'yes | npm run payload -- migrate'"
+      - name: Ensure release schema
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml exec -T cms-db psql -v ON_ERROR_STOP=1 -U cms -d scttrd_cms < ../cms/sql/ensure-releases.sql"
       - name: Verify Releases API and schema
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
