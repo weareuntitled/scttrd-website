@@ -3,11 +3,14 @@ import { getCollection } from 'astro:content';
 import Customers from '../components/Customers.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { isoDate, past as hubPast, nextShow as hubNextShow, orderedUpcoming, showUrl } from '../lib/show.ts';
-import { getPage, getShows } from '../lib/cms.ts';
+import { getPage, getReleases, getShows } from '../lib/cms.ts';
+import { bannerRelease, releaseDateLabel, releasePhase, releaseUrl } from '../lib/release.ts';
 import '../styles/tokens.css';
 
 const shows = (await getShows()) as any;
 const homePage = (await getPage('home')) as any;
+const releases = (await getReleases()) as any[];
+const promotedRelease = bannerRelease(releases);
 const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
 const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
 const [homeText] = await getCollection('homeText');
@@ -136,6 +139,18 @@ const structuredData = {
           </a>
         </div>
       )}
+      {promotedRelease && (
+        <div class="home-release wrapper">
+          <a class="home-release-card" href={releaseUrl(promotedRelease)}>
+            <img src={promotedRelease.cover} alt={promotedRelease.coverAlt || promotedRelease.title} loading="lazy" />
+            <span class="home-release-copy">
+              <span class="home-release-kicker">{releasePhase(promotedRelease) === 'upcoming' ? `Neuer Track · ${releaseDateLabel(promotedRelease)}` : 'Out now · neuester Track'}</span>
+              <strong>{promotedRelease.title}</strong>
+              <span>Release öffnen <b aria-hidden="true">→</b></span>
+            </span>
+          </a>
+        </div>
+      )}
     </section>
     <section class="section-about" id="about">
       <div class="wrapper">
@@ -240,6 +255,16 @@ const structuredData = {
      @font-face { font-family: Founders; src: url('/fonts/TestFoundersGrotesk-Semibold.otf'); font-weight: 800 900; font-display: swap; }
      @media (prefers-reduced-motion: reduce) { .home-hero-img-container[data-tilt] .home-hero-img, .home-hero-next, .home-hero-next-arrow { transition: none !important; } }
      .home-hero-cta { margin-top: clamp(28px, 6vw, 72px); }
+     .home-release { margin-top: 18px; }
+     .home-release-card { display: grid; grid-template-columns: clamp(112px, 18vw, 190px) 1fr; min-height: 170px; color: #0c0c0c; background: #f00000; border: 2px solid #0c0c0c; box-shadow: 8px 8px 0 rgba(12,12,12,.28); text-decoration: none; font-family: Founders, Arial, sans-serif; transition: transform .18s ease, box-shadow .18s ease; }
+     .home-release-card:hover, .home-release-card:focus-visible { transform: translate(4px,4px); box-shadow: 4px 4px 0 #0c0c0c; }
+     .home-release-card img { width: 100%; height: 100%; min-height: 170px; object-fit: cover; border-right: 2px solid #0c0c0c; }
+     .home-release-copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(20px,4vw,42px); }
+     .home-release-kicker { font-size: 11px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+     .home-release-copy strong { margin: 8px 0 14px; font-size: clamp(34px,6vw,70px); line-height: .86; letter-spacing: -.045em; text-transform: uppercase; }
+     .home-release-copy > span:last-child { font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+     .home-release-copy b { display: inline-block; margin-left: 8px; transition: transform .18s ease; }
+     .home-release-card:hover b, .home-release-card:focus-visible b { transform: translateX(8px); }
      .customers-empty { grid-column: 1 / -1; margin: 0; padding: 24px 0; border-bottom: 1px solid #000; color: #000; font-size: 17px; }
      .customers-section-description { font-size: var(--text-heading) !important; line-height: 1.1; font-weight: 800; }
      .customers-since { display: none; }
@@ -321,6 +346,10 @@ const structuredData = {
       .home-hero-img-container[data-tilt] .home-hero-img { display: block; width: 100%; max-width: none; }
       .home-hero-img._1, .home-hero-img._2 { height: auto !important; aspect-ratio: 4 / 5; object-fit: cover; }
       .home-hero-cta { margin-top: 32px; }
+      .home-release-card { grid-template-columns: 104px 1fr; min-height: 142px; }
+      .home-release-card img { min-height: 142px; }
+      .home-release-copy { padding: 18px; }
+      .home-release-copy strong { font-size: clamp(28px,8vw,42px); }
       .home-hero-next { min-height: 210px; padding: 24px; }
       .home-hero-next-show { font-size: clamp(34px, 10vw, 48px); line-height: .9; }
       .home-hero-next-label { margin-bottom: 14px; }

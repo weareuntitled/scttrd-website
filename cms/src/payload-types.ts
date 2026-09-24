@@ -72,6 +72,8 @@ export interface Config {
     pages: Page;
     shows: Show;
     links: Link;
+    releases: Release;
+    'rider-requests': RiderRequest;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +86,8 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     shows: ShowsSelect<false> | ShowsSelect<true>;
     links: LinksSelect<false> | LinksSelect<true>;
+    releases: ReleasesSelect<false> | ReleasesSelect<true>;
+    'rider-requests': RiderRequestsSelect<false> | RiderRequestsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -231,7 +235,7 @@ export interface Page {
    */
   subheading?: string | null;
   /**
-   * Claim/Slogan (z. B. Punk, aber schön)
+   * Claim/Slogan (z. B. Brutal, aber schön.)
    */
   text?: string | null;
   /**
@@ -287,6 +291,10 @@ export interface Show {
   imageAlt?: string | null;
   link?: string | null;
   /**
+   * Ticket = echter Ticketshop · Webseite = Venue-/Eventseite (kein Ticketverkauf) · Video = Recording
+   */
+  linkKind?: ('ticket' | 'website' | 'video') | null;
+  /**
    * Acts des gemeinsamen Line-ups mit offiziellen Artist-Links und Quelle
    */
   lineup?:
@@ -319,18 +327,79 @@ export interface Show {
  */
 export interface Link {
   id: number;
-  title: string;
   /**
-   * Anzeigename, z. B. Instagram
+   * Automatisch aus dem Link übernommen
    */
-  label: string;
+  title?: string | null;
+  /**
+   * Anzeigename — automatisch aus dem Link übernommen
+   */
+  label?: string | null;
   platform?: ('instagram' | 'tiktok' | 'spotify' | 'soundcloud' | 'youtube' | 'other') | null;
   /**
    * https://…
    */
   url: string;
+  /**
+   * Cover-URL — automatisch via Link-Scrape, manuell überschreibbar
+   */
+  cover?: string | null;
+  /**
+   * Letzter erfolgreicher Scrape
+   */
+  scrapedAt?: string | null;
   target?: ('_blank' | '_self') | null;
   order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Ein Eintrag steuert Landingpage, Linkhub und das optionale Homepage-Banner.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "releases".
+ */
+export interface Release {
+  id: number;
+  title: string;
+  /**
+   * Wird beim ersten Speichern automatisch aus dem Titel erzeugt.
+   */
+  slug: string;
+  releaseDate: string;
+  cover: number | Media;
+  description?: string | null;
+  preSaveUrl?: string | null;
+  spotifyUrl?: string | null;
+  soundcloudUrl?: string | null;
+  youtubeUrl?: string | null;
+  bannerEnabled?: boolean | null;
+  /**
+   * Vor dem Release ist das Banner sofort sichtbar, danach standardmäßig 28 Tage.
+   */
+  bannerDurationDays?: number | null;
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Wer hat Rider-PDF und Hospitality Rider angefordert (Name, Venue, E-Mail, Zeitpunkt).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rider-requests".
+ */
+export interface RiderRequest {
+  id: number;
+  name: string;
+  /**
+   * Venue / Veranstaltung
+   */
+  venue: string;
+  email: string;
+  file?: 'rider' | null;
+  source?: string | null;
+  userAgent?: string | null;
+  ip?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -377,6 +446,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'links';
         value: number | Link;
+      } | null)
+    | ({
+        relationTo: 'releases';
+        value: number | Release;
+      } | null)
+    | ({
+        relationTo: 'rider-requests';
+        value: number | RiderRequest;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -504,6 +581,7 @@ export interface ShowsSelect<T extends boolean = true> {
   image?: T;
   imageAlt?: T;
   link?: T;
+  linkKind?: T;
   lineup?:
     | T
     | {
@@ -526,8 +604,45 @@ export interface LinksSelect<T extends boolean = true> {
   label?: T;
   platform?: T;
   url?: T;
+  cover?: T;
+  scrapedAt?: T;
   target?: T;
   order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "releases_select".
+ */
+export interface ReleasesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  releaseDate?: T;
+  cover?: T;
+  description?: T;
+  preSaveUrl?: T;
+  spotifyUrl?: T;
+  soundcloudUrl?: T;
+  youtubeUrl?: T;
+  bannerEnabled?: T;
+  bannerDurationDays?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rider-requests_select".
+ */
+export interface RiderRequestsSelect<T extends boolean = true> {
+  name?: T;
+  venue?: T;
+  email?: T;
+  file?: T;
+  source?: T;
+  userAgent?: T;
+  ip?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -599,6 +714,12 @@ export interface LinkHub {
      */
     description?: string | null;
   };
+  /**
+   * Nur die Spotify-Track-URL eintragen. Titel, Cover und Kuenstler werden automatisch geladen.
+   */
+  featuredRelease?: {
+    spotify?: string | null;
+  };
   bookingEmail?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -627,6 +748,11 @@ export interface LinkHubSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+      };
+  featuredRelease?:
+    | T
+    | {
+        spotify?: T;
       };
   bookingEmail?: T;
   updatedAt?: T;

@@ -1,6 +1,6 @@
 // Rider-Gate: Die HTML-Version des Technical Riders ist frei aufrufbar.
 // PDF und Hospitality Rider gibt es erst, wenn Name, Venue und E-Mail hinterlegt sind.
-// Kein Mailversand — die Anfrage wird im CMS (rider-requests) protokolliert.
+// Die Anfrage wird im CMS protokolliert und per Mail an die Band gemeldet.
 
 export const RIDER_FILES = {
   html: '/styleguide/assets/rider/scttrd-foh-rider.html',

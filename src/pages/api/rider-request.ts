@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import nodemailer from 'nodemailer';
 import {
   RIDER_COOKIE,
   RIDER_FILES,
@@ -41,6 +42,44 @@ async function logToCms(payload: ReturnType<typeof riderRequestPayload>) {
   }
 }
 
+async function sendNotification(data: { name: string; venue: string; email: string }) {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+  if (!host || !user || !pass) {
+    console.error('[rider-request] SMTP-Konfiguration fehlt');
+    return false;
+  }
+  try {
+    const port = Number(process.env.SMTP_PORT) || 465;
+    const transport = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+    });
+    await transport.sendMail({
+      from: `SCTTRD Website <${user}>`,
+      to: process.env.RIDER_MAIL_TO || 'info@scttrd.de',
+      replyTo: data.email,
+      subject: `Neue Rider-Anfrage: ${data.venue}`,
+      text: [
+        'Eine neue Rider- und Hospitality-Anfrage ist eingegangen.',
+        '',
+        `Name: ${data.name}`,
+        `Venue / Veranstaltung: ${data.venue}`,
+        `E-Mail: ${data.email}`,
+        '',
+        'Die Anfrage wurde zusätzlich im Payload CMS unter Rider-Anfragen gespeichert.',
+      ].join('\n'),
+    });
+    return true;
+  } catch (err) {
+    console.error('[rider-request] Mailversand fehlgeschlagen:', err);
+    return false;
+  }
+}
+
 export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect }) => {
   const wantsJson = (request.headers.get('accept') || '').includes('application/json');
   let input: Record<string, unknown> = {};
@@ -62,15 +101,18 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect
   try {
     ip = clientAddress;
   } catch {}
-  await logToCms(
-    riderRequestPayload(result.data, {
-      userAgent: request.headers.get('user-agent'),
-      ip: request.headers.get('x-forwarded-for') || ip,
-    }),
-  );
+  const [emailSent] = await Promise.all([
+    sendNotification(result.data),
+    logToCms(
+      riderRequestPayload(result.data, {
+        userAgent: request.headers.get('user-agent'),
+        ip: request.headers.get('x-forwarded-for') || ip,
+      }),
+    ),
+  ]);
 
   cookies.set(RIDER_COOKIE, '1', { path: '/', maxAge: 60 * 60 * 24 * 30, sameSite: 'lax' });
-  return wantsJson ? json({ ok: true, files: RIDER_FILES }) : redirect('/styleguide/#rider', 303);
+  return wantsJson ? json({ ok: true, emailSent, files: RIDER_FILES }) : redirect('/styleguide/#rider', 303);
 };
 
 export const GET: APIRoute = () => json({ ok: false, error: 'POST erwartet' }, 405);

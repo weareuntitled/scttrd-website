@@ -28,7 +28,7 @@ export const LinkHub: GlobalConfig = {
       fields: [
         { name: 'handle', type: 'text', required: true, defaultValue: '@scttrd_ofc' },
         { name: 'title', type: 'text', required: true, defaultValue: 'SCTTRD Official Music' },
-        { name: 'description', type: 'textarea', required: true, defaultValue: 'Brutal, aber schoen. Live zwischen Post-Punk, Techno und Trance.' },
+        { name: 'description', type: 'textarea', required: true, defaultValue: 'Brutal, aber schön. Live zwischen Post-Punk, Techno und Trance.' },
         { name: 'image', type: 'upload', relationTo: 'media' },
       ],
     },

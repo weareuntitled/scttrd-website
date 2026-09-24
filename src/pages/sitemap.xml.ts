@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import { getShows } from '../lib/cms.ts';
+import { getReleases, getShows } from '../lib/cms.ts';
 import { showUrl } from '../lib/show.ts';
+import { releaseUrl } from '../lib/release.ts';
 
 const siteUrl = 'https://scttrd.de';
 
@@ -15,7 +16,8 @@ const escapeXml = (value: string): string =>
 
 export const GET: APIRoute = async () => {
   const shows = (await getShows()) as any[];
-  const paths = ['/', '/links/', '/gallery/', ...shows.map((show) => showUrl(show))];
+  const releases = (await getReleases()) as any[];
+  const paths = ['/', '/links/', '/gallery/', ...shows.map((show) => showUrl(show)), ...releases.map((release) => releaseUrl(release))];
   const uniquePaths = [...new Set(paths)];
   const urls = uniquePaths
     .map((path) => `  <url><loc>${escapeXml(`${siteUrl}${path}`)}</loc></url>`)

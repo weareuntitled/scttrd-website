@@ -52,6 +52,27 @@ export async function getLinks() {
   return local.sort((a, b) => a.data.order - b.data.order).map((item) => item.data)
 }
 
+export async function getReleases() {
+  const base = cmsBase()
+  const abs = (url: any) => {
+    if (!url) return ''
+    if (/^https?:\/\//i.test(String(url))) return String(url)
+    try { return new URL(String(url), base).href } catch { return String(url) }
+  }
+  try {
+    const r = await fetch(`${base}/api/releases?sort=releaseDate&limit=100&depth=1`, { signal: AbortSignal.timeout(3000) } as any)
+    if (r.ok) {
+      const docs = ((await r.json()) as any).docs ?? []
+      return docs.map((d: any) => ({
+        ...d,
+        cover: typeof d.cover === 'object' ? abs(d.cover?.url) : abs(d.cover),
+        coverAlt: typeof d.cover === 'object' ? d.cover?.alt || d.title : d.title,
+      }))
+    }
+  } catch {}
+  return []
+}
+
 export async function getShows() {
   const base = cmsBase()
   const abs = (u: any) => {

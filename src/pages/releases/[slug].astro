@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getReleases, getShows } from '../../lib/cms.ts';
+import { nextShow, showUrl } from '../../lib/show.ts';
+import { releaseDateLabel, releasePhase, releaseUrl } from '../../lib/release.ts';
+import '../../styles/tokens.css';
+
+const releases = await getReleases() as any[];
+const release = releases.find((item) => item.slug === Astro.params.slug);
+if (!release) return Astro.redirect('/links/');
+const shows = await getShows() as any[];
+const upcomingShow = nextShow(shows);
+const nextShowUrl = upcomingShow ? showUrl(upcomingShow) : null;
+const phase = releasePhase(release);
+const date = releaseDateLabel(release);
+const buttons = [
+  phase === 'upcoming' && release.preSaveUrl && { label: 'Pre-save', url: release.preSaveUrl },
+  release.spotifyUrl && { label: 'Spotify', url: release.spotifyUrl },
+  release.soundcloudUrl && { label: 'SoundCloud', url: release.soundcloudUrl },
+  release.youtubeUrl && { label: 'YouTube', url: release.youtubeUrl },
+].filter(Boolean) as { label: string; url: string }[];
+const description = release.description || `${release.title}, der neue Track von SCTTRD. Release am ${date}.`;
+---
+
+<BaseLayout
+  title={`${release.title} | SCTTRD`}
+  description={description}
+  currentPath={Astro.url.pathname}
+  nextShowUrl={nextShowUrl}
+  canonical={`https://scttrd.de${releaseUrl(release)}`}
+  bodyClass="release-body"
+>
+  <Fragment slot="head">
+    <meta property="og:type" content="music.song" />
+    <meta property="og:image" content={release.cover} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </Fragment>
+  <main class="release-page">
+    <div class="release-art"><img src={release.cover} alt={release.coverAlt || release.title} /></div>
+    <section class="release-copy">
+      <Breadcrumbs items={[{ label: 'Home', url: '/' }, { label: 'Links', url: '/links/' }, { label: release.title }]} />
+      <p class="release-kicker">{phase === 'upcoming' ? `Neuer Track · ${date}` : `Out now · ${date}`}</p>
+      <h1>{release.title}</h1>
+      {release.description && <p class="release-description">{release.description}</p>}
+      {buttons.length > 0 ? <nav class="release-actions" aria-label="Track anhören">
+        {buttons.map((button) => <a href={button.url} target="_blank" rel="noopener noreferrer">{button.label}<span>↗</span></a>)}
+      </nav> : <p class="release-pending">Streaming-Links folgen.</p>}
+    </section>
+  </main>
+</BaseLayout>
+
+<style is:global>
+  .release-body { margin: 0; background: #f00000; color: #0c0c0c; font-family: Poppins, sans-serif; }
+  .release-page { min-height: calc(100vh - 88px); display: grid; grid-template-columns: minmax(320px, 48vw) 1fr; }
+  .release-art { min-height: calc(100vh - 88px); background: #0c0c0c; }
+  .release-art img { display: block; position: sticky; top: 0; width: 100%; height: calc(100vh - 88px); object-fit: cover; }
+  .release-copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(36px, 7vw, 110px); }
+  .release-kicker { margin: clamp(42px, 8vh, 90px) 0 18px; font-size: 12px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+  .release-copy h1 { margin: 0; max-width: 9ch; font-size: clamp(62px, 10vw, 150px); line-height: .77; letter-spacing: -.07em; text-transform: uppercase; overflow-wrap: anywhere; }
+  .release-description { max-width: 620px; margin: 36px 0 0; font-size: clamp(17px, 2vw, 23px); line-height: 1.45; }
+  .release-actions { display: grid; gap: 10px; margin-top: clamp(42px, 8vh, 90px); }
+  .release-actions a { display: flex; justify-content: space-between; align-items: center; min-height: 64px; padding: 15px 20px; color: #f00000; background: #0c0c0c; border: 2px solid #0c0c0c; font-size: 15px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; transition: background .15s ease, color .15s ease, transform .15s ease; }
+  .release-actions a:hover, .release-actions a:focus-visible { color: #0c0c0c; background: transparent; transform: translateX(6px); }
+  .release-pending { margin-top: 48px; font-weight: 800; text-transform: uppercase; }
+  @media (max-width: 760px) {
+    .release-page { display: block; }
+    .release-art { min-height: 0; }
+    .release-art img { position: static; height: auto; aspect-ratio: 1; }
+    .release-copy { min-height: 70vh; padding: 32px 20px 64px; }
+    .release-copy h1 { font-size: clamp(58px, 20vw, 96px); }
+    .release-kicker { margin-top: 42px; }
+  }
+</style>

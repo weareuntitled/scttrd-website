@@ -10,5 +10,7 @@
 | CTA Video | Großes Video vor Footer | `videos[0]` |
 | Nächste Show | Früheste `upcoming` Termin / Show nach deutschem Datum (t.b.a. ignoriert); Badge „NEXT“ + oben fixiert | Quelle: `show.ts:nextShow`; Button immer zur Veranstaltungsseite `/shows/<slug>/` |
 | Linkhub | Schwarze Seite `/links/` mit Avatar, Release-Kachel, Upcoming-Shows + externe Links | CMS-Global `Link Hub`; Vorschau + QR im Payload |
+| Release | Ein Track mit Datum, Cover, Beschreibung und Streaming-/Pre-Save-Links. | CMS `Releases`; erzeugt `/releases/<slug>/` und steuert Linkhub sowie Homepage-Banner |
+| Release-Banner | Optionale Promotion direkt unter der nächsten Show; vor Release sofort, danach standardmäßig 28 Tage. | Auswahl und Laufzeit in `release.ts`; kein Cronjob nötig |
 | Link-Scrape | Beim Anlegen eines Links (Spotify/Soundcloud) Titel + Cover + Typ via oEmbed/OpenGraph ziehen | Wie Linktree; manuell überschreibbar |
 | Tracking | Herkunft messen: `?utm_source=linkhub&utm_medium=...` an Ticket-Hrefs + Referrer | Funnel Links → Show → Ticket |
