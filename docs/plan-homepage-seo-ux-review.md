@@ -104,7 +104,7 @@ Landing
 ### Aufgaben
 
 - [ ] Den Hero-H1 nicht nur als `SCTTRD` verwenden, sondern eine sichtbare Subline ergaenzen: "Elektronisches Live-Projekt aus Augsburg".
-- [ ] Einen kurzen Genre-Satz direkt unter dem H1 platzieren: "Post-Punk, Techno und Trance. Punk, aber schoen."
+- [ ] Einen kurzen Genre-Satz direkt unter dem H1 platzieren: "Post-Punk, Techno und Trance. Brutal, aber schön."
 - [ ] `Next Show` als primaere Karte beibehalten und visuell vor Past Shows priorisieren.
 - [ ] Die Hero-Bilder mit festen responsiven Seitenverhaeltnissen und `object-fit: cover` stabilisieren.
 - [ ] Fuer das erste Hero-Bild `fetchpriority="high"` und fuer das zweite Bild lazy loading verwenden.

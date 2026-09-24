@@ -59,10 +59,13 @@ describe('Rider-Gate: Verdrahtung', () => {
     assert.doesNotMatch(src, /href="https:\/\/drive\.google\.com\/drive\/folders\/1R8LF6_T1DeVFs72Bm3O-HAaX2_3jqp45"/, 'Hospitality darf nicht mehr direkt verlinkt sein');
   });
 
-  it('API-Route existiert und schreibt ins CMS', () => {
+  it('API-Route existiert, schreibt ins CMS und verschickt die Benachrichtigung', () => {
     const src = read('src/pages/api/rider-request.ts');
     assert.match(src, /\/api\/rider-requests/);
     assert.match(src, /validateRiderRequest/);
+    assert.match(src, /sendNotification/);
+    assert.match(src, /SMTP_PASSWORD/);
+    assert.match(src, /sendMail/);
   });
 
   it('CMS kennt die Collection rider-requests inkl. Migration', () => {

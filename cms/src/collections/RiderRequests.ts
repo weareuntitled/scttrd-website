@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 // Wer hat den Technical Rider angefordert? Wird von der Website
-// (POST /api/rider-request) befüllt. Kein Mailversand — nur Protokoll.
+// (POST /api/rider-request) befüllt und zusätzlich per Mail gemeldet.
 export const RiderRequests: CollectionConfig = {
   slug: 'rider-requests',
   labels: { singular: 'Rider-Anfrage', plural: 'Rider-Anfragen' },

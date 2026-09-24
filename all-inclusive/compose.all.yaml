@@ -26,6 +26,11 @@ services:
     env_file: .env
     environment:
       PAYLOAD_URL: https://cms.scttrd.de
+      SMTP_HOST: ${SMTP_HOST:-w021c25a.kasserver.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-info@scttrd.de}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      RIDER_MAIL_TO: ${RIDER_MAIL_TO:-info@scttrd.de}
     depends_on:
       - cms
 

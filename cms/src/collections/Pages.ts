@@ -71,7 +71,7 @@ export const Pages: CollectionConfig = {
             {
               name: 'text',
               type: 'textarea',
-              admin: { description: 'Claim/Slogan (z. B. Punk, aber schön)' },
+                admin: { description: 'Claim/Slogan (z. B. Brutal, aber schön.)' },
             },
             {
               name: 'email',
