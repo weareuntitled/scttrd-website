@@ -10,6 +10,7 @@ import { Media } from './collections/Media'
 import { Shows } from './collections/Shows'
 import { Pages } from './collections/Pages'
 import { Links } from './collections/Links'
+import { RiderRequests } from './collections/RiderRequests'
 import { LinkHub } from './globals/LinkHub'
 // NOTE: prodMigrations bewusst NICHT verdrahtet (2026-09-08): Boot-Migration
 // hing den CMS-Container auf (nie healthy, keine Logs remote einsehbar).
@@ -25,7 +26,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages, Shows, Links],
+  collections: [Users, Media, Pages, Shows, Links, RiderRequests],
   globals: [LinkHub],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-change-me',

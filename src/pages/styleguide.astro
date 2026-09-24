@@ -1,8 +1,12 @@
 ---
+import { RIDER_COOKIE, RIDER_FILES } from '../lib/riderRequest.ts';
+
 const logos = [
   { name: 'Wordmark', file: 'SCTTRD_logo_01' },
   { name: 'Kreis', file: 'SCTTRD_logo_kreis' },
 ];
+const riderUnlocked = Astro.cookies.get(RIDER_COOKIE)?.value === '1';
+const riderError = Astro.url.searchParams.get('rider') === 'error';
 ---
 <!doctype html>
 <html lang="de">
@@ -98,10 +102,29 @@ const logos = [
 
       <section id="downloads">
         <div class="section-head"><span class="section-no">05</span><h2>Downloads</h2></div>
+        <div class="rider-gate" id="rider" data-unlocked={riderUnlocked ? 'true' : 'false'}>
+          <div class="rider-gate-copy">
+            <span class="type-label">Technical Rider · Version 2026-09</span>
+            <strong>Rider &amp; Hospitality</strong>
+            <p>Den Technical Rider kannst du direkt anschauen. Für das PDF und den Hospitality Rider bitte kurz Name, Venue und E-Mail hinterlassen, dann gibt es beides sofort. Wir nutzen die Angaben nur, um zu wissen, wer die aktuelle Version hat.</p>
+            <a class="button button-large rider-open" href={RIDER_FILES.html}><span class="button-copy"><strong>Technical Rider</strong><small>HTML · Stage Plot · frei</small></span><span aria-hidden="true">↗</span></a>
+          </div>
+          <form class="rider-form" method="post" action="/api/rider-request" novalidate>
+            <label>Name<input name="name" required autocomplete="name" /></label>
+            <label>Venue / Veranstaltung<input name="venue" required autocomplete="organization" /></label>
+            <label>E-Mail<input name="email" type="email" required autocomplete="email" /></label>
+            <label class="rider-hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
+            <button class="button button-large" type="submit"><span class="button-copy"><strong>Downloads freischalten</strong><small>Rider PDF + Hospitality · sofort</small></span><span aria-hidden="true">→</span></button>
+            <p class="rider-error" role="alert" hidden={!riderError}>Bitte alle Felder prüfen.</p>
+          </form>
+          <div class="rider-links">
+            <span class="type-label">Freigeschaltet</span>
+            <a class="button button-large" href={RIDER_FILES.pdf} download><span class="button-copy"><strong>Technical Rider</strong><small>PDF · Download</small></span><span aria-hidden="true">↓</span></a>
+            <a class="button button-large" href={RIDER_FILES.hospitality} target="_blank" rel="noreferrer"><span class="button-copy"><strong>Hospitality Rider</strong><small>Google Drive</small></span><span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
         <div class="utility-actions">
           <a class="button button-large" href="https://scttrd.de" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Website</strong><small>scttrd.de</small></span><span aria-hidden="true">↗</span></a>
-          <a class="button button-large" href="/styleguide/assets/rider/scttrd-foh-rider.html"><span class="button-copy"><strong>Technical Rider</strong><small>HTML · Stage Plot</small></span><span aria-hidden="true">↗</span></a>
-          <a class="button button-large" href="https://drive.google.com/drive/folders/1R8LF6_T1DeVFs72Bm3O-HAaX2_3jqp45" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Hospitality Rider</strong><small>Google Drive</small></span><span aria-hidden="true">↗</span></a>
           <a class="button button-large" href="https://drive.google.com/uc?export=download&id=1ORX9ptTiJjEDnK9D8UvOD2eBMsiXjp_D" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Factsheet DE</strong><small>PDF · Deutsch</small></span><span aria-hidden="true">↓</span></a>
           <a class="button button-large" href="https://drive.google.com/uc?export=download&id=1JTGC42QTP5z2-DT9lYrjQ0a3jFQ3kPEm" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Factsheet EN</strong><small>PDF · English</small></span><span aria-hidden="true">↓</span></a>
         </div>
@@ -140,6 +163,33 @@ const logos = [
         document.querySelector(`.nav-links a[href="#${visible.target.id}"]`)?.setAttribute('aria-current', 'location');
       }, { rootMargin: '-20% 0px -65% 0px' });
       sections.forEach((section) => observer.observe(section));
+
+      const gate = document.querySelector<HTMLElement>('.rider-gate');
+      const riderForm = gate?.querySelector<HTMLFormElement>('.rider-form');
+      riderForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const error = riderForm.querySelector<HTMLElement>('.rider-error');
+        const submit = riderForm.querySelector<HTMLButtonElement>('button[type="submit"]');
+        if (submit) submit.disabled = true;
+        try {
+          const response = await fetch(riderForm.action, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', accept: 'application/json' },
+            body: JSON.stringify(Object.fromEntries(new FormData(riderForm).entries())),
+          });
+          const result = await response.json();
+          if (result.ok) {
+            gate?.setAttribute('data-unlocked', 'true');
+            gate?.querySelector<HTMLAnchorElement>('.rider-links a')?.focus();
+            return;
+          }
+          if (error) { error.textContent = Object.values(result.errors ?? {}).join(' ') || 'Bitte alle Felder prüfen.'; error.hidden = false; }
+        } catch {
+          riderForm.submit();
+        } finally {
+          if (submit) submit.disabled = false;
+        }
+      });
     </script>
   </body>
 </html>
@@ -260,6 +310,23 @@ const logos = [
   .press-button-meta { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
   .press-button strong, .press-button-meta b { transition: transform 220ms var(--motion-easing-enter); }
   .press-button-meta b { display: inline-block; margin-left: .6rem; font-size: 18px; }
+  .rider-gate { display: grid; grid-template-columns: 1fr 1.3fr; gap: 2rem; margin-bottom: var(--space-2); padding: clamp(1.4rem, 3vw, 2.4rem); color: var(--color-red-500); background: var(--color-surface-inverse); border-radius: var(--border-radius-container); }
+  .rider-gate-copy { display: grid; gap: .8rem; align-content: start; }
+  .rider-gate-copy > strong { font-size: clamp(1.8rem, 4vw, 3rem); line-height: .9; font-weight: 700; letter-spacing: -.03em; text-transform: uppercase; }
+  .rider-gate-copy p { margin: 0; max-width: 36ch; font-size: 15px; line-height: 1.5; color: var(--color-neutral-50); }
+  .rider-open { margin-top: .4rem; border-color: var(--color-red-500); }
+  .rider-links .type-label { color: var(--color-neutral-50); }
+  .rider-form { display: grid; gap: .8rem; align-content: start; }
+  .rider-form label { display: grid; gap: .35rem; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+  .rider-form input { min-height: 46px; padding: .6rem .8rem; color: var(--color-neutral-50); background: transparent; border: 1px solid color-mix(in srgb, var(--color-red-500) 55%, transparent); border-radius: var(--border-radius-control); font: inherit; font-size: 15px; letter-spacing: 0; text-transform: none; }
+  .rider-form input:focus { outline: none; border-color: var(--color-red-500); }
+  .rider-form .button { margin-top: .4rem; border-color: var(--color-red-500); }
+  .rider-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .rider-error { margin: 0; font-size: 13px; color: var(--color-neutral-50); }
+  .rider-links { display: grid; gap: var(--space-2); align-content: start; }
+  .rider-links .button { border-color: var(--color-red-500); }
+  .rider-gate[data-unlocked='false'] .rider-links { display: none; }
+  .rider-gate[data-unlocked='true'] .rider-form { display: none; }
   .utility-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-2); }
   .button-large { min-height: 88px; padding: 1rem 1.15rem; text-transform: none; }
   .button-copy { display: grid; gap: 4px; text-align: left; }
@@ -283,7 +350,7 @@ const logos = [
     h2 { font-size: clamp(44px, 15vw, 64px); line-height: .88; }
     .logo-grid, .swatches { grid-template-columns: 1fr; }
     .logo-stage { min-height: 220px; padding: 36px 24px; }
-    .font-downloads, .utility-actions { grid-template-columns: 1fr; }
+    .font-downloads, .utility-actions, .rider-gate { grid-template-columns: 1fr; }
     .display { margin: 24px 0 48px; font-size: clamp(64px, 22vw, 92px); }
     .body-copy { font-size: 24px; line-height: 1.32; }
     .press-intro { margin: 0 0 36px; font-size: 21px; }
