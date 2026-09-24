@@ -11,7 +11,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const base = (process.argv[2] || process.env.RIDER_BASE_URL || 'http://127.0.0.1:4329').replace(/\/$/, '');
-const url = `${base}/styleguide/assets/rider/scttrd-foh-rider.html`;
+// Cache-Buster: Chrome nutzt sonst ggf. eine gecachte Version aus dem Profil.
+const url = `${base}/styleguide/assets/rider/scttrd-foh-rider.html?pdf=${Date.now()}`;
 const out = path.resolve('public/styleguide/assets/rider/scttrd-foh-rider.pdf');
 
 const candidates = [
