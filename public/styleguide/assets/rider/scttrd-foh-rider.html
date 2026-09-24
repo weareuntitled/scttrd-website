@@ -5,152 +5,398 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>SCTTRD | Technical Rider und Stage Plot</title>
   <style>
-    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Regular.otf') format('opentype');font-weight:400}
-    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Semibold.otf') format('opentype');font-weight:600}
-    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Bold.otf') format('opentype');font-weight:700}
-    :root{--ink:#090909;--paper:#f4f3ef;--red:#c92a2a;--line:#b9b8b3;--muted:#64635f}
+    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Regular.otf') format('opentype');font-weight:400;font-display:swap}
+    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Medium.otf') format('opentype');font-weight:500;font-display:swap}
+    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Semibold.otf') format('opentype');font-weight:600;font-display:swap}
+    @font-face{font-family:Founders;src:url('/styleguide/assets/fonts/FoundersGrotesk-Bold.otf') format('opentype');font-weight:700;font-display:swap}
+    :root{--ink:#0c0c0c;--red:#ff0000;--paper:#ffffff;--soft:#f4f3ef;--line:#d9d8d3;--muted:#6b6a66}
     *{box-sizing:border-box}
-    body{margin:0;background:var(--paper);color:var(--ink);font-family:Founders,Arial,sans-serif;font-size:15px;line-height:1.55}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:Founders,Arial,sans-serif;font-size:15px;font-weight:400;line-height:1.55;-webkit-font-smoothing:antialiased}
     main{max-width:1080px;margin:auto;padding:48px}
     header{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end;padding-bottom:28px;border-bottom:3px solid var(--ink)}
     .brand{font-size:clamp(3.5rem,11vw,8rem);font-weight:700;line-height:.72;letter-spacing:-.04em;text-transform:uppercase}
-    .meta{text-align:right;font-size:12px;line-height:1.6;text-transform:uppercase;letter-spacing:.08em}
-    .deadline{margin:36px 0;padding:24px;background:var(--red);color:#fff;display:grid;grid-template-columns:1fr 1.5fr;gap:24px}
-    .deadline h1{margin:0;font-size:clamp(1.8rem,4vw,3.4rem);line-height:.92;text-transform:uppercase}
-    .deadline p{margin:0;font-size:17px;line-height:1.45}
-    .reply{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.5);display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;font-size:14px}
-    section{padding:52px 0;border-bottom:1px solid var(--line)}
-    .section-head{display:grid;grid-template-columns:80px 1fr;gap:24px;margin-bottom:28px}
-    .number{font-size:12px;letter-spacing:.14em;color:var(--red)}
-    h2{margin:0;font-size:clamp(2.5rem,7vw,5.5rem);line-height:.83;text-transform:uppercase;letter-spacing:-.035em}
-    h3{margin:0 0 10px;font-size:20px}
+    .meta{text-align:right;font-size:12px;font-weight:500;line-height:1.65;text-transform:uppercase;letter-spacing:.08em}
+    .meta b{color:var(--red);font-weight:700}
+    section{padding:56px 0;border-bottom:1px solid var(--line)}
+    .section-head{display:grid;grid-template-columns:132px 1fr;gap:24px;margin-bottom:28px;align-items:baseline}
+    .number{font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--red);white-space:nowrap}
+    h2{margin:0;font-size:clamp(2.5rem,7vw,5.25rem);line-height:.82;font-weight:700;text-transform:uppercase;letter-spacing:-.035em}
+    h3{margin:0 0 10px;font-size:22px;font-weight:600;letter-spacing:-.01em}
     p{margin:0 0 12px}
-    .options{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .option{padding:22px;border:1px solid var(--ink);background:#fff}
-    .option.recommended{border-top:8px solid var(--red)}
-    .tag{display:inline-block;margin-bottom:18px;padding:4px 8px;background:var(--ink);color:#fff;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-    .recommended .tag{background:var(--red)}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:12px 8px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
-    th{width:170px;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-    .requirements{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .requirement{padding:20px;border:1px solid var(--line);background:#fff}
-    .requirement strong{display:block;margin-bottom:7px;font-size:18px}
-    .plot{padding:24px;background:#fff;border:2px solid var(--ink)}
+    strong{font-weight:600}
+    .lead{font-size:18px;line-height:1.5;max-width:64ch}
+    .icon{width:28px;height:28px;flex:0 0 28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter}
+    .icon.red{color:var(--red)}
+
+    .intro-title{margin:0 0 20px;font-size:clamp(2rem,5vw,3.6rem);line-height:.92;font-weight:700;text-transform:uppercase;letter-spacing:-.03em}
+    .intro-title em{font-style:normal;color:var(--red)}
+    .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+    .role{padding:22px;border:1px solid var(--ink);background:var(--paper)}
+    .role.center{border:3px solid var(--red)}
+    .role .icon{width:40px;height:40px;margin-bottom:14px}
+    .role .who{display:block;margin-bottom:4px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .role strong{display:block;margin-bottom:8px;font-size:20px;font-weight:700}
+    .overview{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-top:24px;align-items:stretch}
+    .device{margin:0;padding:22px;background:var(--soft);border:2px solid var(--ink);display:flex;flex-direction:column;justify-content:center}
+    .device svg{display:block;width:100%;height:auto}
+    .device figcaption{margin-top:12px;font-size:13px;font-weight:500}
+    .facts{margin:0;padding:20px 24px;border:2px solid var(--ink);list-style:none}
+    .facts-title{margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+    .facts li{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+    .facts li:last-child{border-bottom:0}
+    .facts li .icon{width:24px;height:24px;flex-basis:24px;margin-top:1px}
+
+    .plot{padding:24px;background:var(--soft);border:2px solid var(--ink)}
     .plot svg{display:block;width:100%;height:auto}
-    .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;font-size:13px}
-    .legend span{padding-top:8px;border-top:2px solid var(--ink)}
+    .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px;font-size:13px;font-weight:500}
+    .legend span{display:flex;gap:10px;align-items:center;padding-top:10px;border-top:2px solid var(--ink)}
+    .legend i{display:inline-block;width:14px;height:14px;border:2px solid var(--ink);background:var(--paper)}
+    .legend i.red{border-color:var(--red);background:var(--soft)}
+    .legend i.dash{border-style:dashed}
+
+    .signal{border:2px solid var(--ink);background:var(--paper)}
+    table.patch{width:100%;border-collapse:collapse}
+    table.patch th,table.patch td{padding:13px 24px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+    table.patch th{width:250px;font-weight:600;font-size:15px}
+    table.patch th small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+    table.patch tr.group th{width:auto;background:var(--ink);color:#fff;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:8px 24px;border-bottom:0}
+    table.patch tr.group.optional th{background:var(--red)}
+    .note{margin:0;padding:18px 24px;font-size:15px;background:var(--soft)}
+    .note strong{font-weight:700}
+    .feedback{display:flex;gap:16px;align-items:flex-start;margin:16px 0 0;padding:18px 24px;border-left:8px solid var(--red);background:var(--soft);font-size:15px}
+    .feedback strong{font-weight:700;color:var(--red)}
+
+    .needs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .need{padding:20px 22px;border:1px solid var(--line);background:var(--paper)}
+    .need h3{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+    .need h3 .icon{width:24px;height:24px;flex-basis:24px;color:var(--ink)}
+    .need ul{margin:0;padding:0;list-style:none}
+    .need li{padding:7px 0;border-top:1px solid var(--line)}
+    .need li:first-child{border-top:0;padding-top:0}
+    .need li b{font-weight:700}
+    .need.conditional{border-left:8px solid var(--red)}
+    .need.conditional h3 .icon{color:var(--red)}
+
     .steps{counter-reset:step;display:grid;gap:0}
-    .step{counter-increment:step;display:grid;grid-template-columns:56px 1fr;gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
-    .step:before{content:counter(step,decimal-leading-zero);color:var(--red);font-weight:700}
-    .step strong{display:block;font-size:17px}
-    .feedback{margin-top:24px;padding:20px;border-left:8px solid var(--red);background:#fff}
-    footer{display:flex;justify-content:space-between;gap:24px;padding:28px 0;font-size:13px}
+    .step{counter-increment:step;display:grid;grid-template-columns:56px 1fr auto;gap:20px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline}
+    .step:before{content:counter(step,decimal-leading-zero);color:var(--red);font-weight:700;font-size:18px}
+    .step strong{display:block;font-size:17px;font-weight:600}
+    .step .time{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+    .total{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0 0;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:-.01em}
+    .total span:last-child{display:flex;align-items:center;gap:10px;color:var(--red)}
+
+    .confirm{margin:56px 0 0;padding:28px;background:var(--red);color:#fff;display:grid;grid-template-columns:1fr 1.5fr;gap:28px}
+    .confirm h2{font-size:clamp(1.8rem,4vw,3.2rem);line-height:.9}
+    .confirm .number{display:block;margin-bottom:12px;color:#fff}
+    .confirm p{margin:0 0 14px;font-size:16px;line-height:1.5}
+    .confirm strong{font-weight:700}
+    .reply{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 22px;padding-top:14px;border-top:1px solid rgba(255,255,255,.55);font-size:14px;font-weight:500}
+    .confirm a{color:#fff;font-weight:700}
+
+    footer{display:flex;justify-content:space-between;gap:24px;padding:28px 0;font-size:13px;font-weight:500}
     a{color:inherit}
-    @media(max-width:720px){main{padding:24px 18px}header,.deadline,.options,.requirements{grid-template-columns:1fr}.meta{text-align:left}.reply,.legend{grid-template-columns:1fr}.section-head{grid-template-columns:1fr}.number{margin-bottom:-12px}}
-    @media print{body{background:#fff;font-size:10px}main{max-width:none;padding:8mm}.brand{font-size:54px}.deadline{margin:6mm 0;padding:5mm}.deadline h1{font-size:24px}section{padding:7mm 0;break-inside:avoid}.section-head{margin-bottom:4mm}h2{font-size:28px}.option,.requirement{padding:4mm}.plot{padding:4mm}.plot svg{max-height:120mm}footer{padding:5mm 0}.no-print{display:none}}
+
+    @media(max-width:720px){
+      main{padding:24px 18px}
+      header,.roles,.overview,.needs,.confirm{grid-template-columns:1fr}
+      .meta{text-align:left}
+      .reply,.legend{grid-template-columns:1fr}
+      .section-head{grid-template-columns:1fr;gap:6px}
+      .number{margin-bottom:2px}
+      table.patch th,table.patch td{display:block;width:100%;padding:10px 18px}
+      table.patch th{border-bottom:0;padding-bottom:2px}
+      table.patch td{padding-top:0}
+      .note,.feedback{padding-left:18px;padding-right:18px}
+      .step{grid-template-columns:40px 1fr}
+      .step .time{grid-column:2}
+      footer{flex-direction:column;gap:6px}
+    }
+    @media print{
+      body{background:#fff;font-size:10px}
+      main{max-width:none;padding:8mm}
+      .brand{font-size:54px}
+      section{padding:7mm 0;break-inside:avoid}
+      .section-head{margin-bottom:4mm}
+      h2{font-size:28px}
+      .lead{font-size:12px}
+      .role,.need,.signal,.plot,.device,.facts,.confirm{break-inside:avoid}
+      .role,.need{padding:3mm}
+      .plot{padding:4mm}
+      .plot svg{max-height:130mm}
+      table.patch th,table.patch td{padding:2mm 3mm}
+      .confirm{margin-top:6mm;padding:5mm}
+      footer{padding:5mm 0}
+      .no-print{display:none}
+    }
   </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-mixer" viewBox="0 0 32 32"><rect x="4" y="4" width="24" height="24"/><path d="M10 9v14M16 9v14M22 9v14"/><path d="M7 18h6M13 12h6M19 20h6"/></symbol>
+  <symbol id="i-laptop" viewBox="0 0 32 32"><rect x="6" y="6" width="20" height="14"/><path d="M3 25h26M12 23h8"/></symbol>
+  <symbol id="i-drums" viewBox="0 0 32 32"><circle cx="10" cy="11" r="5"/><circle cx="22" cy="11" r="5"/><circle cx="16" cy="22" r="6"/><path d="M4 28l6-6M28 28l-6-6"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 32 32"><rect x="12" y="3" width="8" height="14" rx="4"/><path d="M8 13a8 8 0 0 0 16 0M16 21v7M11 28h10"/></symbol>
+  <symbol id="i-stand" viewBox="0 0 32 32"><rect x="13" y="3" width="6" height="10" rx="3"/><path d="M16 13v13M16 26l-7 3M16 26l7 3"/></symbol>
+  <symbol id="i-inear" viewBox="0 0 32 32"><circle cx="13" cy="11" r="6"/><path d="M13 17c0 6 6 6 6 12M19 9a4 4 0 0 1 4 4"/></symbol>
+  <symbol id="i-power" viewBox="0 0 32 32"><rect x="3" y="10" width="22" height="12"/><circle cx="9" cy="16" r="2"/><circle cx="14" cy="16" r="2"/><circle cx="19" cy="16" r="2"/><path d="M25 16h4"/></symbol>
+  <symbol id="i-cable" viewBox="0 0 32 32"><circle cx="8" cy="16" r="5"/><path d="M13 16h4c5 0 5-8 10-8M6 15h1M9 15h1M8 18h1"/></symbol>
+  <symbol id="i-riser" viewBox="0 0 32 32"><rect x="4" y="14" width="24" height="9"/><path d="M8 23v6M24 23v6M16 4v8M12 8l4-4 4 4"/></symbol>
+  <symbol id="i-table" viewBox="0 0 32 32"><path d="M3 12h26M7 12v16M25 12v16"/><rect x="11" y="6" width="10" height="6"/></symbol>
+  <symbol id="i-wedge" viewBox="0 0 32 32"><path d="M4 27h24V13L4 21z"/><circle cx="19" cy="20" r="3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12"/><path d="M16 9v7h5"/></symbol>
+  <symbol id="i-out" viewBox="0 0 32 32"><path d="M4 16h22M19 9l7 7-7 7"/></symbol>
+  <symbol id="i-in" viewBox="0 0 32 32"><path d="M28 16H6M13 9l-7 7 7 7"/></symbol>
+  <symbol id="i-hybrid" viewBox="0 0 32 32"><path d="M4 12q12-8 24 0M16 10v18M7 28h18"/><rect x="9" y="20" width="14" height="6"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 32 32"><path d="M16 4L29 27H3z"/><path d="M16 12v8M16 23v1"/></symbol>
+</svg>
 <main>
   <header>
     <div class="brand">SCTTRD</div>
-    <div class="meta">Technical Rider + Stage Plot<br>Version 2026-08<br>Daniel Peters · +49 172 5231109</div>
+    <div class="meta">Technical Rider + Stage Plot<br>Version <b>2026-09</b><br>info@scttrd.de · +49 172 5231109</div>
   </header>
 
-  <aside class="deadline">
-    <h1>Rückmeldung<br>5 Tage vorher</h1>
-    <div>
-      <p>Bitte bestätigt spätestens fünf Kalendertage vor der Show die Signaloption und den Soundcheck. Ohne Rückmeldung planen wir mit Option A und 60 Minuten Soundcheck.</p>
-      <div class="reply">
-        <span>□ Option A: XR18 + Tablet</span><span>□ Option B: Hauspult</span>
-        <span>Soundcheck: __________ Uhr</span><span>Showtime: __________ Uhr</span>
-        <span>FOH-Kontakt: ______________</span><span>Bühnenmaß: ______________</span>
-      </div>
-    </div>
-  </aside>
-
   <section>
-    <div class="section-head"><span class="number">01 / SIGNAL</span><h2>Eine Option wählen</h2></div>
-    <div class="options">
-      <article class="option recommended">
-        <span class="tag">Option A · bevorzugt</span>
-        <h3>Mix auf unserem XR18</h3>
-        <p>Wir bringen XR18, Router, Tablet und Feedback Destroyer mit. FOH mischt den Raum über unser Tablet. Zur Haus-PA gehen Main L/R.</p>
-        <table><tr><th>Venue</th><td>2 freie Eingänge an der PA bzw. Systemübergabe L/R</td></tr><tr><th>Monitoring</th><td>Unser internes Monitoring bleibt im XR18</td></tr></table>
-      </article>
-      <article class="option">
-        <span class="tag">Option B</span>
-        <h3>Mix auf dem Hauspult</h3>
-        <p>FOH erhält Instrumente L/R, Vocalbus und Klick separat. Den Feedback Destroyer schleifen wir in den Vocal- und Effektweg ein.</p>
-        <table><tr><th>Ausgänge</th><td>2x Instrumente L/R, 1x Vocalbus, 1x Klick</td></tr><tr><th>Return</th><td>1x Monitor-Summe an die Band</td></tr></table>
-      </article>
+    <div class="section-head"><span class="number">00 / ÜBERBLICK</span><h2>Kurz erklärt</h2></div>
+    <p class="intro-title">Wir sind SCTTRD.<br>Wir machen <em>Live-Techno.</em></p>
+    <p class="lead">Unser Set läuft live von einem PC. Nate spielt dazu E-Drums und triggert damit Sounds direkt im Live-Set. Daraus entsteht ein <strong>vorgemischter Backing Track</strong>. Darüber liegt Babsis Stimme – mit Vocal-Looper und Effekten, die wir als <strong>fertigen Vocal-Mix</strong> ausgeben. <strong>Alles läuft bei Dani am Tisch zusammen und wird dort auf unserem XR18 gemischt.</strong></p>
+
+    <div class="roles">
+      <div class="role"><svg class="icon"><use href="#i-drums"/></svg><span class="who">Stage Left oder Right</span><strong>Nate · E-Drums</strong>Bringt sein E-Drumset selbst mit und triggert Sounds im Live-Set. Kein Drumset, kein Podest nötig. Manchmal Hybrid mit echter Snare + Cymbal – das klären wir vorab.</div>
+      <div class="role center"><svg class="icon red"><use href="#i-mixer"/></svg><span class="who">Immer zentral</span><strong>Dani · Live-Set + Mix</strong>Tisch mit PC, XR18 (Mischpult + Interface), Talkback und Feedback Destroyer. Hier laufen alle Kabel zusammen – deshalb steht Dani in der Mitte.</div>
+      <div class="role"><svg class="icon"><use href="#i-mic"/></svg><span class="who">Vorne, links oder rechts</span><strong>Babsi · Vocals</strong>Stimme mit Vocal-Looper (RC-505) und Effekten (RE-202), eigenes Mikro. Steht gerne auf einem Podest oder zumindest leicht erhöht.</div>
+    </div>
+
+    <div class="overview">
+      <figure class="device">
+        <svg viewBox="0 0 520 190" role="img" aria-label="Behringer X Air XR18 – Illustration der Front">
+          <rect x="6" y="20" width="508" height="150" fill="#0c0c0c"/>
+          <rect x="6" y="20" width="18" height="150" fill="#1f1f1f"/>
+          <rect x="496" y="20" width="18" height="150" fill="#1f1f1f"/>
+          <text x="40" y="48" fill="#fff" font-size="15" font-weight="700" letter-spacing="1">X AIR</text>
+          <text x="96" y="48" fill="#ff0000" font-size="15" font-weight="700">XR18</text>
+          <text x="480" y="48" text-anchor="end" fill="#9a9a96" font-size="10" letter-spacing="2">BEHRINGER</text>
+          <g fill="#2b2b2b" stroke="#6b6a66" stroke-width="1.5">
+            <circle cx="60" cy="88" r="15"/><circle cx="110" cy="88" r="15"/><circle cx="160" cy="88" r="15"/><circle cx="210" cy="88" r="15"/>
+            <circle cx="260" cy="88" r="15"/><circle cx="310" cy="88" r="15"/><circle cx="360" cy="88" r="15"/><circle cx="410" cy="88" r="15"/>
+            <circle cx="60" cy="136" r="15"/><circle cx="110" cy="136" r="15"/><circle cx="160" cy="136" r="15"/><circle cx="210" cy="136" r="15"/>
+            <circle cx="260" cy="136" r="15"/><circle cx="310" cy="136" r="15"/><circle cx="360" cy="136" r="15"/><circle cx="410" cy="136" r="15"/>
+          </g>
+          <g fill="#0c0c0c">
+            <circle cx="60" cy="88" r="5"/><circle cx="110" cy="88" r="5"/><circle cx="160" cy="88" r="5"/><circle cx="210" cy="88" r="5"/>
+            <circle cx="260" cy="88" r="5"/><circle cx="310" cy="88" r="5"/><circle cx="360" cy="88" r="5"/><circle cx="410" cy="88" r="5"/>
+            <circle cx="60" cy="136" r="5"/><circle cx="110" cy="136" r="5"/><circle cx="160" cy="136" r="5"/><circle cx="210" cy="136" r="5"/>
+            <circle cx="260" cy="136" r="5"/><circle cx="310" cy="136" r="5"/><circle cx="360" cy="136" r="5"/><circle cx="410" cy="136" r="5"/>
+          </g>
+          <rect x="446" y="74" width="34" height="28" fill="#2b2b2b" stroke="#6b6a66"/>
+          <rect x="446" y="122" width="34" height="28" fill="#2b2b2b" stroke="#6b6a66"/>
+          <circle cx="463" cy="62" r="3" fill="#ff0000"/>
+          <text x="260" y="186" text-anchor="middle" fill="#6b6a66" font-size="10" letter-spacing="2">16 MIC-/LINE-INPUTS · AUX-OUTS · WLAN-STEUERUNG</text>
+        </svg>
+        <figcaption>Behringer X Air XR18 – unser Mischpult und Interface auf Danis Tisch. Wir mischen unseren Sound vor Ort selbst. (Illustration)</figcaption>
+      </figure>
+      <ul class="facts">
+        <li class="facts-title">Das Wichtigste in Kürze</li>
+        <li><svg class="icon"><use href="#i-mixer"/></svg><span><strong>Wir mischen selbst</strong> auf unserem XR18 und geben fertige Signale an FOH.</span></li>
+        <li><svg class="icon red"><use href="#i-out"/></svg><span><strong>An FOH:</strong> Main L/R (Backing Track), Vocal-Mix, Klick + Talkback.</span></li>
+        <li><svg class="icon"><use href="#i-inear"/></svg><span><strong>Zurück:</strong> 2× In-Ear-Weg (Dani + Babsi). In-Ears bringen wir selbst.</span></li>
+        <li><svg class="icon"><use href="#i-drums"/></svg><span><strong>Nate</strong> bringt sein E-Drumset mit. Bei Hybrid: Snare/Cymbal abnehmen.</span></li>
+        <li><svg class="icon"><use href="#i-wedge"/></svg><span><strong>Wedges nur sehr leise</strong> – Rückkopplung ist unser größtes Risiko.</span></li>
+        <li><svg class="icon"><use href="#i-clock"/></svg><span><strong>Soundcheck:</strong> ideal 60 Minuten.</span></li>
+      </ul>
     </div>
   </section>
 
   <section>
-    <div class="section-head"><span class="number">02 / VENUE</span><h2>Was wir brauchen</h2></div>
-    <div class="requirements">
-      <div class="requirement"><strong>1x stabiler Tisch</strong>Mindestens 120 x 60 cm, ca. 75 bis 90 cm hoch. Bühnenmitte für Danis Synths, Pads, XR18 und Feedback Destroyer.</div>
-      <div class="requirement"><strong>2x Podest</strong>Je 120 x 100 cm, 20 bis 30 cm hoch. Stage Left für Nate, Stage Right für Babsi.</div>
-      <div class="requirement"><strong>Strom</strong>1x 6-fach bei Dani, 1x 3-fach bei Nate, 1x 6-fach bei Babsi. Schuko, getrennt von störenden Verbrauchern.</div>
-      <div class="requirement"><strong>Mikrofone</strong>1x Vocal-Mikrofon mit Stativ für Babsi. 1x Mikrofon mit Galgenstativ für Nates Becken.</div>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-head"><span class="number">03 / PLOT</span><h2>Stage Plot</h2></div>
+    <div class="section-head"><span class="number">01 / PLOT</span><h2>Stage Plot</h2></div>
+    <p class="lead">Wir stehen im <strong>Dreieck</strong>. Die genaue Aufstellung ist flexibel – wichtig ist nur, dass <strong>Dani zentral steht</strong>, damit die Kabelwege kurz bleiben.</p>
     <div class="plot">
-      <svg viewBox="0 0 920 570" role="img" aria-label="Stage Plot SCTTRD">
-        <rect x="20" y="20" width="880" height="500" fill="#fff" stroke="#090909" stroke-width="3"/>
-        <text x="460" y="48" text-anchor="middle" font-size="13" letter-spacing="4">UPSTAGE</text>
-        <text x="460" y="555" text-anchor="middle" font-size="13" letter-spacing="4">PUBLIKUM / FOH</text>
+      <svg viewBox="0 0 920 640" role="img" aria-label="Stage Plot SCTTRD: Dani zentral am Tisch mit XR18, Nate mit E-Drums ebenerdig, Babsi auf dem Podest, Signale an FOH, zwei In-Ear-Wege zurück">
+        <defs>
+          <g id="person"><circle cx="0" cy="0" r="9" fill="#0c0c0c"/><path d="M-16 22Q0 6 16 22" fill="none" stroke="#0c0c0c" stroke-width="3"/></g>
+          <g id="person-red"><circle cx="0" cy="0" r="9" fill="#ff0000"/><path d="M-16 22Q0 6 16 22" fill="none" stroke="#ff0000" stroke-width="3"/></g>
+          <g id="strip"><rect x="0" y="0" width="60" height="16" fill="#ffffff" stroke="#0c0c0c" stroke-width="1.5"/><circle cx="9" cy="8" r="2.2" fill="#0c0c0c"/><circle cx="17" cy="8" r="2.2" fill="#0c0c0c"/><circle cx="25" cy="8" r="2.2" fill="#0c0c0c"/><text x="44" y="12" text-anchor="middle" font-size="9" font-weight="700" fill="#0c0c0c">6×</text></g>
+          <g id="pad"><circle cx="0" cy="0" r="14" fill="#ffffff" stroke="#0c0c0c" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#0c0c0c"/></g>
+        </defs>
 
-        <rect x="322" y="120" width="276" height="120" fill="#f4f3ef" stroke="#c92a2a" stroke-width="4"/>
-        <text x="460" y="154" text-anchor="middle" font-size="24" font-weight="700">DANI</text>
-        <text x="460" y="180" text-anchor="middle" font-size="15">TISCH 120 x 60</text>
-        <text x="460" y="204" text-anchor="middle" font-size="13">Synths · Pads · XR18 · Feedback Destroyer</text>
-        <rect x="580" y="132" width="88" height="28" fill="#090909"/>
-        <text x="624" y="151" text-anchor="middle" fill="#fff" font-size="11">6-FACH</text>
+        <rect x="20" y="20" width="880" height="470" fill="#ffffff" stroke="#0c0c0c" stroke-width="3"/>
+        <text x="40" y="44" font-size="11" letter-spacing="4" fill="#6b6a66">UPSTAGE</text>
+        <text x="880" y="478" text-anchor="end" font-size="11" letter-spacing="4" fill="#6b6a66">PUBLIKUM</text>
 
-        <rect x="85" y="300" width="250" height="170" fill="#fff" stroke="#090909" stroke-width="2" stroke-dasharray="7 5"/>
-        <circle cx="210" cy="370" r="55" fill="#f4f3ef" stroke="#090909" stroke-width="3"/>
-        <text x="210" y="364" text-anchor="middle" font-size="22" font-weight="700">NATE</text>
-        <text x="210" y="389" text-anchor="middle" font-size="14">Drums · Ableton</text>
-        <text x="210" y="452" text-anchor="middle" font-size="12">PODEST 120 x 100</text>
-        <text x="105" y="327" font-size="12" fill="#c92a2a">BECKEN-MIKRO + GALGEN</text>
-        <rect x="95" y="423" width="75" height="25" fill="#090909"/>
-        <text x="132" y="440" text-anchor="middle" fill="#fff" font-size="10">3-FACH</text>
+        <path d="M300 300L405 198M620 300L515 198" fill="none" stroke="#ff0000" stroke-width="2" stroke-dasharray="6 5"/>
 
-        <rect x="585" y="300" width="250" height="170" fill="#fff" stroke="#090909" stroke-width="2" stroke-dasharray="7 5"/>
-        <circle cx="710" cy="370" r="55" fill="#f4f3ef" stroke="#090909" stroke-width="3"/>
-        <text x="710" y="364" text-anchor="middle" font-size="22" font-weight="700">BABSI</text>
-        <text x="710" y="389" text-anchor="middle" font-size="14">Vocals · RC-505 · FX</text>
-        <text x="710" y="452" text-anchor="middle" font-size="12">PODEST 120 x 100</text>
-        <text x="605" y="327" font-size="12" fill="#c92a2a">VOCAL-MIKRO + STATIV</text>
-        <rect x="750" y="423" width="75" height="25" fill="#090909"/>
-        <text x="787" y="440" text-anchor="middle" fill="#fff" font-size="10">6-FACH</text>
+        <!-- Dani · Tisch, zentral -->
+        <use href="#person-red" x="460" y="48"/>
+        <rect x="330" y="78" width="260" height="120" fill="#f4f3ef" stroke="#ff0000" stroke-width="4"/>
+        <rect x="330" y="64" width="64" height="20" fill="#ff0000"/>
+        <text x="362" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">DANI</text>
+        <use href="#strip" x="526" y="66"/>
+        <rect x="346" y="92" width="70" height="44" fill="#ffffff" stroke="#0c0c0c" stroke-width="2"/>
+        <rect x="352" y="98" width="58" height="16" fill="#0c0c0c"/>
+        <path d="M356 122h50M356 128h50" stroke="#0c0c0c" stroke-width="1.5"/>
+        <text x="381" y="150" text-anchor="middle" font-size="9" fill="#6b6a66">PC · LIVE-SET</text>
+        <rect x="430" y="92" width="96" height="44" fill="#0c0c0c"/>
+        <g fill="#ffffff"><circle cx="442" cy="104" r="3"/><circle cx="456" cy="104" r="3"/><circle cx="470" cy="104" r="3"/><circle cx="484" cy="104" r="3"/><circle cx="498" cy="104" r="3"/><circle cx="512" cy="104" r="3"/><circle cx="442" cy="116" r="3"/><circle cx="456" cy="116" r="3"/><circle cx="470" cy="116" r="3"/><circle cx="484" cy="116" r="3"/><circle cx="498" cy="116" r="3"/><circle cx="512" cy="116" r="3"/></g>
+        <text x="478" y="131" text-anchor="middle" font-size="9" font-weight="700" fill="#ffffff">XR18</text>
+        <text x="478" y="150" text-anchor="middle" font-size="9" fill="#6b6a66">MISCHPULT</text>
+        <rect x="541" y="92" width="14" height="20" rx="7" fill="#ffffff" stroke="#0c0c0c" stroke-width="2"/>
+        <path d="M548 112v16M540 128h16" stroke="#0c0c0c" stroke-width="2"/>
+        <text x="548" y="150" text-anchor="middle" font-size="9" fill="#6b6a66">TALKBACK</text>
+        <rect x="346" y="160" width="118" height="18" fill="#ffffff" stroke="#0c0c0c" stroke-width="1.5"/>
+        <text x="405" y="172" text-anchor="middle" font-size="8" letter-spacing="1">FEEDBACK DESTROYER</text>
+        <rect x="472" y="158" width="34" height="22" fill="#ffffff" stroke="#0c0c0c" stroke-width="1.5"/>
+        <rect x="476" y="162" width="26" height="14" fill="#f4f3ef"/>
+        <rect x="514" y="160" width="60" height="18" fill="#ffffff" stroke="#0c0c0c" stroke-width="1.5"/>
+        <text x="544" y="172" text-anchor="middle" font-size="8" letter-spacing="1">ROUTER</text>
+        <text x="460" y="192" text-anchor="middle" font-size="9" fill="#6b6a66">TISCH 120 × 60 · ALLES LÄUFT HIER ZUSAMMEN</text>
 
-        <path d="M335 300 L410 240 M585 300 L510 240" stroke="#c92a2a" stroke-width="2" stroke-dasharray="5 5"/>
-        <text x="460" y="282" text-anchor="middle" font-size="12" fill="#c92a2a">SIGNAL + MONITORING ZUM XR18</text>
+        <!-- Nate · E-Drums, ebenerdig -->
+        <rect x="70" y="246" width="64" height="20" fill="#0c0c0c"/>
+        <text x="102" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">NATE</text>
+        <use href="#pad" x="160" y="300"/><use href="#pad" x="195" y="288"/><use href="#pad" x="230" y="300"/>
+        <use href="#pad" x="168" y="336"/><use href="#pad" x="238" y="340"/>
+        <circle cx="128" cy="318" r="11" fill="#ffffff" stroke="#0c0c0c" stroke-width="2"/>
+        <rect x="184" y="326" width="22" height="26" fill="#0c0c0c"/>
+        <circle cx="168" cy="336" r="21" fill="none" stroke="#ff0000" stroke-width="2" stroke-dasharray="5 4"/>
+        <circle cx="270" cy="284" r="18" fill="none" stroke="#ff0000" stroke-width="2" stroke-dasharray="5 4"/>
+        <use href="#person" x="195" y="382"/>
+        <use href="#strip" x="70" y="404"/>
+        <text x="195" y="428" text-anchor="middle" font-size="10" fill="#ff0000">GESTRICHELT = NUR BEI HYBRID: SNARE + CYMBAL</text>
+        <text x="195" y="444" text-anchor="middle" font-size="10" fill="#6b6a66">E-DRUMS · EIGENES SET · KEIN PODEST</text>
+
+        <!-- Babsi · Podest -->
+        <rect x="600" y="250" width="250" height="200" fill="#ffffff" stroke="#0c0c0c" stroke-width="2" stroke-dasharray="7 5"/>
+        <rect x="600" y="236" width="70" height="20" fill="#0c0c0c"/>
+        <text x="635" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">BABSI</text>
+        <use href="#strip" x="782" y="258"/>
+        <use href="#person" x="725" y="290"/>
+        <rect x="718" y="318" width="14" height="22" rx="7" fill="#ffffff" stroke="#0c0c0c" stroke-width="2"/>
+        <path d="M725 340v32M711 372h28" stroke="#0c0c0c" stroke-width="3"/>
+        <rect x="652" y="382" width="62" height="24" fill="#ffffff" stroke="#0c0c0c" stroke-width="1.5"/>
+        <text x="683" y="398" text-anchor="middle" font-size="8" letter-spacing="1">RC-505</text>
+        <rect x="736" y="382" width="56" height="24" fill="#ffffff" stroke="#0c0c0c" stroke-width="1.5"/>
+        <text x="764" y="398" text-anchor="middle" font-size="8" letter-spacing="1">RE-202</text>
+        <text x="725" y="424" text-anchor="middle" font-size="10" fill="#6b6a66">VOCALS · LOOPER · FX · EIGENES MIKRO</text>
+        <text x="725" y="440" text-anchor="middle" font-size="10" fill="#6b6a66">PODEST 120 × 100 · POSITION FLEXIBEL</text>
+
+        <!-- Signale -->
+        <line x1="448" y1="200" x2="448" y2="538" stroke="#ff0000" stroke-width="3"/>
+        <polygon points="440,532 456,532 448,548" fill="#ff0000"/>
+        <line x1="472" y1="214" x2="472" y2="548" stroke="#0c0c0c" stroke-width="3"/>
+        <polygon points="464,214 480,214 472,200" fill="#0c0c0c"/>
+        <text x="436" y="470" text-anchor="end" font-size="12" font-weight="700" fill="#ff0000">AN FOH: MAIN L/R · VOCAL-MIX · KLICK+TB</text>
+        <text x="484" y="470" font-size="12" font-weight="700">ZURÜCK: 2× IEM (DANI + BABSI)</text>
+
+        <path d="M80 452V575H360" fill="none" stroke="#6b6a66" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <text x="92" y="530" font-size="11" fill="#6b6a66">NUR HYBRID:</text>
+        <text x="92" y="546" font-size="11" fill="#6b6a66">MIKROS DIREKT AN FOH</text>
+
+        <rect x="360" y="550" width="200" height="50" fill="#0c0c0c"/>
+        <path d="M382 562v26M396 562v26M410 562v26" stroke="#ffffff" stroke-width="2"/>
+        <g fill="#ffffff"><rect x="377" y="572" width="10" height="5"/><rect x="391" y="578" width="10" height="5"/><rect x="405" y="566" width="10" height="5"/></g>
+        <text x="484" y="581" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff" letter-spacing="3">FOH</text>
       </svg>
-      <div class="legend"><span>Stage Left: Nate</span><span>Mitte: Dani + Tisch</span><span>Stage Right: Babsi</span></div>
+      <div class="legend"><span><i></i>Nate · E-Drums, ebenerdig</span><span><i class="red"></i>Dani · zentral, Tisch mit XR18</span><span><i class="dash"></i>Babsi · Podest, Position flexibel</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="number">02 / TECHNIK</span><h2>Signalweg</h2></div>
+    <p class="lead">Wir mischen unseren Sound auf dem XR18 selbst vor. FOH bekommt fertige Summen und schickt uns zwei komplette In-Ear-Mixe zurück.</p>
+    <div class="signal">
+      <table class="patch">
+        <tbody>
+          <tr class="group"><th colspan="2">An FOH · von unserem XR18</th></tr>
+          <tr><th>Main L/R<small>2× XLR · Stereo</small></th><td>Vorgemischter Backing Track inkl. Nates Drum-Trigger aus dem Live-Set.</td></tr>
+          <tr><th>Vocal-Mix<small>1× XLR · Aux</small></th><td>Babsis Stimme inkl. Looper (RC-505) und Effekten (RE-202) als <strong>ein fertiger Mix</strong> über den Feedback Destroyer. FOH regelt den Raumpegel.</td></tr>
+          <tr><th>Klick + Talkback<small>1× XLR · Aux</small></th><td>Klick und Ansagen in einem Aux – <strong>nur für die In-Ears, nicht auf die PA.</strong></td></tr>
+          <tr class="group optional"><th colspan="2">Optional · nur bei Hybrid</th></tr>
+          <tr><th>Snare + Cymbal<small>Mikros vom Venue</small></th><td>Direkt an FOH, <strong>nicht</strong> über das XR18. Bei reinem E-Drum-Set entfällt das komplett.</td></tr>
+          <tr class="group"><th colspan="2">Zurück von FOH · 2× In-Ear</th></tr>
+          <tr><th>IEM Dani<small>1× XLR · Mono</small></th><td>Kompletter Mix inkl. Vocals, Klick und Talkback.</td></tr>
+          <tr><th>IEM Babsi<small>1× XLR · Mono</small></th><td>Kompletter Mix inkl. Vocals, Klick und Talkback.</td></tr>
+        </tbody>
+      </table>
+      <p class="note"><strong>FOH-Aufgabe:</strong> Raum-Mix aus Main L/R und Vocal-Mix (bei Hybrid plus Snare/Cymbal) sowie die zwei In-Ear-Mixe. Den Grundsound liefern wir fertig gemischt.</p>
+    </div>
+    <div class="feedback"><svg class="icon red"><use href="#i-warn"/></svg><span><strong>Feedback ist der kritische Punkt.</strong> Vocal-Mix und Hybrid-Mikros nach dem Einmessen nicht ohne Rücksprache anheben. Wedges so leise wie möglich.</span></div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="number">03 / VENUE</span><h2>Was wir brauchen</h2></div>
+    <div class="needs">
+      <div class="need">
+        <h3><svg class="icon"><use href="#i-table"/></svg>Bühne</h3>
+        <ul>
+          <li><b>1× Tisch für Dani</b> – stabil, mind. 120 × 60 cm, 75–90 cm hoch, zentral.</li>
+          <li><b>1× Podest für Babsi</b> – ca. 120 × 100 cm, 20–30 cm hoch, neben oder vor dem Tisch. Bei erhöhter Bühne nicht nötig.</li>
+          <li><b>Nate:</b> kein Podest, kein Drumset – das E-Set bringt er mit.</li>
+        </ul>
+      </div>
+      <div class="need">
+        <h3><svg class="icon"><use href="#i-power"/></svg>Strom</h3>
+        <ul>
+          <li><b>3× 6-fach Schuko</b> – je eine bei Dani, Babsi und Nate.</li>
+          <li>Getrennt von Störern (Dimmer, Kühlung, Nebel).</li>
+        </ul>
+      </div>
+      <div class="need">
+        <h3><svg class="icon"><use href="#i-cable"/></svg>Kabel</h3>
+        <ul>
+          <li><b>ca. 8× XLR, je ca. 6 m</b> – 4 an FOH, 2 In-Ear zurück, Reserve bzw. Hybrid-Mikros.</li>
+        </ul>
+      </div>
+      <div class="need">
+        <h3><svg class="icon"><use href="#i-inear"/></svg>Monitoring</h3>
+        <ul>
+          <li><b>In-Ears bringen wir selbst.</b> Wir brauchen nur <b>2 In-Ear-Ausgänge (XLR)</b> von FOH.</li>
+          <li>Wedges optional – nur sehr leise.</li>
+        </ul>
+      </div>
+      <div class="need">
+        <h3><svg class="icon"><use href="#i-stand"/></svg>Mikrofonstativ</h3>
+        <ul>
+          <li><b>1× Mikrofonstativ</b> für Babsi – ihr Mikro bringt sie selbst mit.</li>
+        </ul>
+      </div>
+      <div class="need conditional">
+        <h3><svg class="icon"><use href="#i-hybrid"/></svg>Nur bei Hybrid</h3>
+        <ul>
+          <li><b>Snare- und Cymbal-Mikro</b> mit Stativ bzw. Galgen, direkt an FOH.</li>
+          <li>Klären wir spätestens 5 Tage vorher.</li>
+        </ul>
+      </div>
     </div>
   </section>
 
   <section>
     <div class="section-head"><span class="number">04 / CHECK</span><h2>Soundcheck</h2></div>
     <div class="steps">
-      <div class="step"><div><strong>60 Minuten blocken</strong>Aufbau und Linecheck sind darin nicht enthalten. Die bestätigte Uhrzeit brauchen wir fünf Tage vor der Show.</div></div>
-      <div class="step"><div><strong>Vocals zuerst</strong>Babsi trocken einpegeln. Danach In-Ear und Monitor prüfen.</div></div>
-      <div class="step"><div><strong>Feedback Destroyer einmessen</strong>Vocalbus, RE-202 und RC-505 einzeln prüfen. Grenzpegel festlegen, bevor der Gesamtmix läuft.</div></div>
-      <div class="step"><div><strong>Loops und Songs prüfen</strong>RC-505 testen und die Pegel der kritischen Songs angleichen.</div></div>
-      <div class="step"><div><strong>Gesamtmix</strong>Band, Raum und Monitoring gemeinsam prüfen. Danach Setup nicht mehr grundlegend ändern.</div></div>
+      <div class="step"><div><strong>Aufbau</strong>Wir bauen unser Setup auf und verkabeln zu FOH.</div><span class="time">15–20 Min</span></div>
+      <div class="step"><div><strong>Leise testen</strong>Wedges (so leise wie möglich), Talkback und Klick auf beiden In-Ears.</div><span class="time">ca. 10 Min</span></div>
+      <div class="step"><div><strong>Zwei Songs anspielen</strong>Pegel, Vocal-Mix und In-Ear-Mixe einstellen.</div><span class="time">ca. 15 Min</span></div>
+      <div class="step"><div><strong>Ein Song komplett</strong>Gesamtmix im Raum und auf den In-Ears prüfen. Danach nichts mehr grundlegend ändern.</div><span class="time">ca. 10 Min</span></div>
+      <div class="step"><div><strong>Stehen lassen oder abbauen</strong>Nach Absprache mit der Venue.</div><span class="time">Rest</span></div>
     </div>
-    <div class="feedback"><strong>Feedback ist der kritische Punkt.</strong> Vocal- und Effektpegel dürfen nach dem Einmessen nicht ohne Rücksprache angehoben werden. Bei Fragen Daniel direkt anrufen.</div>
+    <div class="total"><span>Soundcheck gesamt</span><span><svg class="icon red"><use href="#i-clock"/></svg>ideal 60 Minuten</span></div>
   </section>
 
-  <footer><span>Daniel Peters · <a href="tel:+491725231109">+49 172 5231109</a> · <a href="mailto:djdanep@gmail.com">djdanep@gmail.com</a></span><span>SCTTRD Technical Rider 2026</span></footer>
+  <aside class="confirm">
+    <div>
+      <span class="number">05 / RÜCKMELDUNG</span>
+      <h2>Bitte kurz bestätigen</h2>
+    </div>
+    <div>
+      <p>Sobald ihr den Rider gelesen habt, gebt uns bitte kurz Bescheid – <strong>spätestens 5 Tage vor der Show</strong>. Bei Fragen oder Unklarheiten schreibt an <a href="mailto:info@scttrd.de">info@scttrd.de</a>, Nate kümmert sich um alles Weitere. Ohne Rückmeldung planen wir mit reinem E-Drum-Set und 60 Minuten Soundcheck.</p>
+      <div class="reply">
+        <span>□ Gelesen und verstanden</span><span>□ Nicht verstanden → info@scttrd.de</span>
+        <span>□ Nate: nur E-Drums</span><span>□ Nate: Hybrid (Snare + Cymbal)</span>
+        <span>Soundcheck: __________ Uhr</span><span>Showtime: __________ Uhr</span>
+        <span>FOH-Kontakt: ______________</span><span>Bühnenmaß: ______________</span>
+      </div>
+    </div>
+  </aside>
+
+  <footer><span><a href="mailto:info@scttrd.de">info@scttrd.de</a> · Daniel Peters · <a href="tel:+491725231109">+49 172 5231109</a></span><span>SCTTRD Technical Rider 2026-09</span></footer>
 </main>
 </body>
 </html>
