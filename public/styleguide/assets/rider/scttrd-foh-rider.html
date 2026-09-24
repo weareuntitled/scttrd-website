@@ -120,17 +120,42 @@
       body{background:#fff;font-size:10px}
       main{max-width:none;padding:0}
       .brand{font-size:54px}
-      section{padding:7mm 0;break-inside:avoid}
-      .section-head{margin-bottom:4mm}
-      h2{font-size:28px}
-      .lead{font-size:12px}
-      .role,.need,.signal,.plot,.device,.facts,.confirm{break-inside:avoid}
-      .role,.need{padding:3mm}
+      header{padding-bottom:4mm}
+      section{padding:6mm 0}
+      .section-head{margin-bottom:3mm;break-after:avoid}
+      h2{font-size:26px}
+      .lead{font-size:11px;margin-bottom:3mm;break-after:avoid}
+      .intro-title{font-size:22px;margin-bottom:3mm}
+      .roles{gap:3mm;margin-top:4mm}
+      .role{padding:3mm}
+      .role .icon{width:22px;height:22px;margin-bottom:2mm}
+      .role strong{font-size:13px;margin-bottom:1mm}
+      .overview{gap:3mm;margin-top:3mm}
+      .device{padding:3mm}
+      .device svg{max-height:34mm}
+      .device figcaption{font-size:9px;margin-top:2mm}
+      .facts{padding:3mm 4mm}
+      .facts li{padding:1.4mm 0;font-size:10px}
+      .facts li .icon{width:16px;height:16px;flex-basis:16px}
+      .sec-plot,.sec-tech,.sec-venue,.sec-check{break-before:page}
+      .sec-venue,.sec-check{padding:5mm 0}
+      .needs{gap:3mm}
+      .need li{padding:1.2mm 0}
+      .steps .step strong{font-size:12px}
+      .total{padding-top:3mm;font-size:13px}
+      .confirm{margin-top:4mm;padding:4mm 5mm;gap:5mm}
+      .confirm h2{font-size:20px}
+      .confirm p{font-size:10px;margin-bottom:2mm}
+      .reply{gap:1.5mm 5mm;padding-top:2mm;font-size:9px}
+      .role,.need,.signal,.plot,.device,.facts,.confirm,.step,.intro-title{break-inside:avoid}
+      footer{break-inside:avoid}
+      .need{padding:3mm}
       .plot{padding:4mm}
-      .plot svg{max-height:130mm}
+      .plot svg{max-height:150mm}
       table.patch th,table.patch td{padding:2mm 3mm}
+      .step{padding:2.5mm 0}
       .confirm{margin-top:6mm;padding:5mm}
-      footer{padding:5mm 0}
+      footer{padding:4mm 0}
       .no-print{display:none}
     }
   </style>
@@ -164,7 +189,7 @@
     <button class="pill ghost" type="button" onclick="window.print()">Drucken</button>
   </div>
 
-  <section>
+  <section class="sec-overview">
     <div class="section-head"><span class="number">00 / ÜBERBLICK</span><h2>Kurz erklärt</h2></div>
     <p class="intro-title">Wir sind SCTTRD.<br>Wir machen <em>Live-Techno.</em></p>
     <p class="lead">Unser Set läuft live von einem PC. Nate spielt dazu E-Drums und triggert damit Sounds direkt im Live-Set. Daraus entsteht ein <strong>vorgemischter Backing Track</strong>. Darüber liegt Babsis Stimme – mit Vocal-Looper und Effekten, die wir als <strong>fertigen Vocal-Mix</strong> ausgeben. <strong>Alles läuft bei Dani am Tisch zusammen und wird dort auf unserem XR18 gemischt.</strong></p>
@@ -215,7 +240,7 @@
     </div>
   </section>
 
-  <section>
+  <section class="sec-plot">
     <div class="section-head"><span class="number">01 / PLOT</span><h2>Stage Plot</h2></div>
     <p class="lead">Wir stehen im <strong>Dreieck</strong>. Die genaue Aufstellung ist flexibel – wichtig ist nur, dass <strong>Dani zentral steht</strong>, damit die Kabelwege kurz bleiben.</p>
     <div class="plot">
@@ -308,7 +333,7 @@
     </div>
   </section>
 
-  <section>
+  <section class="sec-tech">
     <div class="section-head"><span class="number">02 / TECHNIK</span><h2>Signalweg</h2></div>
     <p class="lead">Wir mischen unseren Sound auf dem XR18 selbst vor. FOH bekommt fertige Summen und schickt uns zwei komplette In-Ear-Mixe zurück.</p>
     <div class="signal">
@@ -330,7 +355,7 @@
     <div class="feedback"><svg class="icon red"><use href="#i-warn"/></svg><span><strong>Feedback ist der kritische Punkt.</strong> Vocal-Mix und Hybrid-Mikros nach dem Einmessen nicht ohne Rücksprache anheben. Wedges so leise wie möglich.</span></div>
   </section>
 
-  <section>
+  <section class="sec-venue">
     <div class="section-head"><span class="number">03 / VENUE</span><h2>Was wir brauchen</h2></div>
     <div class="needs">
       <div class="need">
@@ -377,7 +402,7 @@
     </div>
   </section>
 
-  <section>
+  <section class="sec-check">
     <div class="section-head"><span class="number">04 / CHECK</span><h2>Soundcheck</h2></div>
     <div class="steps">
       <div class="step"><div><strong>Aufbau</strong>Wir bauen unser Setup auf und verkabeln zu FOH.</div><span class="time">15–20 Min</span></div>
