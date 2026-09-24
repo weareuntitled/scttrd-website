@@ -29,6 +29,12 @@ const cmsLinksBody = await cmsLinks.json()
 if (!Array.isArray(cmsLinksBody.docs)) throw new Error('cms-links-api: response has no docs array')
 console.log(`cms-links-api: ${cmsLinks.status} docs=${cmsLinksBody.docs.length}`)
 
+const cmsReleases = await fetch(`${cmsUrl}/api/releases?limit=1`, { signal: AbortSignal.timeout(15000) })
+if (!cmsReleases.ok) throw new Error(`cms-releases-api: ${cmsReleases.status} ${cmsUrl}/api/releases?limit=1`)
+const cmsReleasesBody = await cmsReleases.json()
+if (!Array.isArray(cmsReleasesBody.docs)) throw new Error('cms-releases-api: response has no docs array')
+console.log(`cms-releases-api: ${cmsReleases.status} docs=${cmsReleasesBody.docs.length}`)
+
 const indexHtml = await fetch(`${baseUrl}/index.html`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
 if (indexHtml.status !== 308 || indexHtml.headers.get('location') !== '/') {
   throw new Error(`index-html-redirect: expected 308 to /, got ${indexHtml.status} ${indexHtml.headers.get('location') || ''}`)
@@ -37,8 +43,8 @@ console.log(`index-html-redirect: ${indexHtml.status}`)
 
 const showChecks = [
   ['singoldsand-show', '/shows/singoldsand-21-08-2026/', ['Singoldsand', 'Ort in Google Maps öffnen'], []],
-  // Nur-CMS: Kneipenfestival ist im CMS vorhanden.
-  ['koe-show', '/shows/kneipenfestival-baarrauschen-koe-17-10-2026/', ['Kneipenfestival', 'Ort in Google Maps öffnen'], []],
+  // Nur-CMS: Die Ulm-Show ersetzt den früheren KOE/Aichach-Datensatz.
+  ['ulm-show', '/shows/sperrstunde-parkhaus-popbastion-ulm-radio-free-fm-17-10-2026/', ['Sperrstunde', 'Ort in Google Maps öffnen'], []],
 ]
 for (const [name, path, markers, forbidden = []] of showChecks) {
   const page = await fetch(`${baseUrl}${path}`, { signal: AbortSignal.timeout(15000) })
