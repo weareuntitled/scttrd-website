@@ -49,9 +49,10 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        # Mail-Env (MAIL_RELAY_*, SMTP_*) kommt aus all-inclusive/.env auf dem Server.
+        # Rider-Mails: PHP-Relay auf ALL-INKL — siehe docs/mail-relay.md
         run: |
-          printf '%s\n' "$SMTP_PASSWORD" | ssh "$SERVER_USER@$SERVER_HOST" "read -r SMTP_PASSWORD && export SMTP_PASSWORD SMTP_PORT=587 && cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml up -d --build"
+          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml up -d --build"
       - name: Run CMS migrations (explicit, outside container boot)
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}

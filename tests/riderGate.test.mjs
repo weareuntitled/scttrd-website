@@ -61,16 +61,18 @@ describe('Rider-Gate: Verdrahtung', () => {
 
   it('API-Route existiert, schreibt ins CMS und verschickt die Benachrichtigung', () => {
     const src = read('src/pages/api/rider-request.ts');
+    const mail = read('src/lib/riderMail.ts');
     assert.match(src, /\/api\/rider-requests/);
     assert.match(src, /validateRiderRequest/);
-    assert.match(src, /sendNotification/);
-    assert.match(src, /SMTP_PASSWORD/);
-    assert.match(src, /sendMail/);
-    assert.match(src, /html: notificationHtml/);
-    assert.match(src, /#f00000/);
-    assert.match(src, /connectionTimeout/);
-    assert.match(src, /socketTimeout/);
-    assert.match(read('all-inclusive/compose.all.yaml'), /SMTP_PORT: \$\{SMTP_PORT:-587\}/);
+    assert.match(src, /sendRiderNotification/);
+    assert.match(mail, /MAIL_RELAY_URL/);
+    assert.match(mail, /MAIL_RELAY_SECRET/);
+    assert.match(mail, /SMTP_PASSWORD/);
+    assert.match(mail, /sendMail/);
+    assert.match(mail, /#f00000/);
+    assert.match(mail, /connectionTimeout/);
+    assert.match(mail, /socketTimeout/);
+    assert.match(read('all-inclusive/compose.all.yaml'), /MAIL_RELAY_URL/);
   });
 
   it('CMS kennt die Collection rider-requests inkl. Migration', () => {
