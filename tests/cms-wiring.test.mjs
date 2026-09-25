@@ -144,6 +144,21 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     assert.match(index, /20260925_000000_add_release_lock_relation/);
   });
 
+  it('release uses one Spotify link instead of four streaming fields', () => {
+    const collection = read('cms/src/collections/Releases.ts');
+    const page = read('src/pages/releases/[slug].astro');
+    assert.match(collection, /name: 'spotifyUrl'/);
+    assert.doesNotMatch(collection, /preSaveUrl|soundcloudUrl|youtubeUrl/);
+    assert.doesNotMatch(page, /preSaveUrl|soundcloudUrl|youtubeUrl/);
+  });
+
+  it('release editor defaults new releases to draft and explains the single link', () => {
+    const collection = read('cms/src/collections/Releases.ts');
+    assert.match(collection, /defaultValue: 'draft'/);
+    assert.match(collection, /Spotify-Link \(vorläufig möglich\)/);
+    assert.match(collection, /Bitte eine gültige URL eintragen/);
+  });
+
   it('content collections still cover homepage groups for the fallback', () => {
     const ts = read('src/content.config.ts');
     for (const name of ['shows', 'links', 'videos', 'reels', 'homeText', 'homeImages']) {
