@@ -34,10 +34,9 @@ const email = process.env.SMTP_HOST
         host: process.env.SMTP_HOST,
         port: smtpPort,
         secure: smtpPort === 465,
-        auth:
-          smtpUser && process.env.SMTP_PASSWORD
-            ? { user: smtpUser, pass: process.env.SMTP_PASSWORD }
-            : undefined,
+        ...(smtpUser && process.env.SMTP_PASSWORD
+          ? { auth: { user: smtpUser, pass: process.env.SMTP_PASSWORD } }
+          : {}),
         connectionTimeout: 8000,
         greetingTimeout: 8000,
         socketTimeout: 10000,
