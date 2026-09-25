@@ -15,10 +15,7 @@ const nextShowUrl = upcomingShow ? showUrl(upcomingShow) : null;
 const phase = releasePhase(release);
 const date = releaseDateLabel(release);
 const buttons = [
-  phase === 'upcoming' && release.preSaveUrl && { label: 'Pre-save', url: release.preSaveUrl },
   release.spotifyUrl && { label: 'Spotify', url: release.spotifyUrl },
-  release.soundcloudUrl && { label: 'SoundCloud', url: release.soundcloudUrl },
-  release.youtubeUrl && { label: 'YouTube', url: release.youtubeUrl },
 ].filter(Boolean) as { label: string; url: string }[];
 const description = release.description || `${release.title}, der neue Track von SCTTRD. Release am ${date}.`;
 ---

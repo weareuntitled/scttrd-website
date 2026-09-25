@@ -30,7 +30,7 @@ export const Releases: CollectionConfig = {
     }],
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
+    { name: 'title', type: 'text', required: true, label: 'Track-Titel' },
     {
       name: 'slug',
       type: 'text',
@@ -42,20 +42,33 @@ export const Releases: CollectionConfig = {
     {
       name: 'releaseDate',
       type: 'date',
+      label: 'Release-Datum',
       required: true,
       admin: { date: { pickerAppearance: 'dayOnly', displayFormat: 'dd.MM.yyyy' } },
     },
-    { name: 'cover', type: 'upload', relationTo: 'media', required: true },
-    { name: 'description', type: 'textarea' },
     {
-      type: 'collapsible',
-      label: 'Streaming und Pre-Save',
-      fields: [
-        { name: 'preSaveUrl', type: 'text', label: 'Pre-Save URL' },
-        { name: 'spotifyUrl', type: 'text', label: 'Spotify URL' },
-        { name: 'soundcloudUrl', type: 'text', label: 'SoundCloud URL' },
-        { name: 'youtubeUrl', type: 'text', label: 'YouTube URL' },
-      ],
+      name: 'cover',
+      type: 'upload',
+      relationTo: 'media',
+      required: true,
+      label: 'Cover',
+      admin: { description: 'Das Cover für Release-Seite, Linkhub und Banner.' },
+    },
+    { name: 'description', type: 'textarea', label: 'Beschreibung' },
+    {
+      name: 'spotifyUrl',
+      type: 'text',
+      label: 'Spotify-Link (vorläufig möglich)',
+      admin: { description: 'Nur diesen einen Link eintragen. Die endgültige Spotify-URL kann später ersetzt werden.' },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        try {
+          new URL(value)
+          return true
+        } catch {
+          return 'Bitte eine gültige URL eintragen.'
+        }
+      },
     },
     {
       type: 'collapsible',
@@ -76,7 +89,7 @@ export const Releases: CollectionConfig = {
       name: 'status',
       type: 'select',
       required: true,
-      defaultValue: 'published',
+      defaultValue: 'draft',
       options: [
         { label: 'Entwurf', value: 'draft' },
         { label: 'Veröffentlicht', value: 'published' },
