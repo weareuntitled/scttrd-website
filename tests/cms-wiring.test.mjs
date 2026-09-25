@@ -136,6 +136,14 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     assert.match(checker, /admin\/login/);
   });
 
+  it('releases migration adds the Payload locked-document relation', () => {
+    const migration = read('cms/src/migrations/20260925_000000_add_release_lock_relation.ts');
+    const index = read('cms/src/migrations/index.ts');
+    assert.match(migration, /ADD COLUMN IF NOT EXISTS "releases_id" integer/);
+    assert.match(migration, /DROP COLUMN IF EXISTS "releases_id"/);
+    assert.match(index, /20260925_000000_add_release_lock_relation/);
+  });
+
   it('content collections still cover homepage groups for the fallback', () => {
     const ts = read('src/content.config.ts');
     for (const name of ['shows', 'links', 'videos', 'reels', 'homeText', 'homeImages']) {
