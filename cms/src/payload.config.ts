@@ -46,6 +46,7 @@ const email = process.env.SMTP_HOST
   : undefined
 
 export default buildConfig({
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   admin: {
     user: Users.slug,
     importMap: {

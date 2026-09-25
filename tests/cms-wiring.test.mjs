@@ -112,6 +112,30 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     }
   });
 
+  it('production CMS keeps the reverse-proxy URL and secure auth cookies', () => {
+    const pc = read('cms/src/payload.config.ts');
+    const users = read('cms/src/collections/Users.ts');
+    assert.match(pc, /serverURL:\s*process\.env\.PAYLOAD_PUBLIC_SERVER_URL/);
+    assert.match(users, /secure:\s*process\.env\.NODE_ENV\s*===\s*['"]production['"]/);
+  });
+
+  it('CMS healthcheck verifies the usable login page, not only an HTTP status', () => {
+    const compose = read('all-inclusive/compose.all.yaml');
+    assert.match(compose, /fetch\('http:\/\/127\.0\.0\.1:3000\/admin\/login'\)/);
+    assert.match(compose, /Login - Payload/);
+  });
+
+  it('production deploy runs the server-side CMS diagnostics', () => {
+    const workflow = read('.github/workflows/deploy.yml');
+    const checker = read('scripts/cms-log-check.sh');
+    assert.match(workflow, /name: CMS diagnostics/);
+    assert.match(workflow, /sh \.\.\/scripts\/cms-log-check\.sh/);
+    assert.match(checker, /docker compose -f compose\.all\.yaml/);
+    assert.match(checker, /logs --no-color --tail=200 cms/);
+    assert.match(checker, /docker inspect/);
+    assert.match(checker, /admin\/login/);
+  });
+
   it('content collections still cover homepage groups for the fallback', () => {
     const ts = read('src/content.config.ts');
     for (const name of ['shows', 'links', 'videos', 'reels', 'homeText', 'homeImages']) {
