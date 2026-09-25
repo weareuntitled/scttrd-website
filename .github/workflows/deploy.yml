@@ -53,6 +53,14 @@ jobs:
         # Rider-Mails: PHP-Relay auf ALL-INKL — siehe docs/mail-relay.md
         run: |
           ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && docker compose -f compose.all.yaml up -d --build"
+      - name: CMS diagnostics
+        if: always()
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH/all-inclusive' && sh ../scripts/cms-log-check.sh"
       - name: Run CMS migrations (explicit, outside container boot)
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
