@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 /**
  * Lädt all-inclusive/mail-relay/ per FTP auf ALL-INKL hoch.
- *
- * Credentials aus ~/Desktop/0.env:
- *   ftp_user_allinkl=w021c25a-…   (KAS → FTP → Benutzername)
- *   ftp_pwd_allinkl=…
- *   EMAIL_PWD=…                   (SMTP-Passwort für config.php)
+ * Credentials & SSH: docs/infra.md (~/Desktop/0.env: ftp_*, EMAIL_PWD)
+ * Architektur: docs/mail-relay.md
  */
 
 import fs from 'node:fs';

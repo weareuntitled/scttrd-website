@@ -80,9 +80,12 @@ describe('Mail: Dokumentation', () => {
     assert.match(read('all-inclusive/mail-relay/config.example.php'), /allowed_to/);
     const doc = read('docs/mail-relay.md');
     assert.match(doc, /scttrd\.de\.w021c25a\.kasserver\.com/);
-    assert.match(doc, /f018d3d2/);
-    assert.match(read('CONTEXT.md'), /docs\/mail-relay\.md/);
-    assert.match(read('AGENTS.md'), /docs\/mail-relay\.md/);
+    assert.match(doc, /MAIL_RELAY_URL/);
+    assert.match(read('docs/infra.md'), /scttrd-server/);
+    assert.match(read('docs/infra.md'), /Desktop\/0\.env/);
+    assert.match(read('CONTEXT.md'), /docs\/infra\.md/);
+    assert.match(read('AGENTS.md'), /docs\/infra\.md/);
+    assert.match(doc, /docs\/infra\.md/);
   });
 
   it('enthält kein echtes Passwort und warnt vor Port 993', () => {
