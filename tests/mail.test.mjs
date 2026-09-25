@@ -36,9 +36,9 @@ describe('Mail: Compose reicht SMTP an alle Dienste durch', () => {
   const compose = read('all-inclusive/compose.all.yaml');
   const block = (name) => compose.split(`  ${name}:`)[1]?.split('\n  #')[0] ?? '';
 
-  it('Website bekommt Host, Benutzer und Empfänger', () => {
+  it('Website bekommt Relay, SMTP-Fallback und Empfänger', () => {
     const web = block('web');
-    for (const key of ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'RIDER_MAIL_TO']) {
+    for (const key of ['MAIL_RELAY_URL', 'MAIL_RELAY_SECRET', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'RIDER_MAIL_TO']) {
       assert.match(web, new RegExp(key), `web fehlt ${key}`);
     }
   });
@@ -69,9 +69,20 @@ describe('Mail: Dokumentation', () => {
   const env = read('all-inclusive/.env.example');
 
   it('listet alle nötigen Variablen', () => {
-    for (const key of ['SMTP_HOST', 'SMTP_PORT', 'SMTP_SECURE', 'SMTP_USER', 'SMTP_PASSWORD', 'MAIL_FROM_ADDRESS', 'MAIL_FROM_NAME', 'RIDER_MAIL_TO']) {
+    for (const key of ['MAIL_RELAY_URL', 'MAIL_RELAY_SECRET', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_SECURE', 'SMTP_USER', 'SMTP_PASSWORD', 'MAIL_FROM_ADDRESS', 'MAIL_FROM_NAME', 'RIDER_MAIL_TO']) {
       assert.match(env, new RegExp(`^${key}=`, 'm'), `fehlt: ${key}`);
     }
+  });
+
+  it('dokumentiert den PHP-Relay auf ALL-INKL', () => {
+    assert.match(env, /mail-relay/);
+    assert.match(read('all-inclusive/mail-relay/send.php'), /relay_secret/);
+    assert.match(read('all-inclusive/mail-relay/config.example.php'), /allowed_to/);
+    const doc = read('docs/mail-relay.md');
+    assert.match(doc, /scttrd\.de\.w021c25a\.kasserver\.com/);
+    assert.match(doc, /f018d3d2/);
+    assert.match(read('CONTEXT.md'), /docs\/mail-relay\.md/);
+    assert.match(read('AGENTS.md'), /docs\/mail-relay\.md/);
   });
 
   it('enthält kein echtes Passwort und warnt vor Port 993', () => {

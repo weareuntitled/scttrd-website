@@ -26,6 +26,9 @@ services:
     env_file: .env
     environment:
       PAYLOAD_URL: https://cms.scttrd.de
+      # Rider-Mails: HTTPS-Relay auf ALL-INKL (Netcup blockiert SMTP 25/465/587).
+      MAIL_RELAY_URL: ${MAIL_RELAY_URL:-}
+      MAIL_RELAY_SECRET: ${MAIL_RELAY_SECRET:-}
       SMTP_HOST: ${SMTP_HOST:-w021c25a.kasserver.com}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-info@scttrd.de}

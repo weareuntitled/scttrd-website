@@ -14,3 +14,5 @@
 | Release-Banner | Optionale Promotion direkt unter der nächsten Show; vor Release sofort, danach standardmäßig 28 Tage. | Auswahl und Laufzeit in `release.ts`; kein Cronjob nötig |
 | Link-Scrape | Beim Anlegen eines Links (Spotify/Soundcloud) Titel + Cover + Typ via oEmbed/OpenGraph ziehen | Wie Linktree; manuell überschreibbar |
 | Tracking | Herkunft messen: `?utm_source=linkhub&utm_medium=...` an Ticket-Hrefs + Referrer | Funnel Links → Show → Ticket |
+| Mail-Relay | PHP-Endpoint auf ALL-INKL; Netcup ruft per HTTP an, Relay sendet per SMTP | Nur Rider-Benachrichtigungen; Details in `docs/mail-relay.md` |
+| Rider-Gate | HTML-Rider frei; PDF + Hospitality nach Formular auf `/styleguide/#rider` | API `/api/rider-request`; Anfragen im CMS `rider-requests` |

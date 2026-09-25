@@ -20,3 +20,4 @@
 - Tests laufen mit `node --test tests/*.test.mjs` (kein Framework nötig).
 - Domain-Vokabular siehe `CONTEXT.md`; Architektur-/Sprachregeln siehe `.agents/skills/improve-codebase-architecture/LANGUAGE.md`.
 - Neuer Content (Shows/Links) wird laut Entscheidung **im CMS** gepflegt; lokale Markdowns sind Fallback.
+- **Mail (Rider):** Entscheidungen, URLs, FTP, `.env`-Keys → `docs/mail-relay.md`. Secrets nur auf dem Server bzw. lokal in `~/Desktop/0.env`, nie ins Repo.
