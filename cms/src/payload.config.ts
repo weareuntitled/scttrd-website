@@ -27,10 +27,12 @@ const dirname = path.dirname(filename)
 const smtpUser = process.env.SMTP_USER || process.env.SMTP_USERNAME
 const smtpPort = Number(process.env.SMTP_PORT) || 587
 const email = process.env.SMTP_HOST
-  ? nodemailerAdapter({
-      defaultFromAddress: process.env.MAIL_FROM_ADDRESS || smtpUser || 'info@scttrd.de',
-      defaultFromName: process.env.MAIL_FROM_NAME || 'SCTTRD CMS',
-      transportOptions: {
+    ? nodemailerAdapter({
+        defaultFromAddress: process.env.MAIL_FROM_ADDRESS || smtpUser || 'info@scttrd.de',
+        defaultFromName: process.env.MAIL_FROM_NAME || 'SCTTRD CMS',
+        // SMTP downtime must not take the CMS admin offline during boot.
+        skipVerify: true,
+        transportOptions: {
         host: process.env.SMTP_HOST,
         port: smtpPort,
         secure: smtpPort === 465,

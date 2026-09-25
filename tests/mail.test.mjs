@@ -26,6 +26,10 @@ describe('Mail: CMS (Passwort-Zurücksetzen)', () => {
     assert.match(config, /Number\(process\.env\.SMTP_PORT\) \|\| 587/);
   });
 
+  it('blockiert den CMS-Start nicht wegen einer nicht erreichbaren SMTP-Verbindung', () => {
+    assert.match(config, /skipVerify:\s*true/);
+  });
+
   it('ist als Abhängigkeit deklariert', () => {
     assert.match(read('cms/package.json'), /"@payloadcms\/email-nodemailer"/);
     assert.match(read('cms/package-lock.json'), /node_modules\/@payloadcms\/email-nodemailer/);
