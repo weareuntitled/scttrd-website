@@ -105,6 +105,19 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     }
   });
 
+  it('bento + CTA videos load the smaller webm first and stay lazy', () => {
+    const src = read('src/pages/index.astro');
+    const bento = src.slice(src.indexOf('bento-hero'), src.indexOf('komod-c0086'));
+    assert.ok(bento.indexOf('clip.webm') > -1 && bento.indexOf('clip.webm') < bento.indexOf('clip.mp4'), 'bento hero: webm before mp4');
+    assert.match(bento, /preload="none"/);
+
+    const cta = src.slice(src.indexOf('cta-video-container'), src.indexOf('cta-text'));
+    assert.match(cta, /preload="none"/);
+    assert.match(cta, /data-autoplay/);
+    assert.doesNotMatch(cta, /autoplay=""/, 'CTA video must not autoplay before it enters the viewport');
+    assert.ok(cta.indexOf("replace('.mp4', '.webm')") < cta.indexOf('src={v.video}') , 'CTA: webm source before mp4');
+  });
+
   it('payload.config.ts declares the CMS collections (Users/Media/Shows)', () => {
     const pc = read('cms/src/payload.config.ts');
     for (const c of ['Users', 'Media', 'Shows']) {
@@ -157,6 +170,15 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     assert.match(collection, /defaultValue: 'draft'/);
     assert.match(collection, /Spotify-Link \(vorläufig möglich\)/);
     assert.match(collection, /Bitte eine gültige URL eintragen/);
+  });
+
+  it('page editor separates Home and About fields and keeps technical fields in the sidebar', () => {
+    const collection = read('cms/src/collections/Pages.ts');
+    assert.match(collection, /condition: \(_, siblingData\) => siblingData\?\.section === 'home'/);
+    assert.match(collection, /condition: \(_, siblingData\) => siblingData\?\.section === 'about'/);
+    assert.match(collection, /name: 'slug'[\s\S]*position: 'sidebar'/);
+    assert.match(collection, /name: 'status'[\s\S]*defaultValue: 'published'/);
+    assert.match(collection, /Wird beim ersten Speichern automatisch aus dem Seitennamen erzeugt/);
   });
 
   it('content collections still cover homepage groups for the fallback', () => {

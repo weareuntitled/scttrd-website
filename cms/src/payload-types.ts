@@ -176,26 +176,35 @@ export interface Media {
   focalY?: number | null;
 }
 /**
- * Home & About: alle Texte und Bilder einer Seite
+ * Texte und Bilder für Home und About pflegen.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
 export interface Page {
   id: number;
+  /**
+   * Nur zur Orientierung im CMS, z. B. Home oder About.
+   */
   title: string;
+  /**
+   * Wird beim ersten Speichern automatisch aus dem Seitennamen erzeugt.
+   */
   slug: string;
+  /**
+   * Bestimmt, welche Inhaltsfelder angezeigt werden.
+   */
   section: 'home' | 'about' | 'other';
   /**
-   * Überschrift der Seite (z. B. SCTTRD)
+   * Überschrift der Home-Seite, z. B. SCTTRD.
    */
   headline?: string | null;
   /**
-   * Untertitel (z. B. LIVE Techno mit Vocals)
+   * Kurzer Zusatz unter der Home-Überschrift.
    */
   subtitle?: string | null;
   /**
-   * Bio deutsch (Home)
+   * Deutsche Bio für Home.
    */
   bio_de?: {
     root: {
@@ -213,7 +222,7 @@ export interface Page {
     [k: string]: unknown;
   } | null;
   /**
-   * Bio englisch (Home/About)
+   * Englische Bio für About.
    */
   bio_en?: {
     root: {
@@ -231,36 +240,39 @@ export interface Page {
     [k: string]: unknown;
   } | null;
   /**
-   * Subheading (About)
+   * Unterüberschrift für About.
    */
   subheading?: string | null;
   /**
-   * Claim/Slogan (z. B. Brutal, aber schön.)
+   * Kurzer Claim, z. B. „Brutal, aber schön.“
    */
   text?: string | null;
   /**
-   * Kontakt-E-Mail (Footer/Nav)
+   * Kontaktadresse für Footer und Navigation.
    */
   email?: string | null;
   /**
-   * CTA-Überschrift (z. B. Want to book us?)
+   * Überschrift des Booking-Bereichs auf Home.
    */
   ctaHeadline?: string | null;
   /**
-   * CTA-Button-Text
+   * Beschriftung des Booking-Buttons.
    */
   ctaButton?: string | null;
   /**
-   * Betreff der Booking-Mail
+   * Betreff der Mail, die über den CTA geöffnet wird.
    */
   ctaButtonEmailSubject?: string | null;
   /**
-   * Hero-Bild der Seite
+   * Hauptbild der About-Seite.
    */
   image?: (number | null) | Media;
+  /**
+   * Kurze Beschreibung für Barrierefreiheit.
+   */
   imageAlt?: string | null;
   /**
-   * Galerie (About-Bilder etc.)
+   * Bilder, die auf der Galerie-Seite erscheinen.
    */
   gallery?:
     | {
@@ -269,8 +281,11 @@ export interface Page {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Nur relevant, wenn mehrere Seiten im selben Bereich sortiert werden.
+   */
   order?: number | null;
-  status?: ('draft' | 'published') | null;
+  status: 'draft' | 'published';
   updatedAt: string;
   createdAt: string;
 }
@@ -367,12 +382,15 @@ export interface Release {
    */
   slug: string;
   releaseDate: string;
+  /**
+   * Das Cover für Release-Seite, Linkhub und Banner.
+   */
   cover: number | Media;
   description?: string | null;
-  preSaveUrl?: string | null;
+  /**
+   * Nur diesen einen Link eintragen. Die endgültige Spotify-URL kann später ersetzt werden.
+   */
   spotifyUrl?: string | null;
-  soundcloudUrl?: string | null;
-  youtubeUrl?: string | null;
   bannerEnabled?: boolean | null;
   /**
    * Vor dem Release ist das Banner sofort sichtbar, danach standardmäßig 28 Tage.
@@ -621,10 +639,7 @@ export interface ReleasesSelect<T extends boolean = true> {
   releaseDate?: T;
   cover?: T;
   description?: T;
-  preSaveUrl?: T;
   spotifyUrl?: T;
-  soundcloudUrl?: T;
-  youtubeUrl?: T;
   bannerEnabled?: T;
   bannerDurationDays?: T;
   status?: T;
