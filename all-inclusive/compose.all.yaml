@@ -48,6 +48,13 @@ services:
       # angelegt werden (sonst 500 auf /api/globals/link-hub nach Schemaänderungen).
       PAYLOAD_PUSH: "true"
       PORT: "3000"
+      # Passwort-Zurücksetzen-Mails (gleiches Postfach wie die Website).
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-info@scttrd.de}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-info@scttrd.de}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-SCTTRD CMS}
     volumes:
       - cms_media:/app/media
     depends_on:
@@ -88,6 +95,15 @@ services:
       DATABASE_URL: postgresql://${DOCMOST_DB_USER:-docmost}:${DOCMOST_DB_PASSWORD}@docmost-db:5432/${DOCMOST_DB_NAME:-docmost}
       REDIS_URL: redis://docmost-redis:6379
       DISABLE_TELEMETRY: "true"
+      # Einladungs- und Reset-Mails. Docmost erwartet SMTP_USERNAME statt SMTP_USER.
+      MAIL_DRIVER: ${MAIL_DRIVER:-smtp}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USER:-info@scttrd.de}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-info@scttrd.de}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-SCTTRD Wiki}
     volumes:
       - docmost_data:/app/data/storage
     depends_on:

@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -20,6 +21,30 @@ import { LinkHub } from './globals/LinkHub'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// SMTP für Passwort-Zurücksetzen-Mails. Gleiche Variablen wie die Website;
+// SMTP_USERNAME zusätzlich, weil das Wiki (Docmost) diesen Namen erwartet.
+// Ohne SMTP_HOST bleibt Payloads Standard: Mails landen nur im Log.
+const smtpUser = process.env.SMTP_USER || process.env.SMTP_USERNAME
+const smtpPort = Number(process.env.SMTP_PORT) || 587
+const email = process.env.SMTP_HOST
+  ? nodemailerAdapter({
+      defaultFromAddress: process.env.MAIL_FROM_ADDRESS || smtpUser || 'info@scttrd.de',
+      defaultFromName: process.env.MAIL_FROM_NAME || 'SCTTRD CMS',
+      transportOptions: {
+        host: process.env.SMTP_HOST,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth:
+          smtpUser && process.env.SMTP_PASSWORD
+            ? { user: smtpUser, pass: process.env.SMTP_PASSWORD }
+            : undefined,
+        connectionTimeout: 8000,
+        greetingTimeout: 8000,
+        socketTimeout: 10000,
+      },
+    })
+  : undefined
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -30,6 +55,7 @@ export default buildConfig({
   collections: [Users, Media, Pages, Shows, Links, Releases, RiderRequests],
   globals: [LinkHub],
   editor: lexicalEditor(),
+  ...(email ? { email } : {}),
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-change-me',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
