@@ -10,6 +10,10 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "content:check": "node scripts/content-import.mjs --check",
+    "content:plan": "node scripts/content-import.mjs",
+    "content:apply": "node scripts/content-import.mjs --apply",
+    "content:verify": "node scripts/content-verify.mjs",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {

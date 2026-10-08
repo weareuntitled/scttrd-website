@@ -8,6 +8,11 @@
     "check": "astro check",
     "lint": "astro check",
     "build": "astro build",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "content:check": "npm --prefix cms run content:check --",
+    "content:plan": "npm --prefix cms run content:plan --",
+    "content:apply": "npm --prefix cms run content:apply --",
+    "content:verify": "npm --prefix cms run content:verify --",
     "verify": "npm run lint && npm run build",
     "preview": "astro preview",
     "rider:pdf": "node scripts/rider-pdf.mjs"

@@ -8,21 +8,42 @@ const cmsBase = () => {
   return url.replace(/\/$/, '')
 }
 
-export async function getPage(slug: string) {
-  const base = cmsBase()
+const cmsWarning = (operation: string) => console.warn(`[cms] ${operation} unavailable; using fallback`)
+
+const abs = (base: string, url: any) => {
+  if (!url) return ''
+  if (/^https?:\/\//i.test(String(url))) return String(url)
+  try { return new URL(String(url), base).href } catch { return String(url) }
+}
+
+async function cmsList(path: string): Promise<any[] | null> {
   try {
-    const r = await fetch(`${base}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&depth=1&limit=1`, { signal: AbortSignal.timeout(1500) } as any)
+    const response = await fetch(`${cmsBase()}/api/${path}`, { signal: AbortSignal.timeout(1500) } as any)
+    if (!response.ok) throw new Error('CMS response failed')
+    const body = await response.json()
+    if (!Array.isArray(body.docs)) throw new Error('Invalid CMS list')
+    return body.docs
+  } catch {
+    cmsWarning(path.split('?')[0])
+    return null
+  }
+}
+
+export async function getPage(slug: string) {
+  try {
+    const r = await fetch(`${cmsBase()}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&depth=1&limit=1`, { signal: AbortSignal.timeout(1500) } as any)
     if (r.ok) return ((await r.json()) as any).docs?.[0] ?? null
-  } catch {}
+    cmsWarning('pages')
+  } catch { cmsWarning('pages') }
   return null
 }
 
 export async function getLinkHub() {
-  const base = cmsBase()
   try {
-    const r = await fetch(`${base}/api/globals/link-hub?depth=1`, { signal: AbortSignal.timeout(1500) } as any)
+    const r = await fetch(`${cmsBase()}/api/globals/link-hub?depth=1`, { signal: AbortSignal.timeout(1500) } as any)
     if (r.ok) return await r.json()
-  } catch {}
+    cmsWarning('link-hub')
+  } catch { cmsWarning('link-hub') }
   return null
 }
 
@@ -40,72 +61,46 @@ export async function getGallery() {
 }
 
 export async function getLinks() {
-  const base = cmsBase()
-  try {
-    const r = await fetch(`${base}/api/links?sort=order&limit=100`, { signal: AbortSignal.timeout(1500) } as any)
-    if (r.ok) {
-      const docs = ((await r.json()) as any).docs ?? []
-      if (docs.length) return docs.map((d: any) => ({ label: d.label, platform: d.platform, url: d.url, target: d.target || '_blank', cover: d.cover || undefined }))
-    }
-  } catch {}
+  const docs = await cmsList('links?sort=order&limit=100')
+  if (docs?.length) return docs.map((d: any) => ({ label: d.label, platform: d.platform, url: d.url, target: d.target || '_blank', cover: d.cover || undefined }))
   const local = await getCollection('links')
   return local.sort((a, b) => a.data.order - b.data.order).map((item) => item.data)
 }
 
 export async function getReleases() {
   const base = cmsBase()
-  const abs = (url: any) => {
-    if (!url) return ''
-    if (/^https?:\/\//i.test(String(url))) return String(url)
-    try { return new URL(String(url), base).href } catch { return String(url) }
-  }
-  try {
-    const r = await fetch(`${base}/api/releases?sort=releaseDate&limit=100&depth=1`, { signal: AbortSignal.timeout(3000) } as any)
-    if (r.ok) {
-      const docs = ((await r.json()) as any).docs ?? []
-      return docs.map((d: any) => ({
-        ...d,
-        cover: typeof d.cover === 'object' ? abs(d.cover?.url) : abs(d.cover),
-        coverAlt: typeof d.cover === 'object' ? d.cover?.alt || d.title : d.title,
-      }))
-    }
-  } catch {}
-  return []
+  const docs = await cmsList('releases?sort=releaseDate&limit=100&depth=1')
+  if (!docs) return []
+  return docs.map((d: any) => ({
+    ...d,
+    cover: abs(base, typeof d.cover === 'object' ? d.cover?.url : d.cover),
+    coverAlt: typeof d.cover === 'object' ? d.cover?.alt || d.title : d.title,
+  }))
 }
 
 export async function getShows() {
   const base = cmsBase()
-  const abs = (u: any) => {
-    if (!u) return ''
-    if (/^https?:\/\//i.test(String(u))) return String(u)
-    try { return new URL(String(u), base).href } catch { return String(u) }
+  const docs = await cmsList('shows?limit=100&sort=-order')
+  // Nur CMS-Shows — kein lokaler Merge/Status-Override mehr.
+  if (docs) {
+    return docs.map((d: any) => ({
+      id: d.id,
+      collection: 'shows',
+      data: {
+        venue: d.venue,
+        city: d.city,
+        date: d.date,
+        status: d.status,
+        order: d.order ?? 10,
+        link: d.link || '',
+        linkKind: d.linkKind || undefined,
+        image: abs(base, typeof d.image === 'object' ? d.image?.url : d.image),
+        imageAlt: d.imageAlt || d.image?.alt || '',
+        srcset: undefined,
+        lineup: Array.isArray(d.lineup) && d.lineup.length ? d.lineup : [],
+      },
+    }))
   }
-  try {
-    const r = await fetch(`${base}/api/shows?limit=100&sort=-order`, { signal: AbortSignal.timeout(3000) } as any)
-    if (r.ok) {
-      const j: any = await r.json()
-      if (j.docs?.length) {
-        // Nur CMS-Shows — kein lokaler Merge/Status-Override mehr.
-        return j.docs.map((d: any) => ({
-          id: d.id,
-          collection: 'shows',
-          data: {
-            venue: d.venue,
-            city: d.city,
-            date: d.date,
-            status: d.status,
-            order: d.order ?? 10,
-            link: d.link || '',
-            linkKind: d.linkKind || undefined,
-            image: typeof d.image === 'object' ? abs(d.image?.url) : (typeof d.image === 'string' ? abs(d.image) : ''),
-            imageAlt: d.imageAlt || d.image?.alt || '',
-            srcset: undefined,
-            lineup: Array.isArray(d.lineup) && d.lineup.length ? d.lineup : [],
-          },
-        }))
-      }
-    }
-  } catch {}
   // Letzte Rettung nur wenn das CMS gar nicht erreichbar ist (keine Doppel/Status-Inkonsistenz).
   const localShows = await getCollection('shows')
   return localShows.map((show) => ({ ...show }))

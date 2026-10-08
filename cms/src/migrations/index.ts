@@ -3,6 +3,7 @@ import { down as down000001, up as up000001 } from './20260908_000001_add_link_c
 import { down as downRiderRequests, up as upRiderRequests } from './20260924_000000_add_rider_requests'
 import { down as downReleases, up as upReleases } from './20260924_000002_add_releases'
 import { down as downReleaseLockRelation, up as upReleaseLockRelation } from './20260925_000000_add_release_lock_relation'
+import { down as downUsersApiKey, up as upUsersApiKey } from './20261008_000000_add_users_api_key'
 
 export const migrations = [
   { name: '20260908_000000_add_shows_lineup', up: up000000, down: down000000 },
