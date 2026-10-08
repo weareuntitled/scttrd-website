@@ -4,6 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getShows, showSlug } from '../../lib/cms.ts';
 import { nextShow as hubNextShow, showUrl, showAction, adjacentShows } from '../../lib/show.ts';
 import { trackedTicketUrl } from '../../lib/tracking.ts';
+import { showEventSchema, breadcrumbSchema, absoluteUrl, DEFAULT_OG_IMAGE } from '../../lib/seo.ts';
 import '../../styles/show.css';
 
 const shows: any[] = await getShows();
@@ -17,6 +18,15 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
 const action = showAction(show);
 const ctaLabel = action.label;
 const ctaHref = trackedTicketUrl(show, { source: 'homepage', medium: 'ticket-button' }) ?? action.href;
+const ogImage = absoluteUrl(image || DEFAULT_OG_IMAGE);
+const structuredData = [
+  showEventSchema(show),
+  breadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Shows', url: '/#shows' },
+    { name: venue, url: showUrl(show) },
+  ]),
+];
 ---
 <BaseLayout
   title={`${venue} | SCTTRD`}
@@ -25,7 +35,11 @@ const ctaHref = trackedTicketUrl(show, { source: 'homepage', medium: 'ticket-but
   nextShowUrl={nextShowHref}
   canonical={`https://scttrd.de${showUrl(show)}`}
   bodyClass="show-body"
+  image={ogImage}
 >
+    <Fragment slot="head">
+      {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)}></script>)}
+    </Fragment>
     <main class="show-page">
       <div class="show-main">
         {image && <div class="show-media"><img src={image} alt={imageAlt || venue} /></div>}

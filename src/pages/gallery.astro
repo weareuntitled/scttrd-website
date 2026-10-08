@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getGallery, getShows } from '../lib/cms.ts';
 import { nextShow as hubNextShow, showUrl } from '../lib/show.ts';
+import { absoluteUrl, DEFAULT_OG_IMAGE } from '../lib/seo.ts';
 import '../styles/tokens.css';
 
 const images = await getGallery();
@@ -15,6 +16,7 @@ const nextShowUrl = next ? showUrl(next) : null;
   currentPath="/gallery/"
   nextShowUrl={nextShowUrl}
   canonical="https://scttrd.de/gallery/"
+  image={absoluteUrl(DEFAULT_OG_IMAGE)}
 >
     <main class="gallery-page">
       <div class="gallery-title">

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { absoluteUrl } from '../lib/seo.ts';
 import Customers from '../components/Customers.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { isoDate, past as hubPast, nextShow as hubNextShow, orderedUpcoming, showUrl } from '../lib/show.ts';
@@ -64,7 +65,7 @@ const structuredData = {
           name: `${nextShow.data.venue} - SCTTRD`,
           startDate: isoDate(nextShow.data.date),
           url: `${siteUrl}${nextShowHref}`,
-          image: nextShow.data.image ? `${siteUrl}${nextShow.data.image}` : undefined,
+          image: absoluteUrl(nextShow.data.image),
           eventStatus: 'https://schema.org/EventScheduled',
           eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
           location: {

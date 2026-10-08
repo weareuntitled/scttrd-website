@@ -8,9 +8,10 @@ interface Props {
   nextShowUrl: string | null;
   bodyClass?: string;
   canonical?: string;
+  image?: string;
 }
 
-const { title, description, currentPath, nextShowUrl, bodyClass, canonical } = Astro.props;
+const { title, description, currentPath, nextShowUrl, bodyClass, canonical, image } = Astro.props;
 ---
 
 <!doctype html>
@@ -22,6 +23,9 @@ const { title, description, currentPath, nextShowUrl, bodyClass, canonical } = A
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    {image && <meta property="og:image" content={image} />}
+    {image && <meta name="twitter:image" content={image} />}
+    {image && <meta name="twitter:card" content="summary_large_image" />}
     <meta name="theme-color" content="#f00000" />
     <link href="/images/favicon.png" rel="shortcut icon" type="image/x-icon" />
     <link href="/images/webclip.png" rel="apple-touch-icon" />
