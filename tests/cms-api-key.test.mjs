@@ -13,42 +13,84 @@ const read = (p) => fs.readFileSync(path.join(root, p), 'utf8')
 
 const usersSource = read('cms/src/collections/Users.ts')
 
+// Spiegel von `to-snake-case` — dem Paket, das Payload für Spaltennamen nutzt:
+// ein Unterstrich vor JEDEN Großbuchstaben, dann klein. Wegen der Akronyme ist
+// das kein normales camelCase-zu-snake_case: enableAPIKey -> enable_a_p_i_key
+// (nicht enable_api_key). Ohne diesen Untersatz landet die Spalte falsch und
+// jeder users-Query schlägt fehl (Login 500).
+const snake = (name) => name.replace(/([A-Z])/g, '_$1').toLowerCase()
+const API_KEY_FIELDS = ['enableAPIKey', 'apiKey', 'apiKeyIndex']
+const API_KEY_COLUMNS = API_KEY_FIELDS.map(snake)
+
+test('snake mirror matches payload naming on columns that already exist in prod', () => {
+  assert.equal(snake('releaseDate'), 'release_date')
+  assert.equal(snake('bannerEnabled'), 'banner_enabled')
+  assert.equal(snake('sourceUrl'), 'source_url')
+  assert.deepEqual(API_KEY_COLUMNS, ['enable_a_p_i_key', 'api_key', 'api_key_index'])
+})
+
 test('Users collection enables Payload API keys', () => {
   assert.match(usersSource, /useAPIKey:\s*true/, 'auth.useAPIKey muss in Users.ts stehen')
 })
 
-describe('api key migration', () => {
-  const migrationPath = 'cms/src/migrations/20261008_000000_add_users_api_key.ts'
+describe('api key migrations', () => {
+  const addPath = 'cms/src/migrations/20261008_000000_add_users_api_key.ts'
+  const repairPath = 'cms/src/migrations/20261008_000001_repair_users_api_key_columns.ts'
   const indexSource = read('cms/src/migrations/index.ts')
 
-  test('migration exists and is registered', () => {
-    assert.ok(fs.existsSync(path.join(root, migrationPath)), `${migrationPath} fehlt`)
-    assert.match(indexSource, /20261008_000000_add_users_api_key/, 'Migration ist nicht in migrations/index.ts registriert')
-  })
+  const upBody = (file) => {
+    const up = /export async function up[\s\S]*?(?=\nexport async function down)/.exec(read(file))?.[0]
+    assert.ok(up, `up() in ${file} nicht gefunden`)
+    return up
+  }
+  const downBody = (file) => {
+    const down = /export async function down[\s\S]*$/.exec(read(file))?.[0]
+    assert.ok(down, `down() in ${file} nicht gefunden`)
+    return down
+  }
 
-  test('up only adds the three api key columns (idempotent, additive)', () => {
-    const up = /export async function up[\s\S]*?(?=\nexport async function down)/.exec(read(migrationPath))?.[0]
-    assert.ok(up, 'up() nicht gefunden')
-    assert.doesNotMatch(up, /\bDROP\b|\bTRUNCATE\b|\bDELETE\b/, 'up() darf nichts entfernen')
-    for (const column of ['enable_api_key', 'api_key', 'api_key_index']) {
-      assert.match(up, new RegExp(`ADD COLUMN IF NOT EXISTS "${column}"`), `up() fügt ${column} nicht idempotent hinzu`)
+  test('both migrations exist and are registered in the migration index', () => {
+    for (const file of [addPath, repairPath]) {
+      assert.ok(fs.existsSync(path.join(root, file)), `${file} fehlt`)
+      const name = path.basename(file, '.ts')
+      assert.match(indexSource, new RegExp(`name: '${name}'`), `${name} fehlt im migrations-Array`)
+      assert.match(indexSource, new RegExp(`from './${name}'`), `${name} wird nicht importiert`)
     }
   })
 
-  test('down drops only those columns', () => {
-    const down = /export async function down[\s\S]*$/.exec(read(migrationPath))?.[0]
-    assert.ok(down, 'down() nicht gefunden')
+  test('up only adds the api key columns (idempotent, additive)', () => {
+    const up = upBody(addPath)
+    assert.doesNotMatch(up, /\bDROP\b|\bTRUNCATE\b|\bDELETE\b/, 'up() darf nichts entfernen')
+    for (const column of API_KEY_COLUMNS) {
+      assert.match(up, new RegExp(`ADD COLUMN IF NOT EXISTS "${column}"`), `up() fügt ${column} nicht idempotent hinzu`)
+    }
+    assert.doesNotMatch(up, /"enable_api_key"/, 'enable_api_key wäre die falsche (nicht von to-snake-case erzeugte) Spalte')
+  })
+
+  test('repair migration fixes a wrong enable_api_key column and is guarded', () => {
+    const up = upBody(repairPath)
+    assert.match(up, /ADD COLUMN IF NOT EXISTS "enable_a_p_i_key"/)
+    assert.match(up, /DROP COLUMN IF EXISTS "enable_api_key"/)
+    assert.doesNotMatch(up, /DROP TABLE|\bTRUNCATE\b/, 'Reparatur darf keine Tabelle löschen')
+    const down = downBody(repairPath)
+    assert.doesNotMatch(down, /DROP TABLE/)
+    assert.match(down, new RegExp(`DROP COLUMN IF EXISTS "${snake('enableAPIKey')}"`))
+    assert.doesNotMatch(down, /DROP COLUMN IF EXISTS "api_key(?!_index)"/, 'die korrekte api_key-Spalte darf die Reparatur nicht löschen')
+  })
+
+  test('down of the add migration drops only those columns', () => {
+    const down = downBody(addPath)
     assert.doesNotMatch(down, /DROP TABLE/, 'down() darf die users-Tabelle nicht löschen')
-    for (const column of ['enable_api_key', 'api_key', 'api_key_index']) {
+    for (const column of API_KEY_COLUMNS) {
       assert.match(down, new RegExp(`DROP COLUMN IF EXISTS "${column}"`), `down() entfernt ${column} nicht`)
     }
   })
 
-  test('column names match Payloads snake_case mapping of the field names', () => {
-    const up = read(migrationPath)
-    for (const [field, column] of [['enableAPIKey', 'enable_api_key'], ['apiKey', 'api_key'], ['apiKeyIndex', 'api_key_index']]) {
-      assert.ok(!new RegExp(`"${field}"`).test(up), `${field} ist kein Postgres-Spaltenname`)
-      assert.match(up, new RegExp(`"${column}"`), `Spalte ${column} (aus ${field}) fehlt`)
+  test('column names equal toSnakeCase(field) for every api key field', () => {
+    const up = upBody(addPath)
+    for (const field of API_KEY_FIELDS) {
+      assert.match(up, new RegExp(`"${snake(field)}"`), `Spalte ${snake(field)} (aus ${field}) fehlt`)
+      assert.doesNotMatch(up, new RegExp(`"${field}"`), `${field} ist kein Postgres-Spaltenname`)
     }
   })
 })
