@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 // Prüft die öffentliche CMS-API, so wie die Website sie liest.
 //   npm run content:verify
+import { loadEnvFiles } from './content-import-lib.mjs'
+
+loadEnvFiles()
+
 const base = (process.env.CMS_URL || process.env.PAYLOAD_URL || 'http://localhost:3000').replace(/\/$/, '')
 
 const report = {}

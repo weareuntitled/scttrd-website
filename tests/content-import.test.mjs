@@ -8,6 +8,7 @@ import {
   buildPlan,
   collectionFor,
   isUploadCandidate,
+  loadEnvFiles,
   parseGermanDate,
   slugify,
   validateInput,
@@ -145,4 +146,32 @@ test('query and collection mapping match the Payload API', () => {
     whereQuery({ type: 'show', identity: { venue: 'Techno & Punsch', city: 'Augsburg', date: '12.12.2026' }, data: {} }),
     'where[and][0][venue][equals]=Techno%20%26%20Punsch&where[and][1][city][equals]=Augsburg&where[and][2][date][equals]=12.12.2026',
   )
+})
+
+const root = path.resolve(import.meta.dirname, '..')
+
+test('loadEnvFiles reads .env files without overwriting the real environment', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'scttrd-env-'))
+  fs.writeFileSync(path.join(dir, '.env'), '# Kommentar\nCMS_URL=https://cms.example.test\nCMS_API_KEY="quoted-key"\nEMPTY=\n')
+  const env = { CMS_URL: 'https://already.set' }
+  const cwd = process.cwd()
+  try {
+    process.chdir(dir)
+    loadEnvFiles(['.env', 'missing.env'], env)
+  } finally {
+    process.chdir(cwd)
+  }
+  assert.equal(env.CMS_URL, 'https://already.set', 'vorhandener Wert darf nicht überschrieben werden')
+  assert.equal(env.CMS_API_KEY, 'quoted-key', 'Anführungszeichen werden entfernt')
+  assert.equal(env.EMPTY, '', 'leere Werte bleiben leer')
+  assert.equal(env.MISSING, undefined)
+  fs.rmSync(dir, { recursive: true, force: true })
+})
+
+test('import and verify both load .env, so verify works without exported variables', () => {
+  const importer = fs.readFileSync(path.join(root, 'cms/scripts/content-import.mjs'), 'utf8')
+  const verify = fs.readFileSync(path.join(root, 'cms/scripts/content-verify.mjs'), 'utf8')
+  assert.match(importer, /loadEnvFiles\(\)/)
+  assert.match(verify, /loadEnvFiles\(\)/, 'content-verify.mjs muss .env laden (sonst localhost:3000)')
+  assert.match(verify, /process\.env\.CMS_URL/)
 })

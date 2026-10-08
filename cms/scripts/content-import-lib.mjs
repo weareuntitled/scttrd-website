@@ -240,6 +240,22 @@ export const collectionFor = (type) => contentTypes[type].collection
 
 export const apiAuthHeader = (token) => `JWT ${token}`
 
+// .env des Projekts (CWD) und des übergeordneten Verzeichnisses einlesen.
+// Gesetzte Umgebungsvariablen haben Vorrang — ein exportierter Wert wird nie
+// überschrieben. Gemeinsam genutzt von content-import und content-verify,
+// damit `npm run content:verify` ohne exportierte Variablen funktioniert.
+export function loadEnvFiles(files = ['.env', '../.env'], env = process.env) {
+  for (const file of files) {
+    let text
+    try { text = fs.readFileSync(file, 'utf8') } catch { continue }
+    for (const line of text.split('\n')) {
+      const match = /^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line)
+      if (!match || line.trim().startsWith('#')) continue
+      if (env[match[1]] === undefined) env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, '$2')
+    }
+  }
+}
+
 // Payload 3 API-Key-Strategie erwartet "<collection-slug> API-Key <key>",
 // nicht "ApiKey <key>". Der Key kommt aus CMS_API_KEY und ersetzt den Login.
 export const apiKeyAuthHeader = (key) => `users API-Key ${key}`

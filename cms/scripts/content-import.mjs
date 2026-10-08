@@ -4,7 +4,7 @@
 //   npm run content:plan  -- --input <file.json>   Plan (create/update/skip) ohne Schreiben
 //   npm run content:apply -- --input <file.json>   Plan ausführen
 // Läuft mit purem node (nur Builtins), braucht also kein installiertes cms/node_modules.
-import { readFileSync, existsSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
@@ -18,22 +18,11 @@ import {
   isRemoteUrl,
   isSitePath,
   isUploadCandidate,
+  loadEnvFiles,
   mediaFields,
   validateInput,
   whereQuery,
 } from './content-import-lib.mjs'
-
-const loadEnvFiles = () => {
-  for (const file of ['.env', '../.env']) {
-    let text
-    try { text = readFileSync(file, 'utf8') } catch { continue }
-    for (const line of text.split('\n')) {
-      const match = /^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line)
-      if (!match || line.trim().startsWith('#')) continue
-      if (process.env[match[1]] === undefined) process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, '$2')
-    }
-  }
-}
 
 loadEnvFiles()
 
