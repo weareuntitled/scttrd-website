@@ -175,3 +175,19 @@ test('import and verify both load .env, so verify works without exported variabl
   assert.match(verify, /loadEnvFiles\(\)/, 'content-verify.mjs muss .env laden (sonst localhost:3000)')
   assert.match(verify, /process\.env\.CMS_URL/)
 })
+
+test('a populated relationship field is compared by id, not by document', () => {
+  const cmsRecord = {
+    id: 10,
+    venue: 'Techno & Punsch',
+    city: 'Augsburg',
+    date: '12.12.2026',
+    status: 'upcoming',
+    page: { id: 1, title: 'Home', slug: 'home' },
+  }
+  assert.equal(buildPlan([show({ page: 1 })], { show: [cmsRecord] })[0].action, 'skip')
+
+  const changed = buildPlan([show({ page: 2 })], { show: [cmsRecord] })[0]
+  assert.equal(changed.action, 'update')
+  assert.deepEqual(changed.changes.page, { from: 1, to: 2 })
+})

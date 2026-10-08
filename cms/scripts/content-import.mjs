@@ -3,12 +3,14 @@
 //   npm run content:check -- --input <file.json>   nur validieren
 //   npm run content:plan  -- --input <file.json>   Plan (create/update/skip) ohne Schreiben
 //   npm run content:apply -- --input <file.json>   Plan ausführen
+//   npm run content:sync -- --input <file.json>    plan + apply + verify + Live-URL in EINEM Lauf
 // Läuft mit purem node (nur Builtins), braucht also kein installiertes cms/node_modules.
 import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { verifyReport } from './content-verify.mjs'
 import {
   apiAuthHeader,
   authHeaderForEnv,
@@ -20,6 +22,8 @@ import {
   isUploadCandidate,
   loadEnvFiles,
   mediaFields,
+  publicUrl,
+  summarizePlan,
   validateInput,
   whereQuery,
 } from './content-import-lib.mjs'
@@ -33,11 +37,16 @@ const argument = (name) => {
 
 const inputPath = argument('--input')
 if (!inputPath) {
-  console.error('Usage: node scripts/content-import.mjs [--check|--apply] --input path/to/content.json')
+  console.error('Usage: node scripts/content-import.mjs [--check|--plan|--apply|--sync] --input path/to/content.json')
   process.exit(1)
 }
 
-const mode = process.argv.includes('--check') ? 'check' : process.argv.includes('--apply') ? 'apply' : 'plan'
+const mode = process.argv.includes('--sync') ? 'sync'
+  : process.argv.includes('--check') ? 'check'
+    : process.argv.includes('--apply') ? 'apply'
+      : 'plan'
+const writes = mode === 'apply' || mode === 'sync'
+const siteUrl = (process.env.SITE_URL || 'https://scttrd.de').replace(/\/+$/, '')
 const cmsUrl = (process.env.CMS_URL || process.env.PAYLOAD_URL || 'http://localhost:3000').replace(/\/$/, '')
 const email = process.env.CMS_EMAIL || process.env.SEED_EMAIL || 'admin@scttrd.de'
 const password = process.env.CMS_PASSWORD || process.env.SEED_PASSWORD
@@ -128,7 +137,7 @@ try {
     process.exit(0)
   }
 
-  if (mode === 'apply') {
+  if (writes) {
     for (const item of items) {
       for (const field of mediaFields[item.type]) {
         if (typeof item.data[field] === 'string') item.data[field] = await resolveMedia(item.data[field])
@@ -158,9 +167,14 @@ try {
   }
 
   const plan = buildPlan(items, byType)
-  console.log(JSON.stringify(plan, null, 2))
+  if (mode === 'sync') {
+    // Sync druckt kompakt (eine Zeile je Datensatz) statt des vollen JSON-Plans.
+    for (const line of summarizePlan(plan)) console.log(line)
+  } else {
+    console.log(JSON.stringify(plan, null, 2))
+  }
 
-  if (mode === 'apply') {
+  if (writes) {
     for (const item of plan) {
       if (item.action === 'skip') continue
       const collection = collectionFor(item.type)
@@ -171,6 +185,20 @@ try {
     const updated = plan.filter((item) => item.action === 'update').length
     const skipped = plan.filter((item) => item.action === 'skip').length
     console.error(`Applied: ${created} create, ${updated} update, ${skipped} skip.`)
+  }
+
+  if (mode === 'sync') {
+    // Ein Lauf = geschrieben, öffentlich geprüft, URLs zum Klicken.
+    const report = await verifyReport()
+    console.log(`verify: ${JSON.stringify(report)}`)
+    for (const item of plan.filter((entry) => entry.action !== 'skip')) {
+      console.log(`live: ${publicUrl(item, siteUrl)}`)
+    }
+    console.log(`live: ${siteUrl}/`)
+    if (!report.ok) {
+      console.error(`content:sync verify failed: ${(report.failures ?? []).join('; ')}`)
+      process.exit(1)
+    }
   }
 } catch (error) {
   console.error(`content:${mode} failed: ${error.message}`)

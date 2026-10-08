@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url'
 import {
   buildPlan,
   mediaFields,
+  relationFields,
   validateInput,
   writableFields,
 } from '../cms/scripts/content-import-lib.mjs'
@@ -108,4 +109,9 @@ test('workflow metadata never reaches the API payload', () => {
   assert.ok(!writableFields.release.includes('sources'))
   const item = validateInput({ type: 'show', data: { venue: 'Club', city: 'Berlin', date: '12.12.2099' }, sources: [{ url: 'https://example.com' }] })
   assert.ok(!('sources' in item.data))
+})
+
+test('relationship fields of the schema are the ones the import compares by id', () => {
+  assert.deepEqual(relationFields.show, fieldsOf('Shows').filter((f) => f.type === 'relationship').map((f) => f.name))
+  assert.deepEqual(relationFields.release, fieldsOf('Releases').filter((f) => f.type === 'relationship').map((f) => f.name))
 })

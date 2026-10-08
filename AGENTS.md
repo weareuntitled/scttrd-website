@@ -31,11 +31,11 @@
 - Generiere selbst: Slug, Status (`upcoming`/`past` aus dem Datum), Release-Datum als `YYYY-MM-DD`, Alt-Texte, SEO-fähige Titel/Descriptions. Nach technischen CMS-Feldern nicht fragen.
 - Beim **Anlegen** wird ein Release automatisch `status: published` gesetzt (nur Published liest die Website); bestehende Releases werden nie ungefragt veröffentlicht.
 - Quellen-Pflicht: jeder Eintrag braucht mindestens eine `sources[].url` — das erzwingt der Import.
-- Ablauf:
-  1. `npm run content:plan -- --input <datei.json>` → Plan (create/update/skip mit Feld-Diff) lesen.
-  2. Erst nach plausibelem Plan: `npm run content:apply -- --input <datei.json>`.
-  3. `npm run content:verify` → öffentliche API-Counts/Integrität prüfen.
-  4. Betroffene Seite lokal/via Preview prüfen.
+- Ablauf (Standard, alles in EINEM Lauf — Ziel: unter 2 Min. von der Idee zur Änderung):
+  1. JSON-Input schreiben (Format unten).
+  2. `npm run content:sync -- --input <datei.json>` → eine Plan-Zeile je Datensatz (`create`/`update`/`skip` + geänderte Felder), danach wird geschrieben, die öffentliche API verifiziert und die Live-URL gedruckt. Fehlschlag der Verifikation = Exit-Code 1.
+  3. Gedruckte Live-URL prüfen (muss 200 sein).
+  - Vorsichtsvariante, wenn der Plan unerwartetes zeigt: `npm run content:plan -- --input …` lesen, erst danach `npm run content:apply -- --input …` und `npm run content:verify` einzeln ausführen.
 - Credentials: vorzugsweise `CMS_API_KEY` (Header `Authorization: users API-Key <key>` → kein Login, kein Passwort), sonst `CMS_URL`, `CMS_EMAIL`, `CMS_PASSWORD` (Fallback `SEED_EMAIL`/`SEED_PASSWORD`) aus `.env` oder Umgebung — niemals auslesen, loggen oder committen.
 - Nur mitgelieferte Felder werden geändert; manuell im CMS editierte Werte bleiben beim erneuten Lauf unangetastet. Keine Duplikate: Identity-Felder sind der Schlüssel.
 - **Vertrag CMS ↔ Import:** `tests/content-schema-contract.test.mjs` liest `Shows.ts`/`Releases.ts` und vergleicht sie mit `writableFields`. Neues CMS-Feld → Test rot → in `cms/scripts/content-import-lib.mjs` (`writableFields`, ggf. `deriveItem`) eintragen. Bei neuen Pflichtfeldern muss der Import es ableiten oder als Pflicht abfragen.

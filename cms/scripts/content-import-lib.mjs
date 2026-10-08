@@ -155,9 +155,19 @@ const asDateKey = (value) => {
   return german ? `${german[3]}-${german[2]}-${german[1]}` : null
 }
 
-// Medien vergleichen wir über die ID, nicht über das Payload-Objekt.
+// Relationship-Felder liefert das CMS mit `depth=1` als populiertes Objekt,
+// die Eingabe dagegen nur die id — vergleichen wir wie die Medien über die id,
+// sonst meldet jeder zweite Lauf ein Phantom-Update und der Diff druckt das
+// ganze Dokument aus.
+export const relationFields = {
+  show: ['page'],
+  release: [],
+}
+
+// Medien/Relationships vergleichen wir über die ID, nicht über das Payload-Objekt.
 const comparable = (type, field, value) => {
   if (mediaFields[type].includes(field)) return isRecord(value) ? value.id : value
+  if (relationFields[type]?.includes(field)) return isRecord(value) ? value.id : value
   if (dateFields[type]?.includes(field)) return asDateKey(value) ?? value
   return value
 }
@@ -197,6 +207,16 @@ const isSame = (type, field, found, next) => {
     if (left.filename !== undefined && right.filename !== undefined) return left.filename === right.filename
     return false
   }
+  if (relationFields[type]?.includes(field)) {
+    // CMS: { id: 1, … } · Eingabe: 1 oder "1" — beides über die id lesen.
+    const id = (value) => (isRecord(value) ? value.id : value)
+    const left = id(found)
+    const right = id(next)
+    if (left === null || left === undefined || right === null || right === undefined) {
+      return (left ?? null) === (right ?? null)
+    }
+    return String(left) === String(right)
+  }
   return equal(comparable(type, field, found), comparable(type, field, next))
 }
 
@@ -234,6 +254,32 @@ export function buildPlan(items, existing) {
     )
     return { ...item, action: Object.keys(changes).length ? 'update' : 'skip', id: found.id, changes }
   })
+}
+
+// Kompakte Plan-Ausgabe für den Sync-Modus: eine Zeile je Datensatz,
+// damit `content:sync` nicht das volle JSON drucken muss.
+export function summarizePlan(plan) {
+  return plan.map((item) => {
+    const head = `${item.action} ${item.type}${item.id ? ` #${item.id}` : ''} — ${identityLabel(item)}`
+    const changed = Object.keys(item.changes ?? {})
+    return item.action === 'update' && changed.length ? `${head} (${changed.join(', ')})` : head
+  })
+}
+
+// Öffentliche URL eines Datensatzes. Die Show-Slug-Regel spiegelt exakt
+// `showSlug` aus src/lib/show.ts (inkl. NFKD, das Umlaut-Reste zu '-' macht) —
+// sonst druckt der Sync eine URL, die 404 gibt. Drift testet content-sync.
+export function publicUrl(item, siteUrl = 'https://scttrd.de') {
+  const base = String(siteUrl).replace(/\/+$/, '')
+  if (item.type === 'show') {
+    const slug = `${item.data.venue ?? ''}-${item.data.date ?? ''}`
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+    return `${base}/shows/${slug}/`
+  }
+  return `${base}/releases/${item.data.slug}/`
 }
 
 export const collectionFor = (type) => contentTypes[type].collection
