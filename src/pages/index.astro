@@ -25,6 +25,23 @@ const nextShowHref = nextShow ? showUrl(nextShow) : null;
 const siteUrl = 'https://scttrd.de';
 const pageTitle = 'SCTTRD - Elektronisches Live-Projekt aus Augsburg';
 const pageDescription = 'SCTTRD ist ein elektronisches Live-Projekt aus Augsburg zwischen Post-Punk, Techno und Trance. Echte Shows, keine DJs.';
+const faq = [
+  { q: 'Was ist SCTTRD?', a: 'SCTTRD ist unser elektronisches Live-Projekt aus Augsburg. Dani produziert, Babsi singt und Nate spielt Drums. Wir verbinden Post-Punk, Techno und Trance mit deutschen und englischen Texten.' },
+  { q: 'Was bedeutet SCTTRD?', a: 'SCTTRD ist „scattered“ ohne Vokale. Das heißt verstreut oder zersplittert, auch ein bisschen zerbrochen. Wir kommen musikalisch aus verschiedenen Richtungen. Wenn wir zusammenspielen, wird daraus unser Sound.' },
+  { q: 'Wo spielt SCTTRD live?', a: 'Wir spielen in Augsburg und der Region, bei Festivals und auch außerhalb Bayerns. Die nächsten Termine, Veranstaltungsorte und Ticketlinks findest du unter Upcoming Shows.' },
+  { q: 'Wie bekomme ich Tickets?', a: 'Öffne den Termin unter Upcoming Shows. Auf der Show-Seite findest du den Ticketshop oder die Veranstaltungsseite. Für Booking schreib an info@scttrd.de.' },
+  { q: 'Wie klingt SCTTRD?', a: 'Bei uns treffen deutsche und englische Vocals auf Synthesizer, Techno-Beats und Live-Drums. Post-Punk und Trance prägen unseren Sound.' },
+  { q: 'Gibt es Pressematerial?', a: 'Pressebilder, Logos und Rider findest du im Styleguide. Für Presse- und Booking-Anfragen erreichst du uns unter info@scttrd.de.' },
+]
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+}
 const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -102,6 +119,7 @@ const structuredData = {
   <meta name="twitter:description" content={pageDescription}>
   <meta name="twitter:image" content={`${siteUrl}${homeHeroImage1}`}>
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/scttrd-websitze.webflow.css" rel="stylesheet" type="text/css">
@@ -199,6 +217,26 @@ const structuredData = {
         <div class="customers-grid">
           <div class="customers-text"><div class="section-name"><h2 class="paragraph">past shows</h2></div></div>
           <div class="customers-list"><Customers shows={pastShows} kind="past" /></div>
+        </div>
+      </div>
+    </section>
+    <section class="section-faq" id="faq" aria-label="Häufige Fragen">
+      <div class="wrapper">
+        <div class="faq-head"><div class="section-name"><h2 class="paragraph">häufige fragen</h2></div></div>
+        <div class="faq-shell">
+          {faq.map((item, index) => (
+            <div class="faq-item" data-faq-item>
+              <h3 class="faq-q-wrap">
+                <button class="faq-q" type="button" aria-expanded="false" aria-controls={`faq-a-${index}`}>
+                  <span>{item.q}</span>
+                  <span class="faq-toggle" aria-hidden="true"></span>
+                </button>
+              </h3>
+              <div class="faq-a-clip" id={`faq-a-${index}`}>
+                <div class="faq-a"><p>{item.a}</p></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -423,3 +461,53 @@ const structuredData = {
   </script>
 </body>
 </html>
+
+<style>
+  .section-faq { padding-block: clamp(64px, 8vw, 112px); background: #f00000; color: #0c0c0c; }
+  .faq-head, .faq-shell { width: min(100%, 840px); margin-inline: auto; }
+  .faq-head .paragraph { margin: 0; color: #0c0c0c; }
+  .faq-shell { display: flex; flex-direction: column; }
+  .faq-item { border-top: 1px solid rgba(12, 12, 12, .65); }
+  .faq-item:last-child { border-bottom: 1px solid rgba(12, 12, 12, .65); }
+  .faq-q-wrap { margin: 0; }
+  .faq-q { width: 100%; min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); padding: 20px 0; background: none; border: 0; cursor: pointer; text-align: left; font: inherit; font-size: clamp(18px, 1.8vw, 23px); font-weight: 700; line-height: 1.3; color: #0c0c0c; transition: color .2s ease; }
+  .faq-q:hover { color: #fff; }
+  .faq-q:focus-visible { outline: 3px solid #0c0c0c; outline-offset: 4px; }
+  .faq-toggle { flex: 0 0 auto; width: 34px; height: 34px; border: 1px solid #0c0c0c; position: relative; transition: background .2s ease, border-color .2s ease; }
+  .faq-toggle::before, .faq-toggle::after { content: ""; position: absolute; inset: 0; margin: auto; background: #0c0c0c; transition: transform .25s ease, background .2s ease; }
+  .faq-toggle::before { width: 14px; height: 2px; }
+  .faq-toggle::after { width: 2px; height: 14px; }
+  .faq-q:hover .faq-toggle, .faq-q[aria-expanded="true"] .faq-toggle { border-color: #0c0c0c; background: #0c0c0c; }
+  .faq-q:hover .faq-toggle::before, .faq-q:hover .faq-toggle::after, .faq-q[aria-expanded="true"] .faq-toggle::before, .faq-q[aria-expanded="true"] .faq-toggle::after { background: #f00000; }
+  .faq-q[aria-expanded="true"] .faq-toggle::after { transform: scaleY(0); }
+  .faq-a-clip { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s cubic-bezier(.22, 1, .36, 1); }
+  .faq-item[data-open] .faq-a-clip { grid-template-rows: 1fr; }
+  .faq-a { overflow: hidden; min-height: 0; }
+  .faq-a p { margin: 0; padding: 0 54px 28px 0; max-width: 66ch; color: #0c0c0c; font-size: clamp(16px, 1.35vw, 17px); line-height: 1.65; }
+  @media (max-width: 767px) {
+    .section-faq { padding-block: 56px; }
+    .faq-q { min-height: 70px; gap: var(--space-4); padding-block: 18px; }
+    .faq-toggle { width: 30px; height: 30px; }
+    .faq-a p { padding: 0 42px var(--space-4) 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .faq-a-clip, .faq-toggle, .faq-toggle::before, .faq-toggle::after { transition: none; } }
+</style>
+
+<script>
+  const closeItem = (item: HTMLElement) => {
+    const button = item.querySelector<HTMLButtonElement>('.faq-q');
+    button?.setAttribute('aria-expanded', 'false');
+    item.removeAttribute('data-open');
+  };
+  document.querySelectorAll<HTMLElement>('[data-faq-item]').forEach((item) => {
+    const button = item.querySelector<HTMLButtonElement>('.faq-q');
+    button?.addEventListener('click', () => {
+      const isOpen = button.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll<HTMLElement>('[data-faq-item][data-open]').forEach(closeItem);
+      if (!isOpen) {
+        button.setAttribute('aria-expanded', 'true');
+        item.setAttribute('data-open', '');
+      }
+    });
+  });
+</script>

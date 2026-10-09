@@ -86,6 +86,7 @@ export async function getShows() {
     return docs.map((d: any) => ({
       id: d.id,
       collection: 'shows',
+      updatedAt: d.updatedAt,
       data: {
         venue: d.venue,
         city: d.city,

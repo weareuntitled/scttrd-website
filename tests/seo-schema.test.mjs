@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { absoluteUrl, showEventSchema, breadcrumbSchema, DEFAULT_OG_IMAGE, SITE_URL } from '../src/lib/seo.ts'
+import { absoluteUrl, showEventSchema, breadcrumbSchema, renderSitemap, DEFAULT_OG_IMAGE, SITE_URL } from '../src/lib/seo.ts'
 import { showSlug, isoDate } from '../src/lib/show.ts'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -90,4 +90,52 @@ test('pages wire up og:image, Event and Breadcrumb schema', () => {
     !index.includes('siteUrl}${nextShow.data.image'),
     'Startseite darf siteUrl und absolute Bild-URL nicht mehr verkettet (Audit-Befund)',
   )
+})
+
+// --- nächste Prioritätswelle: Sitemap-Lastmod, Styleguide-Meta, leeres img, FAQ/AEO ---
+
+test('renderSitemap emits loc plus optional lastmod', () => {
+  const xml = renderSitemap([
+    { loc: 'https://scttrd.de/' },
+    { loc: 'https://scttrd.de/shows/xolo-bar-03-12-2026/', lastmod: '2026-10-08T11:51:13.954Z' },
+  ])
+  assert.match(xml, /^<\?xml version="1.0" encoding="UTF-8"\?>/)
+  assert.match(xml, /<urlset xmlns="http:\/\/www.sitemaps.org\/schemas\/sitemap\/0.9">/)
+  assert.ok(xml.includes('<url><loc>https://scttrd.de/</loc></url>'), 'Eintrag ohne lastmod bleibt kompakt')
+  assert.ok(xml.includes('<url><loc>https://scttrd.de/shows/xolo-bar-03-12-2026/</loc><lastmod>2026-10-08T11:51:13.954Z</lastmod></url>'))
+  assert.ok(!xml.includes('undefined'))
+})
+
+test('sitemap route uses renderSitemap with CMS updatedAt and covers styleguide', () => {
+  const route = read('src/pages/sitemap.xml.ts')
+  assert.match(route, /renderSitemap/)
+  assert.match(route, /updatedAt/)
+  assert.match(route, /\/styleguide\//)
+  const shows = read('src/lib/cms.ts')
+  assert.match(shows, /updatedAt: d\.updatedAt/)
+})
+
+test('show list rows drop the <img> instead of rendering src=""', () => {
+  const customers = read('src/components/Customers.astro')
+  assert.match(customers, /show\.data\.image &&/)
+  assert.ok(!/src=\{show\.data\.image\}(?![\s\S]*image &&)/.test(customers) || /show\.data\.image &&/.test(customers))
+})
+
+test('styleguide ships meta description and canonical', () => {
+  const styleguide = read('src/pages/styleguide.astro')
+  assert.match(styleguide, /<meta name="description"/)
+  assert.match(styleguide, /rel="canonical"/)
+})
+
+test('home carries a FAQ block with FAQPage schema', () => {
+  const index = read('src/pages/index.astro')
+  assert.match(index, /Häufige Fragen/)
+  assert.match(index, /FAQPage/)
+  assert.match(index, /mainEntity/)
+  assert.match(index, /\?/) // Fragen sind echte Frage-Überschriften
+  assert.match(index, /aria-expanded/) // Accordion (Framer-Referenz), Antworten bleiben im DOM
+  const beforeCta = index.indexOf('class="section-faq"') < index.indexOf('class="section-cta"')
+  assert.ok(beforeCta, 'FAQ steht unten vor dem Kontakt-CTA')
+  assert.match(index, /\.faq-item\[data-open\] \.faq-a-clip/, 'Offener Zustand steuert den Clip (Button ist in h3)')
+  assert.ok(!index.includes('wissen willst \\u2014'), 'Kein literal \\u2014 im JSX-Text')
 })

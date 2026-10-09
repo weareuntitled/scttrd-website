@@ -45,6 +45,7 @@ const { shows, kind, pinFirst = false } = Astro.props;
         <div id={interaction?.dateNode} class="customers-el-date">
           <h6>{show.data.date}{kind === 'upcoming' && <span class="customers-el-arrow">→</span>}</h6>
         </div>
+        {show.data.image && (
         <div {...wrapAttrs} class="customers-el-img">
           <img
             {...imageAttrs}
@@ -56,6 +57,7 @@ const { shows, kind, pinFirst = false } = Astro.props;
             class="customers-el-img-pic"
           />
         </div>
+        )}
       </Tag>
     );
   })

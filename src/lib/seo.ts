@@ -66,3 +66,22 @@ export function breadcrumbSchema(crumbs: Crumb[], base: string = SITE_URL) {
     })),
   }
 }
+
+export interface SitemapEntry {
+  loc: string
+  lastmod?: string
+}
+
+export function renderSitemap(entries: SitemapEntry[]): string {
+  const escapeXml = (value: string): string =>
+    value.replace(/[<>&'"]/g, (character) =>
+      ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[character] ?? character)
+  const urls = entries
+    .map((entry) =>
+      entry.lastmod
+        ? `  <url><loc>${escapeXml(entry.loc)}</loc><lastmod>${escapeXml(entry.lastmod)}</lastmod></url>`
+        : `  <url><loc>${escapeXml(entry.loc)}</loc></url>`,
+    )
+    .join('\n')
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`
+}
