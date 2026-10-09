@@ -203,7 +203,12 @@ test('show pages reuse the site header typography and footer', () => {
 
 test('show detail labels and values use one consistent typeface and weight', () => {
   const styles = read('src/styles/show.css')
-  assert.match(styles, /\.show-details span,\s*\.show-details strong\s*\{[^}]*font-family:\s*Founders,\s*Poppins,\s*sans-serif;[^}]*font-weight:\s*500;/)
+  const detailRule = styles.match(/\.show-details span,\s*\.show-details strong\s*\{([^}]*)\}/)?.[1] ?? ''
+  assert.match(detailRule, /font-family:\s*Founders,\s*Poppins,\s*sans-serif;/)
+  assert.match(detailRule, /font-weight:\s*500;/)
+  assert.match(detailRule, /font-size:\s*14px;/)
+  assert.match(styles, /\.show-meta > strong\s*\{[^}]*font-size:\s*19px;/)
+  assert.ok(!/\.show-meta strong\s*\{[^}]*font-size:\s*19px;/.test(styles), 'Mobile size rule only targets the date, not detail values')
 })
 
 test('home carries a FAQ block with FAQPage schema', () => {

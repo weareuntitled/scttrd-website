@@ -79,7 +79,7 @@
   padding: 16px 0;
   border-block: 2px solid var(--scttrd-black);
 }
-.show-meta strong { font-size: 18px; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
+.show-meta > strong { font-size: 18px; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
 .show-meta a {
   color: inherit;
   font-size: 11px;
@@ -94,12 +94,14 @@
 .show-details li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
 .show-details span, .show-details strong {
   font-family: Founders, Poppins, sans-serif;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.3;
   letter-spacing: normal;
   text-transform: none;
 }
-.show-details span { font-size: 13px; line-height: 1.3; opacity: .72; }
-.show-details strong { font-size: 16px; line-height: 1.3; text-align: right; }
+.show-details span { opacity: .72; }
+.show-details strong { text-align: right; }
 .show-description { max-width: 62ch; margin: 22px 0 0; font-size: 16px; line-height: 1.6; }
 
 /* Ticket-CTA */
@@ -219,7 +221,7 @@
   .show-copy { margin-top: 36px; }
   .show-title { margin-bottom: 24px; font-size: clamp(40px, 11.5vw, 54px); line-height: .9; letter-spacing: -.055em; }
   .show-meta { gap: 12px; padding-block: 18px; }
-  .show-meta strong { font-size: 19px; line-height: 1.08; }
+  .show-meta > strong { font-size: 19px; line-height: 1.08; }
   .show-meta a { font-size: 12px; line-height: 1.35; }
   .show-actions { margin-top: 32px; }
   .show-extra { gap: 24px; margin-top: 64px; }
@@ -262,7 +264,7 @@
   .show-copy { flex: 1 1 58%; min-width: 0; margin-top: 0; }
   .show-title { font-size: clamp(54px, 7vw, 92px); }
   .show-meta { border-block-width: 4px; }
-  .show-meta strong { font-size: clamp(24px, 3vw, 36px); }
+  .show-meta > strong { font-size: clamp(24px, 3vw, 36px); }
   .show-actions { display: flex; gap: 16px; }
   .show-ticket { flex: 1; }
   .show-extra { flex: 1 1 100%; }
