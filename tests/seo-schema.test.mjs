@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { absoluteUrl, showEventSchema, breadcrumbSchema, renderSitemap, DEFAULT_OG_IMAGE, SITE_URL } from '../src/lib/seo.ts'
+import { absoluteUrl, showEventSchema, breadcrumbSchema, renderSitemap, truncateDescription, DEFAULT_OG_IMAGE, SITE_URL } from '../src/lib/seo.ts'
 import { showSlug, isoDate } from '../src/lib/show.ts'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -125,6 +125,80 @@ test('styleguide ships meta description and canonical', () => {
   const styleguide = read('src/pages/styleguide.astro')
   assert.match(styleguide, /<meta name="description"/)
   assert.match(styleguide, /rel="canonical"/)
+})
+
+test('showEventSchema carries description, address and times when present', () => {
+  const detailed = showEventSchema({ data: {
+    ...show.data,
+    description: 'SCTTRD live in der Xolo Bar: Post-Punk trifft Techno.',
+    address: 'Beispielstraße 1, 80331 München',
+    doorsTime: '19:00',
+    startTime: '20:00',
+  } })
+  assert.equal(detailed.description, 'SCTTRD live in der Xolo Bar: Post-Punk trifft Techno.')
+  assert.equal(detailed.location.address.streetAddress, 'Beispielstraße 1, 80331 München')
+  assert.equal(detailed.startDate, '2026-12-03T20:00')
+  assert.equal(detailed.doorTime, '2026-12-03T19:00')
+})
+
+test('showEventSchema stays lean without details or times', () => {
+  const plain = showEventSchema(show)
+  assert.equal(plain.description, undefined)
+  assert.equal(plain.doorTime, undefined)
+  assert.equal(plain.startDate, '2026-12-03', 'Ohne Beginn bleibt das reine Tagesdatum')
+  assert.equal(plain.location.address.streetAddress, undefined)
+})
+
+test('showEventSchema ignores malformed times', () => {
+  const broken = showEventSchema({ data: { ...show.data, doorsTime: 'abends', startTime: '20' } })
+  assert.equal(broken.doorTime, undefined)
+  assert.equal(broken.startDate, '2026-12-03')
+})
+
+test('truncateDescription only cuts long text at word boundaries', () => {
+  assert.equal(truncateDescription('Kurz und gut.'), 'Kurz und gut.')
+  const long = `SCTTRD spielt ein DJ Live Set bei Techno und Punsch in Augsburg. Tickets gibt es direkt im Ticketshop. Weitere Infos zum Abend folgen auf der Veranstaltungsseite und an der Abendkasse vor Ort.`
+  const cut = truncateDescription(long)
+  assert.ok(cut.length <= 157)
+  assert.ok(!/\S$/.test(long.slice(0, 157)) || cut === long.slice(0, 157).replace(/\s+\S*$/, ''))
+  assert.ok(!cut.endsWith('vor') && !cut.endsWith('an'), 'Kein abgehacktes Wort am Ende')
+})
+
+test('show pages render description, details and use them for meta', () => {
+  const showPage = read('src/pages/shows/[slug].astro')
+  assert.match(showPage, /description/)
+  assert.match(showPage, /show-description/)
+  assert.match(showPage, /Einlass/)
+  assert.match(showPage, /Beginn/)
+  assert.match(showPage, /Adresse/)
+  assert.match(showPage, /metaDescription/)
+  const cms = read('src/lib/cms.ts')
+  for (const field of ['description', 'address', 'doorsTime', 'startTime']) {
+    assert.ok(cms.includes(field), `getShows reicht ${field} durch`)
+  }
+})
+
+test('base layout ships canonical social meta (url, type, twitter)', () => {
+  const layout = read('src/layouts/BaseLayout.astro')
+  assert.match(layout, /property="og:url"/)
+  assert.match(layout, /property="og:type"/)
+  assert.match(layout, /name="twitter:title"/)
+  assert.match(layout, /name="twitter:description"/)
+})
+
+test('show pages reuse the site header typography and footer', () => {
+  const header = read('src/components/SiteHeader.astro')
+  assert.match(header, /font-family:\s*Poppins,\s*sans-serif/)
+
+  const footer = read('src/components/SiteFooter.astro')
+  assert.match(footer, /class="footer"/)
+  assert.match(footer, /class="footer-links"/)
+
+  const homepage = read('src/pages/index.astro')
+  const showPage = read('src/pages/shows/[slug].astro')
+  assert.match(homepage, /<SiteFooter/)
+  assert.match(showPage, /<SiteFooter/)
+  assert.ok(!showPage.includes('show-footer'), 'Show-Seiten verwenden keinen abweichenden Footer')
 })
 
 test('home carries a FAQ block with FAQPage schema', () => {

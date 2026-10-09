@@ -9,9 +9,11 @@ interface Props {
   bodyClass?: string;
   canonical?: string;
   image?: string;
+  ogType?: string;
 }
 
-const { title, description, currentPath, nextShowUrl, bodyClass, canonical, image } = Astro.props;
+const { title, description, currentPath, nextShowUrl, bodyClass, canonical, image, ogType = 'website' } = Astro.props;
+const pageUrl = `https://scttrd.de${currentPath}`;
 ---
 
 <!doctype html>
@@ -23,9 +25,13 @@ const { title, description, currentPath, nextShowUrl, bodyClass, canonical, imag
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:type" content={ogType} />
     {image && <meta property="og:image" content={image} />}
     {image && <meta name="twitter:image" content={image} />}
     {image && <meta name="twitter:card" content="summary_large_image" />}
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <meta name="theme-color" content="#f00000" />
     <link href="/images/favicon.png" rel="shortcut icon" type="image/x-icon" />
     <link href="/images/webclip.png" rel="apple-touch-icon" />

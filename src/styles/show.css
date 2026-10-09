@@ -89,6 +89,13 @@
   text-underline-offset: 4px;
 }
 
+/* Detailzeilen (Einlass/Beginn/Adresse) + Beschreibung */
+.show-details { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 6px 0 0; padding: 0; list-style: none; }
+.show-details li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.show-details span { font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
+.show-details strong { font-size: 15px; text-align: right; }
+.show-description { max-width: 62ch; margin: 22px 0 0; font-size: 16px; line-height: 1.6; }
+
 /* Ticket-CTA */
 .show-actions { width: 100%; margin-top: 28px; scroll-margin-top: 20px; }
 .show-ticket {
@@ -200,19 +207,6 @@
   border-color: var(--scttrd-black);
 }
 
-/* Footer der Show-Seite */
-.show-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  padding: 40px max(18px, calc((100vw - 1180px) / 2));
-  background: var(--scttrd-black);
-  color: #f4f1ea;
-  text-transform: uppercase;
-}
-.show-footer strong { font-size: clamp(32px, 5vw, 52px); line-height: .8; letter-spacing: -.06em; }
-.show-footer span { color: var(--scttrd-red); font-size: 11px; font-weight: 900; letter-spacing: .15em; }
-
 @media (max-width: 767px) {
   .show-main { flex-direction: column; }
   .show-page { width: calc(100% - 36px); padding-top: 32px; padding-bottom: 136px; }
@@ -249,9 +243,6 @@
     text-transform: uppercase;
   }
   .show-ticket-sticky:hover, .show-ticket-sticky:focus-visible { background: var(--scttrd-red); color: var(--scttrd-black); }
-  .show-footer { align-items: center; gap: 20px; padding: 36px 18px calc(92px + env(safe-area-inset-bottom, 0px)); }
-  .show-footer strong { font-size: 34px; }
-  .show-footer span { font-size: 10px; text-align: right; }
 }
 
 @media (min-width: 768px) {

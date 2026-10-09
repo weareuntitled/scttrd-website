@@ -19,7 +19,7 @@ export const mediaFields = {
 // damit nichts Unbekanntes an die API geschickt wird. `sources` gehört
 // bewusst nicht dazu: es ist reine Workflow-Pflicht, das CMS speichert es nicht.
 export const writableFields = {
-  show: ['venue', 'city', 'date', 'status', 'image', 'imageAlt', 'link', 'linkKind', 'lineup', 'order', 'page'],
+  show: ['venue', 'city', 'date', 'status', 'description', 'address', 'doorsTime', 'startTime', 'image', 'imageAlt', 'link', 'linkKind', 'lineup', 'order', 'page'],
   release: ['title', 'slug', 'releaseDate', 'cover', 'description', 'spotifyUrl', 'bannerEnabled', 'bannerDurationDays', 'status'],
 }
 

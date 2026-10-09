@@ -42,6 +42,38 @@ export const Shows: CollectionConfig = {
       ],
     },
     {
+      name: 'description',
+      type: 'textarea',
+      label: 'Beschreibung',
+      admin: {
+        description: '2–4 Sätze für Show-Seite, Meta-Description und Event-Schema. Nur belegbare Fakten (Venue, Stadt, Datum, Format, Ticketinfo).',
+      },
+    },
+    {
+      name: 'address',
+      type: 'text',
+      label: 'Adresse',
+      admin: {
+        description: 'Straße + Hausnummer der Venue, z. B. „Maxstraße 1, 86150 Augsburg“.',
+      },
+    },
+    {
+      name: 'doorsTime',
+      type: 'text',
+      label: 'Einlass',
+      admin: {
+        description: 'Format: HH:MM, z. B. „19:00“. Leer lassen, wenn unbekannt.',
+      },
+    },
+    {
+      name: 'startTime',
+      type: 'text',
+      label: 'Beginn',
+      admin: {
+        description: 'Format: HH:MM, z. B. „20:00“. Leer lassen, wenn unbekannt.',
+      },
+    },
+    {
       name: 'image',
       type: 'upload',
       relationTo: 'media',

@@ -19,6 +19,10 @@ export interface ShowLike {
     venue?: string
     city?: string
     date?: unknown
+    description?: string
+    address?: string
+    doorsTime?: string
+    startTime?: string
     image?: string | null
     link?: string
     linkKind?: string
@@ -26,13 +30,23 @@ export interface ShowLike {
   }
 }
 
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/
+
 export function showEventSchema(show: ShowLike, base: string = SITE_URL) {
-  const { venue = '', city = '', date, image, link } = show.data
-  const startDate = isoDate(date)
+  const { venue = '', city = '', date, description, address, doorsTime, startTime, image, link } = show.data
+  const day = isoDate(date)
+  const start = typeof startTime === 'string' && TIME.test(startTime.trim()) ? startTime.trim() : ''
+  const doors = typeof doorsTime === 'string' && TIME.test(doorsTime.trim()) ? doorsTime.trim() : ''
+  const startDate = day && start ? `${day}T${start}` : day || undefined
+  const doorTime = day && doors ? `${day}T${doors}` : undefined
+  const text = typeof description === 'string' ? description.trim() : ''
+  const street = typeof address === 'string' ? address.trim() : ''
   return {
     '@type': 'Event',
     name: `${venue} - SCTTRD`,
     ...(startDate ? { startDate } : {}),
+    ...(doorTime ? { doorTime } : {}),
+    ...(text ? { description: text } : {}),
     url: `${base}/shows/${showSlug(venue, date)}/`,
     image: absoluteUrl(image || DEFAULT_OG_IMAGE, base),
     eventStatus: 'https://schema.org/EventScheduled',
@@ -42,6 +56,7 @@ export function showEventSchema(show: ShowLike, base: string = SITE_URL) {
       name: venue,
       address: {
         '@type': 'PostalAddress',
+        ...(street ? { streetAddress: street } : {}),
         ...(city ? { addressLocality: city } : {}),
       },
     },
@@ -70,6 +85,14 @@ export function breadcrumbSchema(crumbs: Crumb[], base: string = SITE_URL) {
 export interface SitemapEntry {
   loc: string
   lastmod?: string
+}
+
+// Meta-Description aus der CMS-Beschreibung: nur kürzen, wenn nötig —
+// und dann an der Wortgrenze. Kurze Texte bleiben unangetastet.
+export function truncateDescription(text: string, max = 157): string {
+  const clean = String(text ?? '').trim().replace(/\s+/g, ' ')
+  if (clean.length <= max) return clean
+  return clean.slice(0, max).replace(/\s+\S*$/, '')
 }
 
 export function renderSitemap(entries: SitemapEntry[]): string {

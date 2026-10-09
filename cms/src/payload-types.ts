@@ -139,6 +139,9 @@ export interface User {
   id: number;
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -302,6 +305,22 @@ export interface Show {
    */
   date: string;
   status: 'upcoming' | 'past';
+  /**
+   * 2–4 Sätze für Show-Seite, Meta-Description und Event-Schema. Nur belegbare Fakten (Venue, Stadt, Datum, Format, Ticketinfo).
+   */
+  description?: string | null;
+  /**
+   * Straße + Hausnummer der Venue, z. B. „Maxstraße 1, 86150 Augsburg“.
+   */
+  address?: string | null;
+  /**
+   * Format: HH:MM, z. B. „19:00“. Leer lassen, wenn unbekannt.
+   */
+  doorsTime?: string | null;
+  /**
+   * Format: HH:MM, z. B. „20:00“. Leer lassen, wenn unbekannt.
+   */
+  startTime?: string | null;
   image?: (number | null) | Media;
   imageAlt?: string | null;
   link?: string | null;
@@ -522,6 +541,9 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
   email?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
@@ -596,6 +618,10 @@ export interface ShowsSelect<T extends boolean = true> {
   city?: T;
   date?: T;
   status?: T;
+  description?: T;
+  address?: T;
+  doorsTime?: T;
+  startTime?: T;
   image?: T;
   imageAlt?: T;
   link?: T;

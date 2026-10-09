@@ -1,10 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getShows, showSlug } from '../../lib/cms.ts';
 import { nextShow as hubNextShow, showUrl, showAction, adjacentShows } from '../../lib/show.ts';
 import { trackedTicketUrl } from '../../lib/tracking.ts';
-import { showEventSchema, breadcrumbSchema, absoluteUrl, DEFAULT_OG_IMAGE } from '../../lib/seo.ts';
+import { showEventSchema, breadcrumbSchema, absoluteUrl, truncateDescription, DEFAULT_OG_IMAGE } from '../../lib/seo.ts';
 import '../../styles/show.css';
 
 const shows: any[] = await getShows();
@@ -12,9 +13,13 @@ const nextShow = hubNextShow(shows);
 const nextShowHref = nextShow ? showUrl(nextShow) : null;
 const show = shows.find((item) => showSlug(item.data.venue, item.data.date) === Astro.params.slug);
 if (!show) return Astro.redirect('/');
-const { venue, city, date, status, image, imageAlt, lineup = [] } = show.data;
+const { venue, city, date, status, description = '', address = '', doorsTime = '', startTime = '', image, imageAlt, lineup = [] } = show.data;
 const { prev, next } = adjacentShows(shows, show);
-const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue}, ${city}`)}`;
+const mapQuery = [venue, address || city].filter(Boolean).join(', ');
+const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+const metaDescription = description.trim().length > 0
+  ? truncateDescription(description)
+  : `SCTTRD live: ${venue}, ${city} am ${date}.`;
 const action = showAction(show);
 const ctaLabel = action.label;
 const ctaHref = trackedTicketUrl(show, { source: 'homepage', medium: 'ticket-button' }) ?? action.href;
@@ -30,7 +35,7 @@ const structuredData = [
 ---
 <BaseLayout
   title={`${venue} | SCTTRD`}
-  description={`SCTTRD live: ${venue}, ${city} am ${date}.`}
+  description={metaDescription}
   currentPath={Astro.url.pathname}
   nextShowUrl={nextShowHref}
   canonical={`https://scttrd.de${showUrl(show)}`}
@@ -49,8 +54,16 @@ const structuredData = [
           <h1 class="show-title">{venue}</h1>
           <div class="show-meta">
             <strong>{city} · {date}</strong>
+            {(doorsTime || startTime || address) && (
+              <ul class="show-details">
+                {doorsTime && <li><span>Einlass</span><strong>{doorsTime} Uhr</strong></li>}
+                {startTime && <li><span>Beginn</span><strong>{startTime} Uhr</strong></li>}
+                {address && <li><span>Adresse</span><strong>{address}</strong></li>}
+              </ul>
+            )}
             <a href={mapUrl} target="_blank" rel="noopener noreferrer">Ort in Google Maps öffnen ↗</a>
           </div>
+          {description.trim() && <p class="show-description">{description.trim()}</p>}
           <div class:list={['show-actions', status === 'upcoming' && ctaHref ? 'show-actions-sticky-dupe' : '']} id="tickets">
             {ctaHref ? <a class="show-ticket" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a> : status === 'upcoming' && <p class="show-muted">{ctaLabel}</p>}
           </div>
@@ -73,5 +86,5 @@ const structuredData = [
       </div>
     </main>
     {status === 'upcoming' && ctaHref && <a class="show-ticket-sticky" href={ctaHref} target="_blank" rel="noopener noreferrer">{ctaLabel}</a>}
-    <footer class="show-footer"><strong>SCTTRD</strong><span>Brutal, aber schön.</span></footer>
+    <SiteFooter />
 </BaseLayout>
