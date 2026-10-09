@@ -92,8 +92,14 @@
 /* Detailzeilen (Einlass/Beginn/Adresse) + Beschreibung */
 .show-details { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 6px 0 0; padding: 0; list-style: none; }
 .show-details li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
-.show-details span { font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
-.show-details strong { font-size: 15px; text-align: right; }
+.show-details span, .show-details strong {
+  font-family: Founders, Poppins, sans-serif;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.show-details span { font-size: 13px; line-height: 1.3; opacity: .72; }
+.show-details strong { font-size: 16px; line-height: 1.3; text-align: right; }
 .show-description { max-width: 62ch; margin: 22px 0 0; font-size: 16px; line-height: 1.6; }
 
 /* Ticket-CTA */

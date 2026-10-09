@@ -201,6 +201,11 @@ test('show pages reuse the site header typography and footer', () => {
   assert.ok(!showPage.includes('show-footer'), 'Show-Seiten verwenden keinen abweichenden Footer')
 })
 
+test('show detail labels and values use one consistent typeface and weight', () => {
+  const styles = read('src/styles/show.css')
+  assert.match(styles, /\.show-details span,\s*\.show-details strong\s*\{[^}]*font-family:\s*Founders,\s*Poppins,\s*sans-serif;[^}]*font-weight:\s*500;/)
+})
+
 test('home carries a FAQ block with FAQPage schema', () => {
   const index = read('src/pages/index.astro')
   assert.match(index, /Häufige Fragen/)
