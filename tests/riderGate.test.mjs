@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { RIDER_FILES, RIDER_GATED, riderRequestPayload, validateRiderRequest } from '../src/lib/riderRequest.ts';
+import { canRevealRiderPhone } from '../src/lib/riderPhone.ts';
 
 const root = path.resolve(import.meta.dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
@@ -33,6 +34,34 @@ describe('Rider-Gate: Validierung', () => {
     assert.equal(p.ip, '1.2.3.4');
     assert.equal(p.file, 'rider');
     assert.equal(p.source, 'styleguide');
+  });
+});
+
+describe('Rider-Gate: Telefonnummer', () => {
+  it('gibt die Nummer nur bei exaktem Passwort frei', () => {
+    assert.equal(canRevealRiderPhone('correct horse battery staple', 'correct horse battery staple'), true);
+    assert.equal(canRevealRiderPhone('correct horse battery staple ', 'correct horse battery staple'), false);
+    assert.equal(canRevealRiderPhone('wrong password', 'correct horse battery staple'), false);
+  });
+
+  it('bleibt geschlossen, wenn das Passwort fehlt oder überlang ist', () => {
+    assert.equal(canRevealRiderPhone('anything', ''), false);
+    assert.equal(canRevealRiderPhone('x'.repeat(513), 'configured'), false);
+  });
+
+  it('enthält die Telefonnummer nicht in öffentlichen Rider-Dateien und konfiguriert den Server-Gate', () => {
+    const html = read('public/styleguide/assets/rider/scttrd-foh-rider.html');
+    assert.doesNotMatch(html, /tel:\+|\+\d{1,3}(?:[ -]?\d){7,14}/);
+    assert.match(html, /data-phone-form/);
+    assert.match(html, /\/api\/rider-phone/);
+    assert.doesNotMatch(read('scripts/build-email-signatures.mjs'), /tel:\+/);
+    assert.doesNotMatch(read('public/styleguide/assets/signatures/daniel-s-dj.html'), /tel:\+/);
+    assert.doesNotMatch(read('wiki/content/signatures/daniel-s-dj.html'), /tel:\+/);
+    assert.doesNotMatch(read('wiki/content/import/email-signaturen/daniel-s-dj.html'), /tel:\+/);
+    assert.match(read('src/pages/api/rider-phone.ts'), /RIDER_PHONE_PASSWORD/);
+    assert.match(read('src/pages/api/rider-phone.ts'), /RIDER_PHONE_NUMBER/);
+    assert.match(read('all-inclusive/.env.example'), /^RIDER_PHONE_NUMBER=$/m);
+    assert.match(read('all-inclusive/.env.example'), /^RIDER_PHONE_PASSWORD=$/m);
   });
 });
 
