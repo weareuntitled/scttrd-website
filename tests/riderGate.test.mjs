@@ -44,10 +44,11 @@ describe('Rider-Gate: Telefonnummer', () => {
     assert.equal(canRevealRiderPhone('wrong password', 'correct horse battery staple'), false);
   });
 
-  it('bleibt geschlossen, wenn das Passwort fehlt oder überlang ist', () => {
+  it('bleibt ohne konfiguriertes oder bei überlangem Passwort geschlossen', () => {
     assert.equal(canRevealRiderPhone('anything', ''), false);
     assert.equal(canRevealRiderPhone('x'.repeat(513), 'configured'), false);
-    assert.equal(canRevealRiderPhone('short-pass', 'short-pass'), false);
+    assert.equal(canRevealRiderPhone('short-pass', 'short-pass'), true);
+    assert.equal(canRevealRiderPhone('wrong-pass', 'short-pass'), false);
   });
 
   it('normalisiert deutsche Nummernformate für den geschützten tel-Link', () => {

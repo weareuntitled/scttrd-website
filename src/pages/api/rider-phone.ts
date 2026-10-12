@@ -30,7 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
   const configuredPassword = configured('RIDER_PHONE_PASSWORD')
   const phone = configured('RIDER_PHONE_NUMBER')
   const normalizedPhone = phone ? normalizeRiderPhone(phone) : null
-  if (!configuredPassword || configuredPassword.length < 20 || !normalizedPhone) {
+  if (!configuredPassword || !normalizedPhone) {
     return json({ ok: false }, 503)
   }
   if (!canRevealRiderPhone(password, configuredPassword)) return json({ ok: false }, 401)
