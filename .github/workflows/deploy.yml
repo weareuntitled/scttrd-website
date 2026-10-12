@@ -44,6 +44,13 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           git archive --format=tar.gz HEAD | ssh "$SERVER_USER@$SERVER_HOST" "tar -xzf - -C '$DEPLOY_PATH'"
+      - name: Remove retired public Rider files
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH' && rm -f public/styleguide/assets/rider/scttrd-foh-rider.html public/styleguide/assets/rider/scttrd-foh-rider.pdf"
       - name: Rebuild services
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}

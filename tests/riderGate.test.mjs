@@ -144,4 +144,13 @@ describe('Rider-Gate: Verdrahtung', () => {
     assert.match(route, /content-disposition/);
     assert.match(route, /private.*no-store/);
   });
+
+  it('deployment entfernt alte, zuvor öffentliche Rider-Dateien vor dem Rebuild', () => {
+    const workflow = read('.github/workflows/deploy.yml');
+    const cleanup = workflow.indexOf('Remove retired public Rider files');
+    const rebuild = workflow.indexOf('name: Rebuild services');
+    assert.ok(cleanup >= 0 && cleanup < rebuild, 'Rider-Dateien werden vor dem Rebuild bereinigt');
+    assert.match(workflow, /rm -f[^\n]*public\/styleguide\/assets\/rider\/scttrd-foh-rider\.html/);
+    assert.match(workflow, /rm -f[^\n]*public\/styleguide\/assets\/rider\/scttrd-foh-rider\.pdf/);
+  });
 });
