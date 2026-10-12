@@ -1,11 +1,12 @@
 ---
-import { RIDER_COOKIE, RIDER_FILES } from '../lib/riderRequest.ts';
+import { isRiderGateTokenValid, RIDER_COOKIE, RIDER_FILES } from '../lib/riderRequest.ts';
 
 const logos = [
   { name: 'Wordmark', file: 'SCTTRD_logo_01' },
   { name: 'Kreis', file: 'SCTTRD_logo_kreis' },
 ];
-const riderUnlocked = Astro.cookies.get(RIDER_COOKIE)?.value === '1';
+const riderGateSecret = import.meta.env.PAYLOAD_SECRET || (typeof process !== 'undefined' ? (process as any).env?.PAYLOAD_SECRET : undefined);
+const riderUnlocked = isRiderGateTokenValid(Astro.cookies.get(RIDER_COOKIE)?.value, riderGateSecret);
 const riderError = Astro.url.searchParams.get('rider') === 'error';
 ---
 <!doctype html>
@@ -109,26 +110,32 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
 
       <section id="downloads">
         <div class="section-head"><span class="section-no">05</span><h2>Downloads</h2></div>
-        <div class="rider-gate" id="rider" data-unlocked={riderUnlocked ? 'true' : 'false'}>
+        <div class="rider-gate" id="rider">
           <div class="rider-gate-copy">
             <span class="type-label">Technical Rider · Version 2026-09</span>
             <strong>Rider &amp; Hospitality</strong>
-            <p>Den Technical Rider kannst du direkt anschauen. Für das PDF und den Hospitality Rider bitte kurz Name, Venue und E-Mail hinterlassen, dann gibt es beides sofort. Wir nutzen die Angaben nur, um zu wissen, wer die aktuelle Version hat.</p>
-            <a class="button button-large rider-open" href={RIDER_FILES.html}><span class="button-copy"><strong>Technical Rider</strong><small>HTML · Stage Plot · frei</small></span><span aria-hidden="true">↗</span></a>
+            <p>HTML-Rider, PDF und Hospitality schalten wir nach Name, Venue und E-Mail frei. Wir machen das, damit wir selbst wissen, wer die Unterlagen angefragt hat.</p>
           </div>
-          <form class="rider-form" method="post" action="/api/rider-request" novalidate>
+          {!riderUnlocked && <form class="rider-form" method="post" action="/api/rider-request" novalidate>
             <label>Name<input name="name" required autocomplete="name" /></label>
             <label>Venue / Veranstaltung<input name="venue" required autocomplete="organization" /></label>
             <label>E-Mail<input name="email" type="email" required autocomplete="email" /></label>
             <label class="rider-hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
-            <button class="button button-large" type="submit"><span class="button-copy"><strong>Downloads freischalten</strong><small>Rider PDF + Hospitality · sofort</small></span><span aria-hidden="true">→</span></button>
+            <button class="button button-large" type="submit"><span class="button-copy"><strong>Downloads freischalten</strong><small>HTML-Rider + PDF + Hospitality · sofort</small></span><span aria-hidden="true">→</span></button>
             <p class="rider-error" role="alert" hidden={!riderError}>Bitte alle Felder prüfen.</p>
-          </form>
-          <div class="rider-links">
+          </form>}
+          {riderUnlocked && <div class="rider-links">
             <span class="type-label">Freigeschaltet</span>
+            <a class="button button-large" href={RIDER_FILES.html} download><span class="button-copy"><strong>Technical Rider</strong><small>HTML · Download</small></span><span aria-hidden="true">↓</span></a>
             <a class="button button-large" href={RIDER_FILES.pdf} download><span class="button-copy"><strong>Technical Rider</strong><small>PDF · Download</small></span><span aria-hidden="true">↓</span></a>
             <a class="button button-large" href={RIDER_FILES.hospitality} target="_blank" rel="noreferrer"><span class="button-copy"><strong>Hospitality Rider</strong><small>Google Drive</small></span><span aria-hidden="true">↗</span></a>
-          </div>
+            <form class="rider-phone-form" data-rider-phone-form>
+              <label for="rider-phone-password">Telefonnummer mit Passwort anzeigen</label>
+              <div><input id="rider-phone-password" type="password" name="password" autocomplete="current-password" required maxlength="512" /><button class="button" type="submit">Nummer anzeigen</button></div>
+              <p class="rider-phone-status" data-rider-phone-status role="status" aria-live="polite"></p>
+              <p class="rider-phone-result" data-rider-phone-result hidden></p>
+            </form>
+          </div>}
         </div>
         <div class="utility-actions">
           <a class="button button-large" href="https://scttrd.de" target="_blank" rel="noreferrer"><span class="button-copy"><strong>Website</strong><small>scttrd.de</small></span><span aria-hidden="true">↗</span></a>
@@ -186,13 +193,45 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
           });
           const result = await response.json();
           if (result.ok) {
-            gate?.setAttribute('data-unlocked', 'true');
-            gate?.querySelector<HTMLAnchorElement>('.rider-links a')?.focus();
+            window.location.assign('/styleguide/#rider');
             return;
           }
           if (error) { error.textContent = Object.values(result.errors ?? {}).join(' ') || 'Bitte alle Felder prüfen.'; error.hidden = false; }
         } catch {
           riderForm.submit();
+        } finally {
+          if (submit) submit.disabled = false;
+        }
+      });
+
+      const phoneForm = document.querySelector<HTMLFormElement>('[data-rider-phone-form]');
+      phoneForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const submit = phoneForm.querySelector<HTMLButtonElement>('button[type="submit"]');
+        const status = phoneForm.querySelector<HTMLElement>('[data-rider-phone-status]');
+        const result = phoneForm.querySelector<HTMLElement>('[data-rider-phone-result]');
+        if (submit) submit.disabled = true;
+        if (status) status.textContent = 'Prüfe Passwort …';
+        if (result) result.hidden = true;
+        try {
+          const response = await fetch('/api/rider-phone', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', accept: 'application/json' },
+            body: JSON.stringify({ password: new FormData(phoneForm).get('password') }),
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok || typeof data.phone !== 'string' || typeof data.tel !== 'string') {
+            if (status) status.textContent = 'Passwort falsch oder Freigabe nicht eingerichtet.';
+            return;
+          }
+          const link = document.createElement('a');
+          link.href = `tel:${data.tel}`;
+          link.textContent = data.phone;
+          result?.replaceChildren(document.createTextNode('Telefon: '), link);
+          if (result) result.hidden = false;
+          if (status) status.textContent = 'Nummer freigegeben.';
+        } catch {
+          if (status) status.textContent = 'Freigabe momentan nicht erreichbar.';
         } finally {
           if (submit) submit.disabled = false;
         }
@@ -321,7 +360,6 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
   .rider-gate-copy { display: grid; gap: .8rem; align-content: start; }
   .rider-gate-copy > strong { font-size: clamp(1.8rem, 4vw, 3rem); line-height: .9; font-weight: 700; letter-spacing: -.03em; text-transform: uppercase; }
   .rider-gate-copy p { margin: 0; max-width: 36ch; font-size: 15px; line-height: 1.5; color: var(--color-neutral-50); }
-  .rider-open { margin-top: .4rem; border-color: var(--color-red-500); }
   .rider-links .type-label { color: var(--color-neutral-50); }
   .rider-form { display: grid; gap: .8rem; align-content: start; }
   .rider-form label { display: grid; gap: .35rem; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
@@ -332,8 +370,13 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
   .rider-error { margin: 0; font-size: 13px; color: var(--color-neutral-50); }
   .rider-links { display: grid; gap: var(--space-2); align-content: start; }
   .rider-links .button { border-color: var(--color-red-500); }
-  .rider-gate[data-unlocked='false'] .rider-links { display: none; }
-  .rider-gate[data-unlocked='true'] .rider-form { display: none; }
+  .rider-phone-form { display: grid; gap: .5rem; margin-top: .6rem; padding-top: .9rem; border-top: 1px solid color-mix(in srgb, var(--color-red-500) 50%, transparent); }
+  .rider-phone-form label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+  .rider-phone-form > div { display: flex; gap: .6rem; }
+  .rider-phone-form input { min-width: 0; min-height: 46px; flex: 1; padding: .6rem .8rem; color: var(--color-neutral-50); background: transparent; border: 1px solid color-mix(in srgb, var(--color-red-500) 55%, transparent); border-radius: var(--border-radius-control); font: inherit; letter-spacing: 0; }
+  .rider-phone-form .button { border-color: var(--color-red-500); }
+  .rider-phone-status, .rider-phone-result { margin: 0; font-size: 13px; color: var(--color-neutral-50); }
+  .rider-phone-result a { color: inherit; text-underline-offset: 3px; }
   .utility-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-2); }
   .button-large { min-height: 88px; padding: 1rem 1.15rem; text-transform: none; }
   .button-copy { display: grid; gap: 4px; text-align: left; }

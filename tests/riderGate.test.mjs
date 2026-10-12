@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { RIDER_FILES, RIDER_GATED, riderRequestPayload, validateRiderRequest } from '../src/lib/riderRequest.ts';
+import { RIDER_FILES, RIDER_GATED, RIDER_PRIVATE_FILES, createRiderGateToken, isRiderGateTokenValid, riderRequestPayload, validateRiderRequest } from '../src/lib/riderRequest.ts';
 import { canRevealRiderPhone, normalizeRiderPhone } from '../src/lib/riderPhone.ts';
 
 const root = path.resolve(import.meta.dirname, '..');
@@ -35,6 +35,15 @@ describe('Rider-Gate: Validierung', () => {
     assert.equal(p.file, 'rider');
     assert.equal(p.source, 'styleguide');
   });
+
+  it('signiert das zeitlich begrenzte Freischalt-Cookie', () => {
+    const now = 1_800_000_000_000;
+    const token = createRiderGateToken('test-payload-secret', now);
+    assert.equal(isRiderGateTokenValid(token, 'test-payload-secret', now), true);
+    assert.equal(isRiderGateTokenValid(token, 'wrong-secret', now), false);
+    assert.equal(isRiderGateTokenValid(`${token}x`, 'test-payload-secret', now), false);
+    assert.equal(isRiderGateTokenValid(token, 'test-payload-secret', now + 31 * 24 * 60 * 60 * 1000), false);
+  });
 });
 
 describe('Rider-Gate: Telefonnummer', () => {
@@ -57,11 +66,13 @@ describe('Rider-Gate: Telefonnummer', () => {
     assert.equal(normalizeRiderPhone('keine Nummer'), null);
   });
 
-  it('enthält die Telefonnummer nicht in öffentlichen Rider-Dateien und konfiguriert den Server-Gate', () => {
-    const html = read('public/styleguide/assets/rider/scttrd-foh-rider.html');
+  it('enthält die Telefonnummer nicht in den heruntergeladenen Rider-Dateien', () => {
+    const html = read('private/rider/scttrd-foh-rider.html');
     assert.doesNotMatch(html, /tel:\+|\+\d{1,3}(?:[ -]?\d){7,14}/);
-    assert.match(html, /data-phone-form/);
-    assert.match(html, /\/api\/rider-phone/);
+    assert.doesNotMatch(html, /data-phone-form|\/api\/rider-phone/);
+    const styleguide = read('src/pages/styleguide.astro');
+    assert.match(styleguide, /data-rider-phone-form/);
+    assert.match(styleguide, /\/api\/rider-phone/);
     assert.doesNotMatch(read('scripts/build-email-signatures.mjs'), /tel:\+/);
     assert.doesNotMatch(read('public/styleguide/assets/signatures/daniel-s-dj.html'), /tel:\+/);
     assert.doesNotMatch(read('wiki/content/signatures/daniel-s-dj.html'), /tel:\+/);
@@ -74,23 +85,27 @@ describe('Rider-Gate: Telefonnummer', () => {
 });
 
 describe('Rider-Gate: Verdrahtung', () => {
-  it('lokale Dateien aus RIDER_FILES existieren in public/', () => {
-    for (const file of Object.values(RIDER_FILES).filter((f) => f.startsWith('/'))) {
-      assert.ok(exists(path.join('public', file)), `fehlt: ${file}`);
-    }
+  it('private Rider-Dateien existieren außerhalb von public/', () => {
+    for (const file of Object.values(RIDER_PRIVATE_FILES)) assert.ok(exists(path.join('private/rider', file)), `fehlt: ${file}`);
+    assert.ok(!exists('public/styleguide/assets/rider/scttrd-foh-rider.html'));
+    assert.ok(!exists('public/styleguide/assets/rider/scttrd-foh-rider.pdf'));
   });
 
-  it('PDF und Hospitality liegen hinter dem Gate, HTML bleibt frei', () => {
-    assert.deepEqual([...RIDER_GATED].sort(), ['hospitality', 'pdf']);
-    assert.ok(!RIDER_GATED.includes('html'));
+  it('HTML, PDF und Hospitality liegen hinter dem Anfrageformular', () => {
+    assert.deepEqual([...RIDER_GATED].sort(), ['hospitality', 'html', 'pdf']);
+    assert.equal(RIDER_FILES.html, '/api/rider-file/html');
+    assert.equal(RIDER_FILES.pdf, '/api/rider-file/pdf');
   });
 
-  it('styleguide.astro: HTML frei verlinkt, PDF + Hospitality nur in .rider-links', () => {
+  it('styleguide.astro: erklärt das Anfrage-Gate und bietet alle Unterlagen danach an', () => {
     const src = read('src/pages/styleguide.astro');
     assert.match(src, /action="\/api\/rider-request"/);
     assert.match(src, /name="website"/, 'Honeypot fehlt');
-    assert.match(src, /class="button button-large rider-open" href=\{RIDER_FILES\.html\}/, 'HTML-Rider muss frei aufrufbar sein');
+    assert.match(src, /wer die Unterlagen angefragt hat/);
+    assert.match(src, /riderUnlocked\s*&&/);
+    assert.match(src, /window\.location\.assign\('\/styleguide\/#rider'\)/);
     const links = src.match(/<div class="rider-links">([\s\S]*?)<\/div>/)?.[1] ?? '';
+    assert.match(links, /RIDER_FILES\.html/);
     assert.match(links, /RIDER_FILES\.pdf/);
     assert.match(links, /RIDER_FILES\.hospitality/);
     assert.doesNotMatch(src, /href="https:\/\/drive\.google\.com\/drive\/folders\/1R8LF6_T1DeVFs72Bm3O-HAaX2_3jqp45"/, 'Hospitality darf nicht mehr direkt verlinkt sein');
@@ -98,10 +113,15 @@ describe('Rider-Gate: Verdrahtung', () => {
 
   it('API-Route existiert, schreibt ins CMS und verschickt die Benachrichtigung', () => {
     const src = read('src/pages/api/rider-request.ts');
+    const fileRoute = read('src/pages/api/rider-file/[file].ts');
     const mail = read('src/lib/riderMail.ts');
     assert.match(src, /\/api\/rider-requests/);
     assert.match(src, /validateRiderRequest/);
     assert.match(src, /sendRiderNotification/);
+    assert.doesNotMatch(src, /files:\s*RIDER_FILES/);
+    assert.match(src, /createRiderGateToken/);
+    assert.match(fileRoute, /isRiderGateTokenValid/);
+    assert.match(fileRoute, /content-disposition.*attachment/i);
     assert.match(mail, /MAIL_RELAY_URL/);
     assert.match(mail, /MAIL_RELAY_SECRET/);
     assert.match(mail, /SMTP_PASSWORD/);
@@ -118,7 +138,10 @@ describe('Rider-Gate: Verdrahtung', () => {
     assert.match(read('cms/src/migrations/index.ts'), /add_rider_requests/);
   });
 
-  it('Rider-HTML verlinkt das PDF', () => {
-    assert.match(read('public/styleguide/assets/rider/scttrd-foh-rider.html'), /href="scttrd-foh-rider\.pdf"/);
+  it('Download-API sperrt ohne Freischalt-Cookie und sendet Attachments', () => {
+    const route = read('src/pages/api/rider-file/[file].ts');
+    assert.match(route, /isRiderGateTokenValid/);
+    assert.match(route, /content-disposition/);
+    assert.match(route, /private.*no-store/);
   });
 });

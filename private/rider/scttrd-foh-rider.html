@@ -99,16 +99,6 @@
     .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid var(--ink);background:var(--ink);color:#fff;font:inherit;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;cursor:pointer}
     .pill.ghost{background:transparent;color:var(--ink)}
     .pill:hover{background:var(--red);border-color:var(--red);color:#fff}
-    .phone-gate{margin-top:18px;padding:16px 20px;border:1px solid var(--line);background:var(--soft)}
-    .phone-gate form{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
-    .phone-gate label{display:grid;gap:5px;min-width:min(100%,260px);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-    .phone-gate input{min-height:42px;padding:8px 10px;border:1px solid var(--ink);background:#fff;color:var(--ink);font:inherit;letter-spacing:normal;text-transform:none}
-    .phone-gate button{min-height:42px;padding:8px 14px;border:2px solid var(--ink);background:var(--ink);color:#fff;font:inherit;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
-    .phone-gate button:hover{border-color:var(--red);background:var(--red)}
-    .phone-gate [data-phone-status]{flex-basis:100%;margin:0;font-size:13px}
-    .phone-gate [data-phone-result]{margin:0;font-weight:600}
-    .phone-gate a{color:var(--ink);text-underline-offset:3px}
-
     @media(max-width:720px){
       main{padding:24px 18px}
       header,.roles,.overview,.needs,.confirm{grid-template-columns:1fr}
@@ -123,8 +113,6 @@
       .step{grid-template-columns:40px 1fr}
       .step .time{grid-column:2}
       footer{flex-direction:column;gap:6px}
-      .phone-gate form{align-items:stretch;flex-direction:column}
-      .phone-gate label,.phone-gate button{width:100%}
     }
     @media print{
       @page{size:A4;margin:12mm}
@@ -195,14 +183,6 @@
     <div class="brand">SCTTRD</div>
     <div class="meta">Technical Rider + Stage Plot<br>Version <b>2026-09</b><br>info@scttrd.de</div>
   </header>
-  <div class="phone-gate no-print">
-    <form data-phone-form>
-      <label for="rider-phone-password">Telefonnummer mit Passwort anzeigen<input id="rider-phone-password" type="password" name="password" autocomplete="current-password" required maxlength="512"></label>
-      <button type="submit">Freigeben</button>
-      <p data-phone-status role="status" aria-live="polite"></p>
-      <p data-phone-result hidden></p>
-    </form>
-  </div>
   <div class="actions no-print">
     <a class="pill" href="scttrd-foh-rider.pdf" download>PDF herunterladen ↓</a>
     <button class="pill ghost" type="button" onclick="window.print()">Drucken</button>
@@ -451,41 +431,5 @@
 
   <footer><span><a href="mailto:info@scttrd.de">info@scttrd.de</a> · Daniel Peters</span><span>SCTTRD Technical Rider 2026-09</span></footer>
 </main>
-<script>
-  const phoneForm = document.querySelector('[data-phone-form]');
-  const phoneStatus = document.querySelector('[data-phone-status]');
-  const phoneResult = document.querySelector('[data-phone-result]');
-  phoneForm?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const button = form.querySelector('button[type="submit"]');
-    const password = new FormData(form).get('password');
-    button.disabled = true;
-    phoneStatus.textContent = 'Prüfe Passwort …';
-    phoneResult.hidden = true;
-    try {
-      const response = await fetch('/api/rider-phone', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'accept': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.ok || typeof data.phone !== 'string' || !/^\+[1-9]\d{6,14}$/.test(data.tel)) {
-        phoneStatus.textContent = 'Passwort falsch oder Freigabe noch nicht eingerichtet.';
-        return;
-      }
-      const link = document.createElement('a');
-      link.href = `tel:${data.tel}`;
-      link.textContent = data.phone;
-      phoneResult.replaceChildren(document.createTextNode('Telefon: '), link);
-      phoneResult.hidden = false;
-      phoneStatus.textContent = 'Nummer freigegeben.';
-    } catch {
-      phoneStatus.textContent = 'Freigabe momentan nicht erreichbar.';
-    } finally {
-      button.disabled = false;
-    }
-  });
-</script>
 </body>
 </html>

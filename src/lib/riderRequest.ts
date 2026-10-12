@@ -1,17 +1,41 @@
-// Rider-Gate: Die HTML-Version des Technical Riders ist frei aufrufbar.
-// PDF und Hospitality Rider gibt es erst, wenn Name, Venue und E-Mail hinterlegt sind.
+import { createHmac, timingSafeEqual } from 'node:crypto';
+
+// Alle technischen Unterlagen werden nach Name, Venue und E-Mail freigeschaltet.
 // Die Anfrage wird im CMS protokolliert und per Mail an die Band gemeldet.
 
 export const RIDER_FILES = {
-  html: '/styleguide/assets/rider/scttrd-foh-rider.html',
-  pdf: '/styleguide/assets/rider/scttrd-foh-rider.pdf',
+  html: '/api/rider-file/html',
+  pdf: '/api/rider-file/pdf',
   hospitality: 'https://drive.google.com/drive/folders/1R8LF6_T1DeVFs72Bm3O-HAaX2_3jqp45',
 } as const;
 
-// Nur diese Dateien liegen hinter dem Formular.
-export const RIDER_GATED = ['pdf', 'hospitality'] as const;
+export const RIDER_PRIVATE_FILES = {
+  html: 'scttrd-foh-rider.html',
+  pdf: 'scttrd-foh-rider.pdf',
+} as const;
+
+export const RIDER_GATED = ['html', 'pdf', 'hospitality'] as const;
 
 export const RIDER_COOKIE = 'scttrd_rider';
+export const RIDER_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+
+export function createRiderGateToken(secret: string, now = Date.now()): string {
+  const expires = Math.floor(now / 1000) + RIDER_COOKIE_MAX_AGE;
+  const signature = createHmac('sha256', secret).update(String(expires)).digest('base64url');
+  return `${expires}.${signature}`;
+}
+
+export function isRiderGateTokenValid(token: string | undefined, secret: string | undefined, now = Date.now()): boolean {
+  if (!token || !secret) return false;
+  const [expiresText, signature, extra] = token.split('.');
+  const expires = Number(expiresText);
+  const nowSeconds = Math.floor(now / 1000);
+  if (extra !== undefined || !Number.isSafeInteger(expires) || expires <= nowSeconds || expires > nowSeconds + RIDER_COOKIE_MAX_AGE) return false;
+
+  const expected = createHmac('sha256', secret).update(String(expires)).digest();
+  const actual = Buffer.from(signature || '', 'base64url');
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
+}
 
 export type RiderRequestInput = {
   name?: unknown;
