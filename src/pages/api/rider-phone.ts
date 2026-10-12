@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { canRevealRiderPhone } from '../../lib/riderPhone.ts'
+import { canRevealRiderPhone, normalizeRiderPhone } from '../../lib/riderPhone.ts'
 
 export const prerender = false
 
@@ -28,12 +28,12 @@ export const POST: APIRoute = async ({ request }) => {
 
   const password = input && typeof input === 'object' ? (input as Record<string, unknown>).password : undefined
   const configuredPassword = configured('RIDER_PHONE_PASSWORD')
-  const phone = configured('RIDER_PHONE_NUMBER')?.trim()
-  const tel = phone?.replace(/[^\d+]/g, '')
-  if (!configuredPassword || !phone || !tel || !/^\+[1-9]\d{6,14}$/.test(tel)) {
+  const phone = configured('RIDER_PHONE_NUMBER')
+  const normalizedPhone = phone ? normalizeRiderPhone(phone) : null
+  if (!configuredPassword || configuredPassword.length < 20 || !normalizedPhone) {
     return json({ ok: false }, 503)
   }
   if (!canRevealRiderPhone(password, configuredPassword)) return json({ ok: false }, 401)
 
-  return json({ ok: true, phone, tel })
+  return json({ ok: true, ...normalizedPhone })
 }

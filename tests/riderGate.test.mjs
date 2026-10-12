@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { RIDER_FILES, RIDER_GATED, riderRequestPayload, validateRiderRequest } from '../src/lib/riderRequest.ts';
-import { canRevealRiderPhone } from '../src/lib/riderPhone.ts';
+import { canRevealRiderPhone, normalizeRiderPhone } from '../src/lib/riderPhone.ts';
 
 const root = path.resolve(import.meta.dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
@@ -47,6 +47,13 @@ describe('Rider-Gate: Telefonnummer', () => {
   it('bleibt geschlossen, wenn das Passwort fehlt oder überlang ist', () => {
     assert.equal(canRevealRiderPhone('anything', ''), false);
     assert.equal(canRevealRiderPhone('x'.repeat(513), 'configured'), false);
+    assert.equal(canRevealRiderPhone('short-pass', 'short-pass'), false);
+  });
+
+  it('normalisiert deutsche Nummernformate für den geschützten tel-Link', () => {
+    assert.deepEqual(normalizeRiderPhone('0171 2345678'), { phone: '0171 2345678', tel: '+491712345678' });
+    assert.deepEqual(normalizeRiderPhone('+49 171 2345678'), { phone: '+49 171 2345678', tel: '+491712345678' });
+    assert.equal(normalizeRiderPhone('keine Nummer'), null);
   });
 
   it('enthält die Telefonnummer nicht in öffentlichen Rider-Dateien und konfiguriert den Server-Gate', () => {
