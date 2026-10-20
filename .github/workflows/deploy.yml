@@ -37,6 +37,15 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' '${{ secrets.SERVER_KNOWN_HOSTS }}' > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
+      - name: Clear stale source files
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        # Das Archiv wird ueber den Bestand entpackt — geloeschte Dateien blieben sonst
+        # liegen und brechen den Build. Deshalb vorher die Quellordner leeren.
+        run: |
+          ssh "$SERVER_USER@$SERVER_HOST" "cd '$DEPLOY_PATH' && rm -rf src public cms scripts && mkdir -p src public cms scripts"
       - name: Upload tracked files
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
