@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { RIDER_FILES, RIDER_GATED, RIDER_PRIVATE_FILES, createRiderGateToken, isRiderGateTokenValid, riderRequestPayload, validateRiderRequest } from '../src/lib/riderRequest.ts';
-import { canRevealRiderPhone, normalizeRiderPhone } from '../src/lib/riderPhone.ts';
+import { normalizeRiderPhone } from '../src/lib/riderPhone.ts';
 
 const root = path.resolve(import.meta.dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
@@ -47,40 +47,31 @@ describe('Rider-Gate: Validierung', () => {
 });
 
 describe('Rider-Gate: Telefonnummer', () => {
-  it('gibt die Nummer nur bei exaktem Passwort frei', () => {
-    assert.equal(canRevealRiderPhone('correct horse battery staple', 'correct horse battery staple'), true);
-    assert.equal(canRevealRiderPhone('correct horse battery staple ', 'correct horse battery staple'), false);
-    assert.equal(canRevealRiderPhone('wrong password', 'correct horse battery staple'), false);
-  });
-
-  it('bleibt ohne konfiguriertes oder bei überlangem Passwort geschlossen', () => {
-    assert.equal(canRevealRiderPhone('anything', ''), false);
-    assert.equal(canRevealRiderPhone('x'.repeat(513), 'configured'), false);
-    assert.equal(canRevealRiderPhone('short-pass', 'short-pass'), true);
-    assert.equal(canRevealRiderPhone('wrong-pass', 'short-pass'), false);
-  });
-
-  it('normalisiert deutsche Nummernformate für den geschützten tel-Link', () => {
+  it('normalisiert deutsche Nummernformate für den tel-Link', () => {
     assert.deepEqual(normalizeRiderPhone('0171 2345678'), { phone: '0171 2345678', tel: '+491712345678' });
     assert.deepEqual(normalizeRiderPhone('+49 171 2345678'), { phone: '+49 171 2345678', tel: '+491712345678' });
     assert.equal(normalizeRiderPhone('keine Nummer'), null);
+  });
+
+  it('steht im Rider-Bereich, ohne Passwort-Gate und ohne eigene API', () => {
+    const styleguide = read('src/pages/styleguide.astro');
+    assert.match(styleguide, /class="rider-phone"/);
+    assert.match(styleguide, /href=\{`tel:\$\{riderPhone\.tel\}`\}/);
+    assert.match(styleguide, /riderUnlocked && riderPhoneEnv \? normalizeRiderPhone/);
+    assert.doesNotMatch(styleguide, /data-rider-phone-form/, 'Passwort-Formular entfernen');
+    assert.doesNotMatch(styleguide, /\/api\/rider-phone/);
+    assert.ok(!exists('src/pages/api/rider-phone.ts'), 'Passwort-API entfernen');
   });
 
   it('enthält die Telefonnummer nicht in den heruntergeladenen Rider-Dateien', () => {
     const html = read('private/rider/scttrd-foh-rider.html');
     assert.doesNotMatch(html, /tel:\+|\+\d{1,3}(?:[ -]?\d){7,14}/);
     assert.doesNotMatch(html, /data-phone-form|\/api\/rider-phone/);
-    const styleguide = read('src/pages/styleguide.astro');
-    assert.match(styleguide, /data-rider-phone-form/);
-    assert.match(styleguide, /\/api\/rider-phone/);
     assert.doesNotMatch(read('scripts/build-email-signatures.mjs'), /tel:\+/);
     assert.doesNotMatch(read('public/styleguide/assets/signatures/daniel-s-dj.html'), /tel:\+/);
     assert.doesNotMatch(read('wiki/content/signatures/daniel-s-dj.html'), /tel:\+/);
     assert.doesNotMatch(read('wiki/content/import/email-signaturen/daniel-s-dj.html'), /tel:\+/);
-    assert.match(read('src/pages/api/rider-phone.ts'), /RIDER_PHONE_PASSWORD/);
-    assert.match(read('src/pages/api/rider-phone.ts'), /RIDER_PHONE_NUMBER/);
     assert.match(read('all-inclusive/.env.example'), /^RIDER_PHONE_NUMBER=$/m);
-    assert.match(read('all-inclusive/.env.example'), /^RIDER_PHONE_PASSWORD=$/m);
   });
 });
 
@@ -103,7 +94,12 @@ describe('Rider-Gate: Verdrahtung', () => {
     assert.match(src, /name="website"/, 'Honeypot fehlt');
     assert.match(src, /wer die Unterlagen angefragt hat/);
     assert.match(src, /riderUnlocked\s*&&/);
-    assert.match(src, /window\.location\.assign\('\/styleguide\/#rider'\)/);
+    assert.match(src, /window\.location\.reload\(\)/, 'nach Freischaltung muss neu geladen werden');
+    assert.doesNotMatch(
+      src,
+      /window\.location\.assign\('\/styleguide\/#rider'\)/,
+      'Navigation auf die identische URL lädt nicht neu und lässt das Formular stehen',
+    );
     const links = src.match(/<div class="rider-links">([\s\S]*?)<\/div>/)?.[1] ?? '';
     assert.match(links, /RIDER_FILES\.html/);
     assert.match(links, /RIDER_FILES\.pdf/);

@@ -1,5 +1,6 @@
 ---
 import { isRiderGateTokenValid, RIDER_COOKIE, RIDER_FILES } from '../lib/riderRequest.ts';
+import { normalizeRiderPhone } from '../lib/riderPhone.ts';
 
 const logos = [
   { name: 'Wordmark', file: 'SCTTRD_logo_01' },
@@ -8,6 +9,9 @@ const logos = [
 const riderGateSecret = import.meta.env.PAYLOAD_SECRET || (typeof process !== 'undefined' ? (process as any).env?.PAYLOAD_SECRET : undefined);
 const riderUnlocked = isRiderGateTokenValid(Astro.cookies.get(RIDER_COOKIE)?.value, riderGateSecret);
 const riderError = Astro.url.searchParams.get('rider') === 'error';
+// Die Nummer steht im Rider-Bereich und wird nur beim freigeschalteten Stand gerendert.
+const riderPhoneEnv = import.meta.env.RIDER_PHONE_NUMBER || (typeof process !== 'undefined' ? (process as any).env?.RIDER_PHONE_NUMBER : undefined);
+const riderPhone = riderUnlocked && riderPhoneEnv ? normalizeRiderPhone(String(riderPhoneEnv)) : null;
 ---
 <!doctype html>
 <html lang="de">
@@ -129,12 +133,7 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
             <a class="button button-large" href={RIDER_FILES.html} download><span class="button-copy"><strong>Technical Rider</strong><small>HTML · Download</small></span><span aria-hidden="true">↓</span></a>
             <a class="button button-large" href={RIDER_FILES.pdf} download><span class="button-copy"><strong>Technical Rider</strong><small>PDF · Download</small></span><span aria-hidden="true">↓</span></a>
             <a class="button button-large" href={RIDER_FILES.hospitality} target="_blank" rel="noreferrer"><span class="button-copy"><strong>Hospitality Rider</strong><small>Google Drive</small></span><span aria-hidden="true">↗</span></a>
-            <form class="rider-phone-form" data-rider-phone-form>
-              <label for="rider-phone-password">Telefonnummer mit Passwort anzeigen</label>
-              <div><input id="rider-phone-password" type="password" name="password" autocomplete="current-password" required maxlength="512" /><button class="button" type="submit">Nummer anzeigen</button></div>
-              <p class="rider-phone-status" data-rider-phone-status role="status" aria-live="polite"></p>
-              <p class="rider-phone-result" data-rider-phone-result hidden></p>
-            </form>
+            {riderPhone && <p class="rider-phone">Technischer Kontakt: <a href={`tel:${riderPhone.tel}`}>{riderPhone.phone}</a></p>}
           </div>}
         </div>
         <div class="utility-actions">
@@ -193,7 +192,10 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
           });
           const result = await response.json();
           if (result.ok) {
-            window.location.assign('/styleguide/#rider');
+            // Neu laden statt navigieren: die Freischaltung wird serverseitig aus dem
+            // gesetzten Cookie gerendert. Ein Sprung auf die identische URL (#rider ist
+            // bereits gesetzt) löst keine Navigation aus und ließe das Formular stehen.
+            window.location.reload();
             return;
           }
           if (error) { error.textContent = Object.values(result.errors ?? {}).join(' ') || 'Bitte alle Felder prüfen.'; error.hidden = false; }
@@ -204,39 +206,7 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
         }
       });
 
-      const phoneForm = document.querySelector<HTMLFormElement>('[data-rider-phone-form]');
-      phoneForm?.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const submit = phoneForm.querySelector<HTMLButtonElement>('button[type="submit"]');
-        const status = phoneForm.querySelector<HTMLElement>('[data-rider-phone-status]');
-        const result = phoneForm.querySelector<HTMLElement>('[data-rider-phone-result]');
-        if (submit) submit.disabled = true;
-        if (status) status.textContent = 'Prüfe Passwort …';
-        if (result) result.hidden = true;
-        try {
-          const response = await fetch('/api/rider-phone', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json', accept: 'application/json' },
-            body: JSON.stringify({ password: new FormData(phoneForm).get('password') }),
-          });
-          const data = await response.json();
-          if (!response.ok || !data.ok || typeof data.phone !== 'string' || typeof data.tel !== 'string') {
-            if (status) status.textContent = 'Passwort falsch oder Freigabe nicht eingerichtet.';
-            return;
-          }
-          const link = document.createElement('a');
-          link.href = `tel:${data.tel}`;
-          link.textContent = data.phone;
-          result?.replaceChildren(document.createTextNode('Telefon: '), link);
-          if (result) result.hidden = false;
-          if (status) status.textContent = 'Nummer freigegeben.';
-        } catch {
-          if (status) status.textContent = 'Freigabe momentan nicht erreichbar.';
-        } finally {
-          if (submit) submit.disabled = false;
-        }
-      });
-    </script>
+      </script>
   </body>
 </html>
 
@@ -370,13 +340,8 @@ const riderError = Astro.url.searchParams.get('rider') === 'error';
   .rider-error { margin: 0; font-size: 13px; color: var(--color-neutral-50); }
   .rider-links { display: grid; gap: var(--space-2); align-content: start; }
   .rider-links .button { border-color: var(--color-red-500); }
-  .rider-phone-form { display: grid; gap: .5rem; margin-top: .6rem; padding-top: .9rem; border-top: 1px solid color-mix(in srgb, var(--color-red-500) 50%, transparent); }
-  .rider-phone-form label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
-  .rider-phone-form > div { display: flex; gap: .6rem; }
-  .rider-phone-form input { min-width: 0; min-height: 46px; flex: 1; padding: .6rem .8rem; color: var(--color-neutral-50); background: transparent; border: 1px solid color-mix(in srgb, var(--color-red-500) 55%, transparent); border-radius: var(--border-radius-control); font: inherit; letter-spacing: 0; }
-  .rider-phone-form .button { border-color: var(--color-red-500); }
-  .rider-phone-status, .rider-phone-result { margin: 0; font-size: 13px; color: var(--color-neutral-50); }
-  .rider-phone-result a { color: inherit; text-underline-offset: 3px; }
+  .rider-phone { margin: .6rem 0 0; padding-top: .9rem; border-top: 1px solid color-mix(in srgb, var(--color-red-500) 50%, transparent); font-size: 13px; color: var(--color-neutral-50); }
+  .rider-phone a { color: inherit; text-underline-offset: 3px; }
   .utility-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-2); }
   .button-large { min-height: 88px; padding: 1rem 1.15rem; text-transform: none; }
   .button-copy { display: grid; gap: 4px; text-align: left; }

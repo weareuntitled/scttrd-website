@@ -26,10 +26,10 @@
 ## Content-Workflow: Agent First
 
 - Der User liefert nur Rohmaterial: einen kurzen Satz, eine URL und/oder eine Datei in `~/Downloads`. `/content <Beschreibung>` ist der Einstieg.
-- Typen: **Show** (Collection `shows`, Identity `venue + city + date`) und **Release** (Collection `releases`, Identity `slug`).
+- Typen: **Show** (Collection `shows`, Identity `venue + city + date`), **Release** (Collection `releases`, Identity `slug`) und **News/Live-Recap** (Collection `news`, Identity `slug`). Für Live-Recaps den Prompt in `docs/live-recap-prompt.md` verwenden.
 - Recherchiere fehlende, öffentlich belegbare Angaben selbst aus offiziellen Quellen (Event-, Venue-, Ticket-, Label- und Artist-Seiten). Erfinde keine Fakten.
 - Generiere selbst: Slug, Status (`upcoming`/`past` aus dem Datum), Release-Datum als `YYYY-MM-DD`, Alt-Texte, SEO-fähige Titel/Descriptions. Nach technischen CMS-Feldern nicht fragen.
-- Beim **Anlegen** wird ein Release automatisch `status: published` gesetzt (nur Published liest die Website); bestehende Releases werden nie ungefragt veröffentlicht.
+- Beim **Anlegen** wird ein Release automatisch `status: published` gesetzt (nur Published liest die Website); bestehende Releases werden nie ungefragt veröffentlicht. News bleiben ohne explizite Veröffentlichungsanweisung `draft`.
 - Quellen-Pflicht: jeder Eintrag braucht mindestens eine `sources[].url` — das erzwingt der Import.
 - Ablauf (Standard, alles in EINEM Lauf — Ziel: unter 2 Min. von der Idee zur Änderung):
   1. JSON-Input schreiben (Format unten).
@@ -38,7 +38,7 @@
   - Vorsichtsvariante, wenn der Plan unerwartetes zeigt: `npm run content:plan -- --input …` lesen, erst danach `npm run content:apply -- --input …` und `npm run content:verify` einzeln ausführen.
 - Credentials: vorzugsweise `CMS_API_KEY` (Header `Authorization: users API-Key <key>` → kein Login, kein Passwort), sonst `CMS_URL`, `CMS_EMAIL`, `CMS_PASSWORD` (Fallback `SEED_EMAIL`/`SEED_PASSWORD`) aus `.env` oder Umgebung — niemals auslesen, loggen oder committen.
 - Nur mitgelieferte Felder werden geändert; manuell im CMS editierte Werte bleiben beim erneuten Lauf unangetastet. Keine Duplikate: Identity-Felder sind der Schlüssel.
-- **Vertrag CMS ↔ Import:** `tests/content-schema-contract.test.mjs` liest `Shows.ts`/`Releases.ts` und vergleicht sie mit `writableFields`. Neues CMS-Feld → Test rot → in `cms/scripts/content-import-lib.mjs` (`writableFields`, ggf. `deriveItem`) eintragen. Bei neuen Pflichtfeldern muss der Import es ableiten oder als Pflicht abfragen.
+- **Vertrag CMS ↔ Import:** `tests/content-schema-contract.test.mjs` liest `Shows.ts`/`Releases.ts`/`News.ts` und vergleicht sie mit `writableFields`. Neues CMS-Feld → Test rot → in `cms/scripts/content-import-lib.mjs` (`writableFields`, ggf. `deriveItem`) eintragen. Bei neuen Pflichtfeldern muss der Import es ableiten oder als Pflicht abfragen.
 - **Vertrag API-Key:** `tests/cms-api-key.test.mjs` hält `auth.useAPIKey` in `cms/src/collections/Users.ts`, die additiven Migrationen `20261008_000000_add_users_api_key` + `20261008_000001_repair_users_api_key_columns` (Spalten `enable_a_p_i_key`/`api_key`/`api_key_index`) und den Auth-Flow des Imports fest: mit `CMS_API_KEY` kein Login, ohne Key weiterhin JWT via Passwort. Header-Format von Payload: `users API-Key <key>` (nicht `ApiKey`). Spaltennamen kommen aus `to-snake-case` (Unterstrich vor **jedem** Großbuchstaben, z. B. `enableAPIKey` → `enable_a_p_i_key`).
 - Input-Format (ein Objekt oder Array davon):
 

@@ -13,3 +13,7 @@ cms/.next
 *.log.err
 
 wiki/content/import/.b64_*
+
+# Lokale Agent-Werkzeuge (Skills) gehören nicht ins Website-Repo.
+.agents/
+skills-lock.json
