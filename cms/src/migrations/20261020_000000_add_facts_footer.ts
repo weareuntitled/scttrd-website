@@ -2,6 +2,9 @@ import { sql, type MigrateDownArgs, type MigrateUpArgs } from '@payloadcms/db-po
 
 // Additive Migration: facts-Collection plus footer-Global inkl. Arrays.
 export async function up({ db }: MigrateUpArgs): Promise<void> {
+  // Beziehung der gesperrten Dokumente (Payload pflegt sie fuer jede Collection).
+  await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD COLUMN IF NOT EXISTS "facts_id" integer`)
+  await db.execute(sql`CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_facts_id_idx" ON "payload_locked_documents_rels" USING btree ("facts_id")`)
   await db.execute(sql`
     CREATE TABLE IF NOT EXISTS "facts" (
       "id" serial PRIMARY KEY NOT NULL,
