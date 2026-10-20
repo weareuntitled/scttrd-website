@@ -59,12 +59,9 @@ export const Facts: CollectionConfig = {
         { name: 'body', type: 'textarea', label: 'Text (Absaetze durch Leerzeile trennen)' },
         {
           name: 'links',
-          type: 'array',
+          type: 'json',
           label: 'Links im Text',
-          fields: [
-            { name: 'label', type: 'text', required: true },
-            { name: 'url', type: 'text', required: true },
-          ],
+          admin: { description: 'Array aus { "label": "…", "url": "…" } — zum Beispiel [{"label":"Shows","url":"/#shows"}].' },
         },
       ],
     },

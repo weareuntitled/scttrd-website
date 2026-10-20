@@ -23,7 +23,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     ['facts_facts', 'facts', [['label', 'varchar NOT NULL', true], ['value', 'varchar NOT NULL', true]]],
     ['facts_members', 'facts', [['name', 'varchar NOT NULL', true], ['role', 'varchar NOT NULL', true]]],
     ['facts_profiles', 'facts', [['label', 'varchar NOT NULL', true], ['url', 'varchar NOT NULL', true]]],
-    ['facts_sections', 'facts', [['heading', 'varchar NOT NULL', true], ['body', 'varchar', false]]],
     ['facts_research_sources', 'facts', [['url', 'varchar NOT NULL', true]]],
   ]
   for (const [table, parent, columns] of arrays) {
@@ -34,21 +33,23 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     await db.execute(sql.raw(`DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '${table}_parent_id_fk') THEN ALTER TABLE "${table}" ADD CONSTRAINT "${table}_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."${parent}"("id") ON DELETE CASCADE ON UPDATE NO ACTION; END IF; END $$`))
   }
 
+  // Sections: die Links liegen als JSON in der Zeile (keine verschachtelte Array-Tabelle).
   await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS "facts_sections_links" (
+    CREATE TABLE IF NOT EXISTS "facts_sections" (
       "_order" integer NOT NULL,
       "_parent_id" integer NOT NULL,
       "id" varchar PRIMARY KEY NOT NULL,
-      "label" varchar NOT NULL,
-      "url" varchar NOT NULL
+      "heading" varchar NOT NULL,
+      "body" varchar,
+      "links" jsonb
     )
   `)
-  await db.execute(sql`CREATE INDEX IF NOT EXISTS "facts_sections_links_order_idx" ON "facts_sections_links" USING btree ("_order")`)
-  await db.execute(sql`CREATE INDEX IF NOT EXISTS "facts_sections_links_parent_id_idx" ON "facts_sections_links" USING btree ("_parent_id")`)
+  await db.execute(sql`CREATE INDEX IF NOT EXISTS "facts_sections_order_idx" ON "facts_sections" USING btree ("_order")`)
+  await db.execute(sql`CREATE INDEX IF NOT EXISTS "facts_sections_parent_id_idx" ON "facts_sections" USING btree ("_parent_id")`)
   await db.execute(sql`
     DO $$ BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'facts_sections_links_parent_id_fk') THEN
-        ALTER TABLE "facts_sections_links" ADD CONSTRAINT "facts_sections_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."facts_sections"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'facts_sections_parent_id_fk') THEN
+        ALTER TABLE "facts_sections" ADD CONSTRAINT "facts_sections_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."facts"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
       END IF;
     END $$
   `)
@@ -102,7 +103,6 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.execute(sql`DROP TABLE IF EXISTS "footer_groups_links"`)
   await db.execute(sql`DROP TABLE IF EXISTS "footer_groups"`)
   await db.execute(sql`DROP TABLE IF EXISTS "footer"`)
-  await db.execute(sql`DROP TABLE IF EXISTS "facts_sections_links"`)
   await db.execute(sql`DROP TABLE IF EXISTS "facts_sections"`)
   await db.execute(sql`DROP TABLE IF EXISTS "facts_research_sources"`)
   await db.execute(sql`DROP TABLE IF EXISTS "facts_profiles"`)

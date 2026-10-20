@@ -511,12 +511,17 @@ export interface Fact {
     | {
         heading: string;
         body?: string | null;
+        /**
+         * Array aus { "label": "…", "url": "…" } — zum Beispiel [{"label":"Shows","url":"/#shows"}].
+         */
         links?:
           | {
-              label: string;
-              url: string;
-              id?: string | null;
-            }[]
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
           | null;
         id?: string | null;
       }[]
@@ -864,13 +869,7 @@ export interface FactsSelect<T extends boolean = true> {
     | {
         heading?: T;
         body?: T;
-        links?:
-          | T
-          | {
-              label?: T;
-              url?: T;
-              id?: T;
-            };
+        links?: T;
         id?: T;
       };
   researchSources?:
