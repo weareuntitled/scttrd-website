@@ -24,6 +24,19 @@ import { Footer } from './globals/Footer'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Die Website zieht Galerie-Bilder per fetch in eine WebGL-Textur, das
+// verlangt CORS auf /api/media/file. Ohne diese Liste bleiben diese Kacheln leer.
+const allowedOrigins = [
+  process.env.SITE_URL,
+  'https://scttrd.de',
+  'https://www.scttrd.de',
+  'http://localhost:4321',
+  'http://127.0.0.1:4321',
+  'http://localhost:4329',
+  'http://127.0.0.1:4329',
+].filter((origin): origin is string => Boolean(origin))
+
+
 // SMTP für Passwort-Zurücksetzen-Mails. Gleiche Variablen wie die Website;
 // SMTP_USERNAME zusätzlich, weil das Wiki (Docmost) diesen Namen erwartet.
 // Ohne SMTP_HOST bleibt Payloads Standard: Mails landen nur im Log.
@@ -51,6 +64,8 @@ const email = process.env.SMTP_HOST
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   admin: {
     user: Users.slug,
     importMap: {
