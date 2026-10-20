@@ -20,6 +20,20 @@ const gridItems = [...curated.slice(0, 24), ...spread.slice(0, 8)].slice(0, 32).
   title: image.alt,
   meta: String(index + 1).padStart(2, '0'),
 }));
+
+const ogImage = absoluteUrl(gridItems[0]?.image ?? DEFAULT_OG_IMAGE);
+const gallerySchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ImageGallery',
+  name: 'SCTTRD Galerie',
+  description: 'Live, backstage und Pressebilder von SCTTRD.',
+  url: 'https://scttrd.de/gallery/',
+  image: images.slice(0, 32).map((image) => ({
+    '@type': 'ImageObject',
+    contentUrl: absoluteUrl(image.src),
+    description: image.alt,
+  })),
+};
 ---
 <BaseLayout
   title="Galerie | SCTTRD"
@@ -27,9 +41,12 @@ const gridItems = [...curated.slice(0, 24), ...spread.slice(0, 8)].slice(0, 32).
   currentPath="/gallery/"
   nextShowUrl={nextShowUrl}
   canonical="https://scttrd.de/gallery/"
-  image={absoluteUrl(DEFAULT_OG_IMAGE)}
+  image={ogImage}
 >
+    <script slot="head" type="application/ld+json" set:html={JSON.stringify(gallerySchema)} />
     <main class="gallery-page">
+      <h1 class="gallery-sr">SCTTRD Galerie</h1>
+      <p class="gallery-sr">Live, backstage und Pressebilder von SCTTRD aus Augsburg: Konzerte in Tiefgaragen und Clubs, Aufnahmen von unterwegs, Porträts aus dem Pressekit.</p>
       <div
         class="gallery-grid"
         data-fisheye
@@ -111,7 +128,23 @@ const gridItems = [...curated.slice(0, 24), ...spread.slice(0, 8)].slice(0, 32).
   }
   .gallery-fallback li { overflow: hidden; background: #0c0c0c; }
   .gallery-fallback img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  :global(html.has-js) .gallery-fallback { display: none; }
+  /* Mit JS übernimmt die Leinwand; die Liste bleibt für Suchmaschinen im DOM. */
+  :global(html.has-js) .gallery-fallback {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .gallery-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
   @media (max-width: 700px) {
     .gallery-grid { height: 100vh; min-height: 420px; }
     .gallery-fallback { grid-template-columns: repeat(2, 1fr); }

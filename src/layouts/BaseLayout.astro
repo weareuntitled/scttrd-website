@@ -1,5 +1,6 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
+import { absoluteUrl, DEFAULT_OG_IMAGE } from '../lib/seo.ts';
 import '../styles/tokens.css';
 import '../styles/interactions.css';
 
@@ -16,6 +17,7 @@ interface Props {
 
 const { title, description, currentPath, nextShowUrl, bodyClass, canonical, image, ogType = 'website' } = Astro.props;
 const pageUrl = `https://scttrd.de${currentPath}`;
+const ogImage = image ?? absoluteUrl(DEFAULT_OG_IMAGE);
 ---
 
 <!doctype html>
@@ -29,9 +31,9 @@ const pageUrl = `https://scttrd.de${currentPath}`;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:type" content={ogType} />
-    {image && <meta property="og:image" content={image} />}
-    {image && <meta name="twitter:image" content={image} />}
-    {image && <meta name="twitter:card" content="summary_large_image" />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {ogImage && <meta name="twitter:card" content="summary_large_image" />}
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="theme-color" content="#f00000" />
