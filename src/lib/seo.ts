@@ -82,6 +82,19 @@ export function breadcrumbSchema(crumbs: Crumb[], base: string = SITE_URL) {
   }
 }
 
+export function articleSchema(article: any, url: string, base: string = SITE_URL) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: article.excerpt,
+    datePublished: article.publishedAt,
+    mainEntityOfPage: url,
+    ...(article.cover ? { image: absoluteUrl(article.cover, base) } : {}),
+    publisher: { '@type': 'Organization', name: 'SCTTRD', url: base },
+  }
+}
+
 export interface SitemapEntry {
   loc: string
   lastmod?: string

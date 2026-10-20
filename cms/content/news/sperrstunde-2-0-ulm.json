@@ -1,0 +1,65 @@
+{
+  "type": "news",
+  "identity": {
+    "slug": "sperrstunde-2-0-ulm-tiefgarage"
+  },
+  "data": {
+    "title": "SCTTRD bei Sperrstunde 2.0: Acht Meter unter Ulm",
+    "slug": "sperrstunde-2-0-ulm-tiefgarage",
+    "category": "live-recap",
+    "excerpt": "45 Minuten live zwischen Post-Punk, Pop und Techno: Unser Rückblick auf Sperrstunde 2.0 in der Tiefgarage am Ulmer Hauptbahnhof.",
+    "body": "Eine Tiefgarage ist ein Ort, den man normalerweise möglichst schnell wieder verlässt. Am 17. Oktober blieben in der Garage am Ulmer Hauptbahnhof mehrere Hundert Menschen stehen. Sperrstunde 2.0 hatte rund acht Meter unter der Stadt einen Platz für Live-Musik gefunden. Der Eintritt war frei, der Abend lief ungefähr von 19:15 bis 22:00 Uhr. Nach unserer Schätzung kamen zwischen 300 und 800 Menschen vorbei: Jüngere, Ältere, Ulmer:innen und sogar ein paar Leute aus Augsburg. Die Garage fühlte sich nicht nach Club an. Das machte sie gerade interessant. Hier musste niemand so tun, als wäre der Ort etwas anderes als eine Tiefgarage.\n\nVor uns spielte KIMBER aus Ulm ein Modular-Live-Set. Von 20:15 bis 21:00 Uhr waren wir dran. Wir spielten Songs zwischen Pop und Post-Punk und instrumentale Techno-Tracks; Drums und Flöte triggern wir live. Auf einer Bühne wie dieser fällt uns wieder auf, warum uns das wichtig ist. Die Musik ist elektronisch, aber sie entsteht mit allem, was im Moment passiert: mit uns, mit dem Raum und mit den Menschen davor. Zwischen den Betonrampen wirkte unser Set anders als im Proberaum oder in einem Club. Genau dafür nehmen wir es mit auf die Bühne.\n\nNach uns übernahm PULSAR COLLECTIVE aus Berlin und spielte eine komplett improvisierte Session. Das passte zu einem Abend, der von Anfang an nicht nach einem üblichen Clubprogramm aussah. Selbst das Ordnungsamt konnte uns die Stimmung nicht nehmen. Vor allem blieb bei uns hängen, wie offen das Publikum war. Wir haben uns in Ulm sehr willkommen gefühlt.\n\nSpäter gingen wir ins Cabaret Eden, hörten 80er- und 90er-Tracks und tranken noch einen Absacker. Für uns war das der passende Schluss: erst eine Tiefgarage voller Musik, dann noch Zeit, den Abend sacken zu lassen.",
+    "publishedAt": "2026-10-19",
+    "status": "published",
+    "cover": "/images/news/Sperrstunde2.0_freeFM_Lovis_Brefka-57.jpg",
+    "photos": [
+      {
+        "image": "/images/news/Sperrstunde2.0_freeFM_Lovis_Brefka-52.jpg",
+        "alt": "Elektronische Live-Performance in der Tiefgarage bei Sperrstunde 2.0 in Ulm",
+        "credit": "Lovis Brefka / Radio free FM"
+      },
+      {
+        "image": "/images/news/Sperrstunde2.0_freeFM_Lovis_Brefka-53.jpg",
+        "alt": "Vocal-Performance am Mikrofon bei Sperrstunde 2.0",
+        "credit": "Lovis Brefka / Radio free FM"
+      },
+      {
+        "image": "/images/news/Sperrstunde2.0_freeFM_Lovis_Brefka-54.jpg",
+        "alt": "Musiker am elektronischen Live-Setup in der Ulmer Tiefgarage",
+        "credit": "Lovis Brefka / Radio free FM"
+      },
+      {
+        "image": "/images/news/Sperrstunde2.0_freeFM_Lovis_Brefka-57.jpg",
+        "alt": "Crowd vor der Bühne in der Tiefgarage am Ulmer Hauptbahnhof",
+        "credit": "Lovis Brefka / Radio free FM"
+      },
+      {
+        "image": "/images/news/Sperrstunde2.0_freeFM_Lovis_Brefka-59.jpg",
+        "alt": "Elektronischer Live-Musiker an seinem Setup bei Sperrstunde 2.0",
+        "credit": "Lovis Brefka / Radio free FM"
+      },
+      {
+        "image": "/images/news/Sperrstunde2.0_freeFM_Lovis_Brefka-71.jpg",
+        "alt": "Schlagzeuger am Set während der Live-Performance in Ulm",
+        "credit": "Lovis Brefka / Radio free FM"
+      }
+    ],
+    "relatedShow": 9,
+    "eventUrl": "https://www.freefm.de/artikel/sperrstunde-20-der-tiefgarage",
+    "recordingUrl": "https://www.freefm.de/mediathek/58996/1792256400/1792274400"
+  },
+  "sources": [
+    {
+      "url": "https://www.freefm.de/artikel/sperrstunde-20-der-tiefgarage"
+    },
+    {
+      "url": "https://www.freefm.de/sendung/sondersendung/sperrstunde-20-der-tiefgarage-am-bahnhof"
+    },
+    {
+      "url": "https://www.freefm.de/mediathek/58996/1792256400/1792274400"
+    },
+    {
+      "url": "https://www.popbastion.de/"
+    }
+  ]
+}

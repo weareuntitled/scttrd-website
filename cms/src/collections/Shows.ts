@@ -89,11 +89,12 @@ export const Shows: CollectionConfig = {
     {
       name: 'linkKind',
       type: 'select',
-      admin: { description: 'Ticket = echter Ticketshop · Webseite = Venue-/Eventseite (kein Ticketverkauf) · Video = Recording' },
+      admin: { description: 'Ticket = echter Ticketshop · Webseite = Venue-/Eventseite · Video/Audio = Recording' },
       options: [
         { label: 'Ticketshop', value: 'ticket' },
         { label: 'Webseite (Location/Event)', value: 'website' },
         { label: 'Video', value: 'video' },
+        { label: 'Audio', value: 'audio' },
       ],
     },
     {

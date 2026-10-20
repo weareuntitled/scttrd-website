@@ -13,6 +13,7 @@ const { currentPath, nextShowUrl } = Astro.props;
 const showsHref = currentPath === '/' ? '#shows' : '/#shows';
 const menuLinks: NavLink[] = [
   { label: 'Shows', url: showsHref },
+  { label: 'News', url: '/news/' },
   { label: 'Links', url: '/links/' },
   { label: 'Galerie', url: '/gallery/' },
   { label: 'About', url: '/#about' },

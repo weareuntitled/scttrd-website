@@ -29,6 +29,27 @@ const release = (data = {}) => ({
   sources: [{ url: 'https://example.com/release' }],
 })
 
+const news = (data = {}) => ({
+  type: 'news',
+  identity: {},
+  data: {
+    title: 'Sperrstunde 2.0 in Ulm',
+    slug: 'sperrstunde-2-0-in-ulm',
+    excerpt: 'SCTTRD bei Sperrstunde 2.0 in der Tiefgarage am Bahnhof in Ulm.',
+    body: 'x'.repeat(1200),
+    publishedAt: '2026-10-19',
+    category: 'live-recap',
+    status: 'published',
+    cover: '12',
+    photos: [{ image: '13', alt: 'SCTTRD live in Ulm', credit: 'Lovis Brefka / Radio free FM' }],
+    eventUrl: 'https://www.freefm.de/artikel/sperrstunde-20-der-tiefgarage',
+    recordingUrl: 'https://www.freefm.de/mediathek/58996/1792256400/1792274400',
+    researchSources: [{ url: 'https://www.freefm.de/artikel/sperrstunde-20-der-tiefgarage' }],
+    ...data,
+  },
+  sources: [{ url: 'https://www.freefm.de/artikel/sperrstunde-20-der-tiefgarage' }],
+})
+
 test('remote CMS requests use Payload JWT authentication', () => {
   assert.equal(apiAuthHeader('secret-token'), 'JWT secret-token')
 })
@@ -142,10 +163,24 @@ test('media file candidates are local files only', () => {
 test('query and collection mapping match the Payload API', () => {
   assert.equal(collectionFor('show'), 'shows')
   assert.equal(collectionFor('release'), 'releases')
+  assert.equal(collectionFor('news'), 'news')
   assert.equal(
     whereQuery({ type: 'show', identity: { venue: 'Techno & Punsch', city: 'Augsburg', date: '12.12.2026' }, data: {} }),
     'where[and][0][venue][equals]=Techno%20%26%20Punsch&where[and][1][city][equals]=Augsburg&where[and][2][date][equals]=12.12.2026',
   )
+})
+
+test('news import requires a substantive researched article and resolves its URL', () => {
+  const parsed = validateInput(news())
+  assert.equal(parsed.identity.slug, 'sperrstunde-2-0-in-ulm')
+  assert.equal(buildPlan([parsed], {})[0].action, 'create')
+  assert.throws(() => validateInput(news({ body: 'too short' })), /at least 1200 characters/i)
+  assert.throws(() => validateInput({ ...news(), sources: [] }), /source/i)
+  const existing = { ...parsed.data, id: 2, cover: { id: 12, filename: 'cover.jpg' }, photos: [{ id: 'p1', image: { id: 13, filename: 'photo.jpg' }, alt: 'SCTTRD live in Ulm', credit: 'Lovis Brefka / Radio free FM' }] }
+  const unchanged = buildPlan([parsed], { news: [existing] })[0]
+  assert.equal(unchanged.action, 'skip', `CMS upload objects must compare by media id: ${JSON.stringify(unchanged.changes)}`)
+  const sameFile = buildPlan([news({ photos: [{ image: '/images/news/photo.jpg', alt: 'SCTTRD live in Ulm', credit: 'Lovis Brefka / Radio free FM' }] })], { news: [{ ...existing, photos: [{ id: 'p1', image: { id: 13, filename: 'photo.jpg' }, alt: 'SCTTRD live in Ulm', credit: 'Lovis Brefka / Radio free FM' }] }] })[0]
+  assert.equal(sameFile.action, 'skip', 'local image path and stored media filename should compare as the same photo')
 })
 
 const root = path.resolve(import.meta.dirname, '..')

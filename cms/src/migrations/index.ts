@@ -6,6 +6,7 @@ import { down as downReleaseLockRelation, up as upReleaseLockRelation } from './
 import { down as downUsersApiKey, up as upUsersApiKey } from './20261008_000000_add_users_api_key'
 import { down as downUsersApiKeyRepair, up as upUsersApiKeyRepair } from './20261008_000001_repair_users_api_key_columns'
 import { down as downShowsDetails, up as upShowsDetails } from './20261009_000000_add_shows_details'
+import { down as downNews, up as upNews } from './20261019_000000_add_news'
 
 export const migrations = [
   { name: '20260908_000000_add_shows_lineup', up: up000000, down: down000000 },
@@ -16,4 +17,5 @@ export const migrations = [
   { name: '20261008_000000_add_users_api_key', up: upUsersApiKey, down: downUsersApiKey },
   { name: '20261008_000001_repair_users_api_key_columns', up: upUsersApiKeyRepair, down: downUsersApiKeyRepair },
   { name: '20261009_000000_add_shows_details', up: upShowsDetails, down: downShowsDetails },
+  { name: '20261019_000000_add_news', up: upNews, down: downNews },
 ]

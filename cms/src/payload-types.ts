@@ -73,6 +73,7 @@ export interface Config {
     shows: Show;
     links: Link;
     releases: Release;
+    news: News;
     'rider-requests': RiderRequest;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -87,6 +88,7 @@ export interface Config {
     shows: ShowsSelect<false> | ShowsSelect<true>;
     links: LinksSelect<false> | LinksSelect<true>;
     releases: ReleasesSelect<false> | ReleasesSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
     'rider-requests': RiderRequestsSelect<false> | RiderRequestsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -325,9 +327,9 @@ export interface Show {
   imageAlt?: string | null;
   link?: string | null;
   /**
-   * Ticket = echter Ticketshop · Webseite = Venue-/Eventseite (kein Ticketverkauf) · Video = Recording
+   * Ticket = echter Ticketshop · Webseite = Venue-/Eventseite · Video/Audio = Recording
    */
-  linkKind?: ('ticket' | 'website' | 'video') | null;
+  linkKind?: ('ticket' | 'website' | 'video' | 'audio') | null;
   /**
    * Acts des gemeinsamen Line-ups mit offiziellen Artist-Links und Quelle
    */
@@ -420,6 +422,55 @@ export interface Release {
   createdAt: string;
 }
 /**
+ * Recherchebasierte News und Live-Recaps. Veröffentlichung nur mit eigenständigem Inhalt, Quellen und Bildrechten.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: number;
+  title: string;
+  /**
+   * Wird beim ersten Speichern automatisch aus dem Titel erzeugt.
+   */
+  slug: string;
+  category: 'live-recap' | 'news';
+  excerpt: string;
+  /**
+   * Mindestens 1.200 Zeichen. Nur recherchierte Fakten und gelieferte persönliche Eindrücke; keine Setlist oder Details erfinden.
+   */
+  body: string;
+  /**
+   * Ein Song pro Zeile. Nur eintragen, wenn die Setlist geliefert oder belegt wurde.
+   */
+  setlist?: string | null;
+  publishedAt: string;
+  cover: number | Media;
+  photos?:
+    | {
+        image: number | Media;
+        alt: string;
+        credit?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  relatedShow?: (number | null) | Show;
+  eventUrl?: string | null;
+  recordingUrl?: string | null;
+  /**
+   * Beleglinks für Faktenprüfung; werden im Artikel nicht öffentlich ausgegeben.
+   */
+  researchSources?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Wer hat Rider-PDF und Hospitality Rider angefordert (Name, Venue, E-Mail, Zeitpunkt).
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -487,6 +538,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'releases';
         value: number | Release;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: number | News;
       } | null)
     | ({
         relationTo: 'rider-requests';
@@ -668,6 +723,40 @@ export interface ReleasesSelect<T extends boolean = true> {
   spotifyUrl?: T;
   bannerEnabled?: T;
   bannerDurationDays?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  category?: T;
+  excerpt?: T;
+  body?: T;
+  setlist?: T;
+  publishedAt?: T;
+  cover?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        credit?: T;
+        id?: T;
+      };
+  relatedShow?: T;
+  eventUrl?: T;
+  recordingUrl?: T;
+  researchSources?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
   status?: T;
   updatedAt?: T;
   createdAt?: T;

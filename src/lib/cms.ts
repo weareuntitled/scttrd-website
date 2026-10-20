@@ -78,6 +78,27 @@ export async function getReleases() {
   }))
 }
 
+export async function getNews() {
+  const base = cmsBase()
+  const docs = await cmsList('news?where[status][equals]=published&sort=-publishedAt&limit=100&depth=1')
+  if (!docs) {
+    const local = await getCollection('news')
+    return local.map((entry: any) => ({ id: entry.id, ...entry.data }))
+  }
+  return docs.map((d: any) => ({
+    ...d,
+    cover: abs(base, typeof d.cover === 'object' ? d.cover?.url : d.cover),
+    relatedShowUrl: d.relatedShow?.venue
+      ? `/shows/${showSlug(d.relatedShow.venue, d.relatedShow.date)}/`
+      : '',
+    photos: Array.isArray(d.photos) ? d.photos.map((photo: any) => ({
+      ...photo,
+      image: abs(base, typeof photo.image === 'object' ? photo.image?.url : photo.image),
+      alt: photo.alt || photo.image?.alt || d.title,
+    })) : [],
+  }))
+}
+
 export async function getShows() {
   const base = cmsBase()
   const docs = await cmsList('shows?limit=100&sort=-order')

@@ -118,11 +118,14 @@ describe('CMS wiring: content ↔ index.astro ↔ admin/config.yml', () => {
     assert.ok(cta.indexOf("replace('.mp4', '.webm')") < cta.indexOf('src={v.video}') , 'CTA: webm source before mp4');
   });
 
-  it('payload.config.ts declares the CMS collections (Users/Media/Shows)', () => {
+  it('payload.config.ts declares the CMS collections, including News', () => {
     const pc = read('cms/src/payload.config.ts');
-    for (const c of ['Users', 'Media', 'Shows']) {
+    for (const c of ['Users', 'Media', 'Shows', 'News']) {
       assert.match(pc, new RegExp(`./collections/${c}'`), `payload.config.ts missing ${c}`);
     }
+    assert.match(read('cms/src/migrations/index.ts'), /20261019_000000_add_news/);
+    assert.match(read('cms/src/migrations/20261019_000000_add_news.ts'), /news_photos/);
+    assert.match(read('cms/src/migrations/20261019_000000_add_news.ts'), /news_research_sources/);
   });
 
   it('production CMS keeps the reverse-proxy URL and secure auth cookies', () => {

@@ -8,12 +8,16 @@ import path from 'node:path'
 export const contentTypes = {
   show: { collection: 'shows', identity: ['venue', 'city', 'date'] },
   release: { collection: 'releases', identity: ['slug'] },
+  news: { collection: 'news', identity: ['slug'] },
 }
 
 export const mediaFields = {
   show: ['image'],
   release: ['cover'],
+  news: ['cover'],
 }
+
+export const mediaArrayFields = { news: ['photos'] }
 
 // Genau diese Felder kennt die Collection — alles andere wird abgelehnt,
 // damit nichts Unbekanntes an die API geschickt wird. `sources` gehört
@@ -21,6 +25,7 @@ export const mediaFields = {
 export const writableFields = {
   show: ['venue', 'city', 'date', 'status', 'description', 'address', 'doorsTime', 'startTime', 'image', 'imageAlt', 'link', 'linkKind', 'lineup', 'order', 'page'],
   release: ['title', 'slug', 'releaseDate', 'cover', 'description', 'spotifyUrl', 'bannerEnabled', 'bannerDurationDays', 'status'],
+  news: ['title', 'slug', 'category', 'excerpt', 'body', 'setlist', 'publishedAt', 'status', 'cover', 'photos', 'relatedShow', 'eventUrl', 'recordingUrl', 'researchSources'],
 }
 
 const GERMAN_DATE = /^(\d{2})\.(\d{2})\.(\d{4})$/
@@ -97,7 +102,7 @@ export function validateInput(raw) {
     const identity = isRecord(item.identity) ? item.identity : {}
     item = { ...item, identity }
     // Slug fehlt oft noch in der Eingabe — er wird wie im CMS aus dem Titel erzeugt.
-    if (item.type === 'release' && !identityValue(item, 'slug') && String(item.data?.title ?? '').trim()) {
+    if (['release', 'news'].includes(item.type) && !identityValue(item, 'slug') && String(item.data?.title ?? '').trim()) {
       item.identity = { ...item.identity, slug: slugify(item.data.title) }
     }
     const missing = contentTypes[item.type].identity.filter((key) => !identityValue(item, key))
@@ -132,6 +137,21 @@ export function deriveItem(item) {
     if (data.releaseDate && !parseIsoDate(data.releaseDate)) throw new Error(`releaseDate must be YYYY-MM-DD, got: ${data.releaseDate}`)
     if (!identityValue(item, 'slug')) throw new Error('Release needs a slug or a title to derive one')
   }
+  if (item.type === 'news') {
+    if (!data.title?.trim()) throw new Error('News title is required')
+    if (!identityValue(item, 'slug')) throw new Error('News needs a slug or title to derive one')
+    if (!parseIsoDate(data.publishedAt)) throw new Error('News publishedAt must be YYYY-MM-DD')
+    if (String(data.body ?? '').trim().length < 1200) throw new Error('News body must contain at least 1200 characters; research more or ask for missing first-hand details')
+    if (!Array.isArray(data.researchSources) || data.researchSources.length === 0) data.researchSources = item.sources.map(({ url }) => ({ url }))
+    if (!Array.isArray(data.photos)) data.photos = []
+    for (const photo of data.photos) {
+      if (!photo?.image || !String(photo.alt ?? '').trim()) throw new Error('Every news photo needs an image and descriptive alt text')
+      const value = photo.image
+      if (typeof value === 'string' && !/^\d+$/.test(value) && !isRemoteUrl(value) && !isSitePath(value) && !isUploadCandidate(value)) {
+        throw new Error(`photo image must be an existing file, URL, site path or media id: ${value}`)
+      }
+    }
+  }
   for (const field of mediaFields[item.type]) {
     const value = data[field]
     if (typeof value !== 'string' || !value) continue
@@ -145,7 +165,7 @@ const equal = (left, right) => JSON.stringify(left) === JSON.stringify(right)
 
 // Datum vergleichen wir auf Tag-Genauigkeit: das CMS liefert ISO, der Input
 // kommt als 'YYYY-MM-DD' bzw. 'DD.MM.YYYY' — sonst meldet jeder Lauf ein Update.
-const dateFields = { show: ['date'], release: ['releaseDate'] }
+const dateFields = { show: ['date'], release: ['releaseDate'], news: ['publishedAt'] }
 
 const asDateKey = (value) => {
   const text = String(value ?? '').trim()
@@ -162,6 +182,7 @@ const asDateKey = (value) => {
 export const relationFields = {
   show: ['page'],
   release: [],
+  news: ['relatedShow'],
 }
 
 // Medien/Relationships vergleichen wir über die ID, nicht über das Payload-Objekt.
@@ -220,8 +241,33 @@ const isSame = (type, field, found, next) => {
   return equal(comparable(type, field, found), comparable(type, field, next))
 }
 
+const photoKey = (photos) => (Array.isArray(photos) ? photos : []).map((photo) => ({
+  image: (() => {
+    const key = mediaKey(photo?.image)
+    return key?.id !== undefined ? { id: key.id } : key
+  })(),
+  alt: photo?.alt ?? '',
+  credit: photo?.credit ?? '',
+}))
+
+const samePhotos = (left, right) => {
+  const a = Array.isArray(left) ? left : []
+  const b = Array.isArray(right) ? right : []
+  return a.length === b.length && a.every((photo, index) => {
+    const other = b[index]
+    const imageA = mediaKey(photo?.image)
+    const imageB = mediaKey(other?.image)
+    const sameImage = imageA?.filename && imageB?.filename
+      ? imageA.filename === imageB.filename
+      : imageA?.id !== undefined && imageB?.id !== undefined && imageA.id === imageB.id
+    return sameImage && photo?.alt === other?.alt && (photo?.credit ?? '') === (other?.credit ?? '')
+  })
+}
+
 const missingForCreate = (item) => {
-  const required = item.type === 'release' ? ['title', 'releaseDate', 'cover'] : []
+  const required = item.type === 'release' ? ['title', 'releaseDate', 'cover']
+    : item.type === 'news' ? ['title', 'slug', 'category', 'excerpt', 'body', 'publishedAt', 'cover', 'status']
+      : []
   return required.filter((field) => !item.data[field])
 }
 
@@ -249,8 +295,13 @@ export function buildPlan(items, existing) {
     }
     const changes = Object.fromEntries(
       Object.entries(item.data)
-        .filter(([field, next]) => !isSame(item.type, field, found[field], next))
-        .map(([field, next]) => [field, { from: mediaFields[item.type].includes(field) ? mediaDisplay(found[field]) : comparable(item.type, field, found[field]) ?? null, to: mediaFields[item.type].includes(field) ? mediaDisplay(next) : comparable(item.type, field, next) }]),
+        .filter(([field, next]) => field === 'photos'
+          ? !samePhotos(found[field], next)
+          : !isSame(item.type, field, found[field], next))
+        .map(([field, next]) => [field, {
+          from: field === 'photos' ? photoKey(found[field]) : mediaFields[item.type].includes(field) ? mediaDisplay(found[field]) : comparable(item.type, field, found[field]) ?? null,
+          to: field === 'photos' ? photoKey(next) : mediaFields[item.type].includes(field) ? mediaDisplay(next) : comparable(item.type, field, next),
+        }]),
     )
     return { ...item, action: Object.keys(changes).length ? 'update' : 'skip', id: found.id, changes }
   })
@@ -279,6 +330,7 @@ export function publicUrl(item, siteUrl = 'https://scttrd.de') {
       .replace(/^-|-$/g, '')
     return `${base}/shows/${slug}/`
   }
+  if (item.type === 'news') return `${base}/news/${item.data.slug}/`
   return `${base}/releases/${item.data.slug}/`
 }
 

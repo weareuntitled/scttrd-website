@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import SiteFooter from '../../components/SiteFooter.astro'
+import Breadcrumbs from '../../components/Breadcrumbs.astro'
+import { getNews, getShows } from '../../lib/cms.ts'
+import { nextShow, showUrl } from '../../lib/show.ts'
+import { newsUrl } from '../../lib/news.ts'
+import '../../styles/news.css'
+
+const [articles, shows] = await Promise.all([getNews() as Promise<any[]>, getShows() as Promise<any[]>])
+const upcomingShow = nextShow(shows)
+const nextShowUrl = upcomingShow ? showUrl(upcomingShow) : null
+const formatDate = (value: string) => new Date(`${value}T00:00:00Z`).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' })
+---
+
+<BaseLayout title="News & Live-Recaps | SCTTRD" description="Rückblicke, Fotos und Recordings von SCTTRD live." currentPath="/news/" nextShowUrl={nextShowUrl} canonical="https://scttrd.de/news/" bodyClass="news-body">
+  <main class="news-page">
+    <Breadcrumbs items={[{ label: 'Home', url: '/' }, { label: 'News' }]} />
+    <header class="news-heading">
+      <p class="news-kicker">SCTTRD // BACKSTAGE</p>
+      <h1>News<span>&</span><br />Live-Recaps</h1>
+      <p>Was live passiert ist — Stories, Bilder und Mitschnitte von unterwegs.</p>
+    </header>
+    {articles.length ? <div class="news-grid">
+      {articles.map((article) => <article class="news-card">
+        <a class="news-card-image" href={newsUrl(article)} aria-label={`Zum Beitrag: ${article.title}`}>
+          <img src={article.cover} alt={article.coverAlt || article.title} loading="lazy" />
+        </a>
+        <div class="news-card-copy">
+          <p class="news-kicker">{article.category === 'live-recap' ? 'Live-Recap' : 'News'} · {formatDate(article.publishedAt)}</p>
+          <h2><a href={newsUrl(article)}>{article.title}</a></h2>
+          <p>{article.excerpt}</p>
+          <a class="news-read-more" href={newsUrl(article)}>Weiterlesen <span aria-hidden="true">↗</span></a>
+        </div>
+      </article>)}
+    </div> : <p class="news-empty">Noch keine Beiträge. Der nächste Live-Recap folgt nach dem nächsten Gig.</p>}
+  </main>
+  <SiteFooter />
+</BaseLayout>

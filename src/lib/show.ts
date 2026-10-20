@@ -99,7 +99,7 @@ const YOUTUBE_HOSTS = /youtube\.com|youtu\.be/i;
 export type ShowActionKind = 'ticket' | 'video' | 'page' | 'none';
 export type ShowAction = { href: string | null; label: string; kind: ShowActionKind };
 
-const LINK_KINDS = ['ticket', 'website', 'video'];
+const LINK_KINDS = ['ticket', 'website', 'video', 'audio'];
 
 export function showAction(show: any): ShowAction {
   const link = show?.data?.link;
@@ -113,6 +113,7 @@ export function showAction(show: any): ShowAction {
   const kind: ShowActionKind =
     explicit ?? (YOUTUBE_HOSTS.test(link) ? 'video' : TICKET_HOSTS.test(link) ? 'ticket' : 'page');
   if (kind === 'video') return { href: link, label: 'Video ansehen ↗', kind };
+  if (kind === 'audio') return { href: link, label: 'Recording anhören ↗', kind };
   if (kind === 'ticket') {
     return status === 'upcoming'
       ? { href: link, label: 'Tickets sichern ↗', kind }

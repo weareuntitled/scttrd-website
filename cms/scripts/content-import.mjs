@@ -22,6 +22,7 @@ import {
   isUploadCandidate,
   loadEnvFiles,
   mediaFields,
+  mediaArrayFields,
   publicUrl,
   summarizePlan,
   validateInput,
@@ -141,6 +142,11 @@ try {
     for (const item of items) {
       for (const field of mediaFields[item.type]) {
         if (typeof item.data[field] === 'string') item.data[field] = await resolveMedia(item.data[field])
+      }
+      for (const field of mediaArrayFields[item.type] ?? []) {
+        for (const row of item.data[field] ?? []) {
+          if (typeof row.image === 'string') row.image = await resolveMedia(row.image)
+        }
       }
     }
   }

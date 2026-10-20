@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import SiteFooter from '../../components/SiteFooter.astro'
+import Breadcrumbs from '../../components/Breadcrumbs.astro'
+import { getNews, getShows } from '../../lib/cms.ts'
+import { nextShow, showUrl } from '../../lib/show.ts'
+import { newsUrl } from '../../lib/news.ts'
+import { absoluteUrl, articleSchema, breadcrumbSchema } from '../../lib/seo.ts'
+import '../../styles/news.css'
+
+const [articles, shows] = await Promise.all([getNews() as Promise<any[]>, getShows() as Promise<any[]>])
+const article = articles.find((item) => item.slug === Astro.params.slug)
+if (!article) return Astro.redirect('/news/')
+const upcomingShow = nextShow(shows)
+const nextShowUrl = upcomingShow ? showUrl(upcomingShow) : null
+const canonical = `https://scttrd.de${newsUrl(article)}`
+const schema = [
+  articleSchema(article, canonical),
+  breadcrumbSchema([{ name: 'Home', url: '/' }, { name: 'News', url: '/news/' }, { name: article.title, url: newsUrl(article) }]),
+]
+const formatDate = (value: string) => new Date(`${value}T00:00:00Z`).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' })
+const blocks = String(article.body ?? '').split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean)
+const photos = (article.photos ?? []).filter((photo: any) => photo.image !== article.cover)
+const coverCredit = (article.photos ?? []).find((photo: any) => photo.image === article.cover)?.credit
+const recordingLabel = article.recordingUrl?.includes('/mediathek/') ? 'Recording anhören' : 'Recording ansehen'
+---
+
+<BaseLayout title={`${article.title} | SCTTRD`} description={article.excerpt} currentPath={newsUrl(article)} nextShowUrl={nextShowUrl} canonical={canonical} bodyClass="news-body" image={absoluteUrl(article.cover)} ogType="article">
+  <Fragment slot="head">
+    {schema.map((item) => <script type="application/ld+json" set:html={JSON.stringify(item)}></script>)}
+  </Fragment>
+  <main class="news-article-page">
+    <Breadcrumbs items={[{ label: 'Home', url: '/' }, { label: 'News', url: '/news/' }, { label: article.title }]} />
+    <article>
+      {(article.relatedShowUrl || article.eventUrl || article.recordingUrl) && <nav class="article-actions" aria-label="Weiterführende Links">
+        {article.relatedShowUrl && <a href={article.relatedShowUrl}>Show-Details <span aria-hidden="true">↗</span></a>}
+        {article.eventUrl && <a href={article.eventUrl} target="_blank" rel="noopener noreferrer">Veranstaltungsseite <span aria-hidden="true">↗</span></a>}
+        {article.recordingUrl && <a href={article.recordingUrl} target="_blank" rel="noopener noreferrer">{recordingLabel} <span aria-hidden="true">↗</span></a>}
+      </nav>}
+      <header class="article-heading">
+        <p class="news-kicker">{article.category === 'live-recap' ? 'Live-Recap' : 'News'} · {formatDate(article.publishedAt)}</p>
+        <h1>{article.title}</h1>
+        <p class="article-excerpt">{article.excerpt}</p>
+        {article.cover && <figure class="article-cover">
+          <img src={article.cover} alt={article.coverAlt || article.title} fetchpriority="high" />
+          {coverCredit && <figcaption>Foto: {coverCredit}</figcaption>}
+        </figure>}
+      </header>
+      <div class="article-content">
+        {blocks.map((block) => block.startsWith('## ')
+          ? <h2>{block.slice(3)}</h2>
+          : <p>{block}</p>)}
+        {article.setlist && <section class="article-setlist"><h2>Setlist</h2><ol>{String(article.setlist).split('\n').map((song) => song.trim()).filter(Boolean).map((song) => <li>{song}</li>)}</ol></section>}
+      </div>
+      {photos.length > 0 && <section class="article-gallery" aria-label="Fotos vom Auftritt">
+        <h2>Ein paar Momente</h2>
+        <div class="article-gallery-grid">
+          {photos.map((photo: any) => <figure>
+            <img src={photo.image} alt={photo.alt} loading="lazy" />
+            {photo.credit && <figcaption>Foto: {photo.credit}</figcaption>}
+          </figure>)}
+        </div>
+      </section>}
+    </article>
+  </main>
+  <SiteFooter />
+</BaseLayout>

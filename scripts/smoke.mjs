@@ -3,6 +3,7 @@ const cmsUrl = (process.env.SMOKE_CMS_URL || 'https://cms.scttrd.de').replace(/\
 
 const checks = [
   ['website', `${baseUrl}/`],
+  ['news', `${baseUrl}/news/`],
   ['gallery', `${baseUrl}/gallery/`],
   ['links', `${baseUrl}/links/`],
   ['cms', `${cmsUrl}/admin`],
@@ -44,7 +45,8 @@ console.log(`index-html-redirect: ${indexHtml.status}`)
 const showChecks = [
   ['singoldsand-show', '/shows/singoldsand-21-08-2026/', ['Singoldsand', 'Ort in Google Maps öffnen'], []],
   // Nur-CMS: Die Ulm-Show ersetzt den früheren KOE/Aichach-Datensatz.
-  ['ulm-show', '/shows/sperrstunde-parkhaus-popbastion-ulm-radio-free-fm-17-10-2026/', ['Sperrstunde', 'Ort in Google Maps öffnen'], []],
+  // Slug folgt dem offiziellen Namen „Sperrstunde 2.0" (venue + date, s. showSlug).
+  ['ulm-show', '/shows/sperrstunde-2-0-17-10-2026/', ['Sperrstunde 2.0', 'Ort in Google Maps öffnen'], []],
 ]
 for (const [name, path, markers, forbidden = []] of showChecks) {
   const page = await fetch(`${baseUrl}${path}`, { signal: AbortSignal.timeout(15000) })

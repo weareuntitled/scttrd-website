@@ -125,6 +125,8 @@ describe('Show-Hub Identität', () => {
     assert.deepEqual(showAction(waiting), { href: null, label: 'Ticketlink folgt.', kind: 'none' });
     const video = show({ status: 'past', venue: 'R', city: 'V', date: '01.08.2025', link: 'https://www.youtube.com/watch?v=x' });
     assert.deepEqual(showAction(video), { href: video.data.link, label: 'Video ansehen ↗', kind: 'video' });
+    const audio = show({ status: 'past', venue: 'S', city: 'U', date: '17.10.2026', link: 'https://www.freefm.de/mediathek/58996/1792256400/1792274400', linkKind: 'audio' });
+    assert.deepEqual(showAction(audio), { href: audio.data.link, label: 'Recording anhören ↗', kind: 'audio' });
     const page = show({ status: 'past', venue: 'K', city: 'A', date: '02.08.2024', link: 'https://www.instagram.com/kontrastfestival.archive/' });
     assert.deepEqual(showAction(page), { href: page.data.link, label: 'Veranstaltungsseite ↗', kind: 'page' });
   });

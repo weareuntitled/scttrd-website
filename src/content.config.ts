@@ -15,7 +15,7 @@ const shows = defineCollection({
     title_en: z.string().optional(),
     srcset: z.string().optional(),
     link: z.string().url().optional(),
-    linkKind: z.enum(['ticket', 'website', 'video']).optional(),
+    linkKind: z.enum(['ticket', 'website', 'video', 'audio']).optional(),
     lineup: z.array(z.object({
       name: z.string(),
       url: z.string().url().optional(),
@@ -63,6 +63,26 @@ const press = defineCollection({
     cover: z.string(),
     link: z.string().url(),
     date: z.string(),
+  }),
+});
+
+const news = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/news' }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string(),
+    category: z.enum(['live-recap', 'news']),
+    excerpt: z.string(),
+    body: z.string().min(1200),
+    setlist: z.string().optional(),
+    publishedAt: z.string(),
+    status: z.enum(['draft', 'published']),
+    cover: z.string(),
+    coverAlt: z.string(),
+    photos: z.array(z.object({ image: z.string(), alt: z.string(), credit: z.string().optional() })).default([]),
+    relatedShowUrl: z.string().optional(),
+    eventUrl: z.string().url().optional(),
+    recordingUrl: z.string().url().optional(),
   }),
 });
 
@@ -134,6 +154,7 @@ export const collections = {
   videos,
   reels,
   press,
+  news,
   homeText,
   homeImages,
   aboutPageImages,

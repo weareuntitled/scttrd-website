@@ -29,6 +29,7 @@ export async function verifyReport() {
 
   const shows = await list('shows', '/api/shows?limit=100&sort=-order')
   const releases = await list('releases', '/api/releases?limit=100&sort=releaseDate&depth=1')
+  const news = await list('news', '/api/news?where[status][equals]=published&limit=100&sort=-publishedAt')
   await list('pages', '/api/pages?limit=1')
   await list('links', '/api/links?limit=1')
 
@@ -37,6 +38,9 @@ export async function verifyReport() {
   }
   for (const release of releases) {
     if (!release.slug || !release.releaseDate) failures.push(`release ${release.id}: missing slug/releaseDate`)
+  }
+  for (const article of news) {
+    if (!article.slug || !article.title || !article.body) failures.push(`news ${article.id}: missing slug/title/body`)
   }
 
   report.ok = failures.length === 0

@@ -54,6 +54,7 @@ test('publicUrl mirrors the website slug rule instead of drifting from it', () =
     publicUrl({ type: 'release', data: { slug: 'vault-cut-01' } }, 'https://example.test'),
     'https://example.test/releases/vault-cut-01/',
   )
+  assert.equal(publicUrl({ type: 'news', data: { slug: 'sperrstunde-2-0-in-ulm' } }, 'https://example.test'), 'https://example.test/news/sperrstunde-2-0-in-ulm/')
 })
 
 describe('content:sync runs plan, apply and verify in one call', () => {

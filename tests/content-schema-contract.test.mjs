@@ -1,5 +1,5 @@
 // Vertrag zwischen CMS-Schema und Agent-Import.
-// Sobald in Shows.ts/Releases.ts ein neues (Pflicht-)Feld landet, läuft dieser
+// Sobald in Shows.ts/Releases.ts/News.ts ein neues (Pflicht-)Feld landet, läuft dieser
 // Test rot — dann muss der Import es kennen, ableiten oder ablehnen.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -76,7 +76,7 @@ const fieldsOf = (collection) => {
 }
 
 test('the import allowlist matches the CMS schema field for field', () => {
-  for (const [type, collection] of [['show', 'Shows'], ['release', 'Releases']]) {
+  for (const [type, collection] of [['show', 'Shows'], ['release', 'Releases'], ['news', 'News']]) {
     const schema = fieldsOf(collection).map((field) => field.name).sort()
     assert.deepEqual(
       [...writableFields[type]].sort(),
@@ -89,14 +89,19 @@ test('the import allowlist matches the CMS schema field for field', () => {
 test('upload fields of the schema are the ones the import resolves to a media id', () => {
   assert.deepEqual(mediaFields.show, fieldsOf('Shows').filter((f) => f.type === 'upload').map((f) => f.name))
   assert.deepEqual(mediaFields.release, fieldsOf('Releases').filter((f) => f.type === 'upload').map((f) => f.name))
+  assert.deepEqual(mediaFields.news, fieldsOf('News').filter((f) => f.type === 'upload').map((f) => f.name))
+  assert.deepEqual(mediaFields.news, ['cover'])
+  const newsSchema = fs.readFileSync(path.join(root, 'cms/src/collections/News.ts'), 'utf8')
+  assert.match(newsSchema, /name: 'photos',[\s\S]*?name: 'image', type: 'upload'/)
 })
 
 test('every required CMS field is present after import derivation', () => {
   const cases = {
     show: () => validateInput({ type: 'show', data: { venue: 'Club', city: 'Berlin', date: '12.12.2099' }, sources: [{ url: 'https://example.com' }] }),
     release: () => validateInput({ type: 'release', data: { title: 'Track', releaseDate: '2099-01-01', cover: '/images/x.jpg' }, sources: [{ url: 'https://example.com' }] }),
+    news: () => validateInput({ type: 'news', data: { title: 'News', slug: 'news', category: 'news', excerpt: 'A useful teaser for the article.', body: 'x'.repeat(1200), publishedAt: '2099-01-01', cover: '12', status: 'draft' }, sources: [{ url: 'https://example.com' }] }),
   }
-  for (const [type, collection] of [['show', 'Shows'], ['release', 'Releases']]) {
+  for (const [type, collection] of [['show', 'Shows'], ['release', 'Releases'], ['news', 'News']]) {
     const created = buildPlan([cases[type]()], {})[0].data
     const required = fieldsOf(collection).filter((field) => field.required).map((field) => field.name)
     const missing = required.filter((field) => created[field] === undefined || created[field] === '')
@@ -107,11 +112,14 @@ test('every required CMS field is present after import derivation', () => {
 test('workflow metadata never reaches the API payload', () => {
   assert.ok(!writableFields.show.includes('sources'))
   assert.ok(!writableFields.release.includes('sources'))
+  assert.ok(!writableFields.news.includes('sources'))
   const item = validateInput({ type: 'show', data: { venue: 'Club', city: 'Berlin', date: '12.12.2099' }, sources: [{ url: 'https://example.com' }] })
   assert.ok(!('sources' in item.data))
+  assert.ok(!('sources' in validateInput({ type: 'news', data: { title: 'News', slug: 'news', category: 'news', excerpt: 'A useful teaser for the article.', body: 'x'.repeat(1200), publishedAt: '2099-01-01', cover: '12', status: 'draft' }, sources: [{ url: 'https://example.com' }] }).data))
 })
 
 test('relationship fields of the schema are the ones the import compares by id', () => {
   assert.deepEqual(relationFields.show, fieldsOf('Shows').filter((f) => f.type === 'relationship').map((f) => f.name))
   assert.deepEqual(relationFields.release, fieldsOf('Releases').filter((f) => f.type === 'relationship').map((f) => f.name))
+  assert.deepEqual(relationFields.news, fieldsOf('News').filter((f) => f.type === 'relationship').map((f) => f.name))
 })
