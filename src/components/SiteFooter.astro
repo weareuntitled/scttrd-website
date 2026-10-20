@@ -1,20 +1,31 @@
 ---
+import { getFooterGroups } from '../lib/cms.ts';
+import { footerGroupsFallback } from '../lib/facts.ts';
+
 interface Props {
   email?: string;
 }
 
 const { email = 'info@scttrd.de' } = Astro.props;
+const groups = (await getFooterGroups()) ?? footerGroupsFallback;
 ---
 
 <div class="footer">
   <div class="wrapper">
-    <div class="footer-container">
-      <div class="footer-links">
-        <a href="/#shows" class="footer-link">shows</a>
-        <a href="/gallery/" class="footer-link">gallery</a>
-        <a href="/styleguide/#presse" class="footer-link">press pack</a>
-        <a href={`mailto:${email}?subject=STTRD%20Reqzest`} class="footer-link">{email}</a>
-      </div>
+    <div class="footer-grid">
+      {groups.map((group) => (
+        <div class="footer-col">
+          <p class="footer-label">{group.label}</p>
+          {group.links?.map((link) => (
+            <a
+              href={link.url}
+              class="footer-link"
+              target={link.target === 'blank' ? '_blank' : undefined}
+              rel={link.target === 'blank' ? 'noopener' : undefined}
+            >{link.label}</a>
+          ))}
+        </div>
+      ))}
     </div>
   </div>
 </div>
@@ -29,12 +40,13 @@ const { email = 'info@scttrd.de' } = Astro.props;
     font-family: Poppins, sans-serif;
   }
   .wrapper { width: min(100% - 36px, 1120px); margin-inline: auto; padding: 0; }
-  .footer-container { display: flex; justify-content: space-between; padding-block: 30px; }
-  .footer-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; gap: 16px; width: 100%; }
-  .footer-link { display: flex; align-items: center; min-height: 44px; margin: 0; color: #0c0c0c; text-decoration: none; overflow-wrap: anywhere; }
+  .footer-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; padding-block: 40px; }
+  .footer-col { display: flex; flex-direction: column; align-items: flex-start; }
+  .footer-label { margin: 0 0 8px; font-size: 13px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+  .footer-link { display: flex; align-items: center; min-height: 36px; color: #0c0c0c; font-size: 15px; text-decoration: none; overflow-wrap: anywhere; }
   .footer-link:hover, .footer-link:focus-visible { text-decoration: underline; text-underline-offset: 4px; }
   @media (max-width: 767px) {
-    .footer-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; padding-block: 16px; }
-    .footer-container { width: 100%; justify-content: flex-start; align-items: center; padding: 0; }
+    .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; padding-block: 28px; }
+    .footer-col:last-child { grid-column: 1 / -1; }
   }
 </style>

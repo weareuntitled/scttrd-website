@@ -9,12 +9,17 @@ export const contentTypes = {
   show: { collection: 'shows', identity: ['venue', 'city', 'date'] },
   release: { collection: 'releases', identity: ['slug'] },
   news: { collection: 'news', identity: ['slug'] },
+  facts: { collection: 'facts', identity: ['slug'] },
+  // Globals haben kein id und liegen unter /api/globals/<slug>.
+  footer: { collection: 'footer', global: true, identity: [] },
 }
 
 export const mediaFields = {
   show: ['image'],
   release: ['cover'],
   news: ['cover'],
+  facts: [],
+  footer: [],
 }
 
 export const mediaArrayFields = { news: ['photos'] }
@@ -26,6 +31,8 @@ export const writableFields = {
   show: ['venue', 'city', 'date', 'status', 'description', 'address', 'doorsTime', 'startTime', 'image', 'imageAlt', 'link', 'linkKind', 'lineup', 'order', 'page'],
   release: ['title', 'slug', 'releaseDate', 'cover', 'description', 'spotifyUrl', 'bannerEnabled', 'bannerDurationDays', 'status'],
   news: ['title', 'slug', 'category', 'excerpt', 'body', 'setlist', 'publishedAt', 'status', 'cover', 'photos', 'relatedShow', 'eventUrl', 'recordingUrl', 'researchSources'],
+  facts: ['title', 'slug', 'description', 'intro', 'facts', 'members', 'profiles', 'sections', 'researchSources', 'status'],
+  footer: ['groups'],
 }
 
 const GERMAN_DATE = /^(\d{2})\.(\d{2})\.(\d{4})$/
@@ -152,6 +159,33 @@ export function deriveItem(item) {
       }
     }
   }
+  if (item.type === 'facts') {
+    if (!data.title?.trim()) throw new Error('Facts title is required')
+    if (!identityValue(item, 'slug')) throw new Error('Facts needs a slug or title to derive one')
+    if (!String(data.description ?? '').trim()) throw new Error('Facts description is required')
+    if (!Array.isArray(data.researchSources) || data.researchSources.length === 0) data.researchSources = item.sources.map(({ url }) => ({ url }))
+    if (!Array.isArray(data.facts)) data.facts = []
+    if (!Array.isArray(data.members)) data.members = []
+    if (!Array.isArray(data.profiles)) data.profiles = []
+    if (!Array.isArray(data.sections)) data.sections = []
+    for (const profile of data.profiles) {
+      if (!String(profile?.url ?? '').trim()) throw new Error('Every facts profile needs a url')
+    }
+  }
+  if (item.type === 'footer') {
+    if (!Array.isArray(data.groups)) data.groups = []
+    data.groups = data.groups.map((group) => ({
+      ...group,
+      links: (group.links ?? []).map((link) => ({ ...link, target: link.target ?? 'self' })),
+    }))
+    for (const group of data.groups) {
+      if (!String(group?.label ?? '').trim()) throw new Error('Every footer group needs a label')
+      if (!Array.isArray(group.links)) group.links = []
+      for (const link of group.links) {
+        if (!String(link?.label ?? '').trim() || !String(link?.url ?? '').trim()) throw new Error('Every footer link needs a label and an url')
+      }
+    }
+  }
   for (const field of mediaFields[item.type]) {
     const value = data[field]
     if (typeof value !== 'string' || !value) continue
@@ -162,6 +196,21 @@ export function deriveItem(item) {
 }
 
 const equal = (left, right) => JSON.stringify(left) === JSON.stringify(right)
+
+// Arrays (Fotoliste, Fakten, Footer-Gruppen) vergleichen wir inhaltlich:
+// das CMS hängt eigene ids an, die im Input nicht stehen.
+const normalizeArray = (value) => {
+  if (Array.isArray(value)) return value.map(normalizeArray)
+  if (isRecord(value)) {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([key]) => key !== 'id')
+        .map(([key, item]) => [key, normalizeArray(item)])
+        .sort(([a], [b]) => a.localeCompare(b)),
+    )
+  }
+  return value
+}
 
 // Datum vergleichen wir auf Tag-Genauigkeit: das CMS liefert ISO, der Input
 // kommt als 'YYYY-MM-DD' bzw. 'DD.MM.YYYY' — sonst meldet jeder Lauf ein Update.
@@ -238,6 +287,9 @@ const isSame = (type, field, found, next) => {
     }
     return String(left) === String(right)
   }
+  if (Array.isArray(found) || Array.isArray(next)) {
+    return equal(normalizeArray(found ?? []), normalizeArray(next ?? []))
+  }
   return equal(comparable(type, field, found), comparable(type, field, next))
 }
 
@@ -267,7 +319,8 @@ const samePhotos = (left, right) => {
 const missingForCreate = (item) => {
   const required = item.type === 'release' ? ['title', 'releaseDate', 'cover']
     : item.type === 'news' ? ['title', 'slug', 'category', 'excerpt', 'body', 'publishedAt', 'cover', 'status']
-      : []
+      : item.type === 'facts' ? ['title', 'slug', 'description']
+        : []
   return required.filter((field) => !item.data[field])
 }
 
@@ -281,11 +334,18 @@ export function buildPlan(items, existing) {
     if (seen.has(key)) throw new Error(`Duplicate content item: ${key}`)
     seen.add(key)
     const records = existing[item.type] ?? []
-    const found = item.id !== undefined
-      ? records.find((record) => String(record?.id) === String(item.id))
-      : records.find((record) => config.identity.every((field) => String(record?.[field] ?? '') === identityOf(item)[field]))
+    const found = config.global
+      ? records[0]
+      : item.id !== undefined
+        ? records.find((record) => String(record?.id) === String(item.id))
+        : records.find((record) => config.identity.every((field) => String(record?.[field] ?? '') === identityOf(item)[field]))
     if (item.id !== undefined && !found) throw new Error(`No ${item.type} with id ${item.id}`)
     if (!found) {
+      // Globals gibt es immer, Payload legt sie beim ersten Speichern an.
+      if (config.global) {
+        const changes = Object.fromEntries(Object.entries(item.data).map(([field, next]) => [field, { from: null, to: next }]))
+        return { ...item, action: 'update', changes }
+      }
       const missing = missingForCreate(item)
       if (missing.length) throw new Error(`New ${item.type} is missing: ${missing.join(', ')}`)
       // Neue Releases sollen öffentlich sichtbar sein (nur published liest die Website);
@@ -331,10 +391,17 @@ export function publicUrl(item, siteUrl = 'https://scttrd.de') {
     return `${base}/shows/${slug}/`
   }
   if (item.type === 'news') return `${base}/news/${item.data.slug}/`
+  if (item.type === 'facts') return `${base}/facts/`
+  if (item.type === 'footer') return `${base}/`
   return `${base}/releases/${item.data.slug}/`
 }
 
 export const collectionFor = (type) => contentTypes[type].collection
+
+// Globals liegen unter /api/globals/<slug> und werden ohne id gelesen/geschrieben.
+export const isGlobal = (type) => Boolean(contentTypes[type]?.global)
+
+export const apiPathFor = (type) => isGlobal(type) ? `/api/globals/${collectionFor(type)}` : `/api/${collectionFor(type)}`
 
 export const apiAuthHeader = (token) => `JWT ${token}`
 

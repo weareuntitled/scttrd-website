@@ -14,7 +14,9 @@ import { Links } from './collections/Links'
 import { RiderRequests } from './collections/RiderRequests'
 import { Releases } from './collections/Releases'
 import { News } from './collections/News'
+import { Facts } from './collections/Facts'
 import { LinkHub } from './globals/LinkHub'
+import { Footer } from './globals/Footer'
 // NOTE: prodMigrations bewusst NICHT verdrahtet (2026-09-08): Boot-Migration
 // hing den CMS-Container auf (nie healthy, keine Logs remote einsehbar).
 // Schema-Updates laufen explizit als CI-Schritt (payload migrate, sichtbar + Timeout).
@@ -55,8 +57,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages, Shows, Links, Releases, News, RiderRequests],
-  globals: [LinkHub],
+  collections: [Users, Media, Pages, Shows, Links, Releases, News, Facts, RiderRequests],
+  globals: [LinkHub, Footer],
   editor: lexicalEditor(),
   ...(email ? { email } : {}),
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-change-me',

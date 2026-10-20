@@ -1,0 +1,14 @@
+{
+  "type": "show",
+  "id": 9,
+  "identity": {
+    "venue": "Sperrstunde 2.0",
+    "city": "Ulm",
+    "date": "17.10.2026"
+  },
+  "data": {
+    "link": "https://www.freefm.de/mediathek/58996/1792256400/1792274400",
+    "linkKind": "audio"
+  },
+  "sources": [{ "url": "https://www.freefm.de/mediathek/58996/1792256400/1792274400" }]
+}

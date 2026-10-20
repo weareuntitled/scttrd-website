@@ -1,0 +1,101 @@
+/* Keep the legacy Webflow layout on one type, spacing and interaction scale. */
+.home-page { font-family: Poppins, sans-serif; font-size: var(--type-body); }
+.home-page .wrapper {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--content-width) + 2 * var(--page-gutter));
+  margin-inline: auto;
+  padding-inline: var(--page-gutter) !important;
+}
+.home-page .site-header { padding-inline: max(var(--page-gutter), calc((100% - var(--content-width)) / 2)); }
+.home-page .section-name { padding-left: 0; }
+.home-page .section-about,
+.home-page .section-bento,
+.home-page .section-customers,
+.home-page .home-news,
+.home-page .section-faq { padding-block: var(--section-space) !important; }
+/* Das alte Webflow-CSS nagelt den About-Bereich auf 100vh fest — das erzeugt Leerflächen. */
+.home-page .section-about { height: auto !important; min-height: 0 !important; }
+.home-page .bento-head,
+.home-page .home-news-heading,
+.home-page .faq-head { margin-bottom: var(--space-8); }
+.home-page .bento-head .paragraph,
+.home-page .customers-text .paragraph,
+.home-page .home-news-heading h2,
+.home-page .faq-head .paragraph {
+  margin: 0;
+  font-family: Poppins, sans-serif;
+  font-size: var(--type-section) !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -.025em !important;
+  text-transform: uppercase;
+}
+.home-page .about-grid { display: block; }
+.home-page .about-section-name, .home-page .about-section-empty { display: none; }
+.home-page .about-section-content { margin-left: 0 !important; }
+.home-page .about-section-content h2 { max-width: 14ch; margin: 0; font-family: Poppins, sans-serif; font-size: var(--type-statement); line-height: .92; letter-spacing: -.03em; }
+.home-page .about-section-content h5 { max-width: 65ch; margin: 0; font: 400 var(--type-body)/1.65 Poppins, sans-serif; }
+.home-page .about-divider-container { margin-block: var(--space-8) !important; }
+.home-page .customers-grid { margin-top: 0; }
+.home-page .customers-list { max-width: none; margin-inline: 0; }
+.home-page .customers-section-description { padding-inline: 0 !important; }
+.home-page .customers-el { padding-inline: 0 !important; }
+.home-page .customers-el-service, .home-page .customers-el-date { opacity: 1; }
+.home-page .customers-el h6 { margin-block: 0; }
+.home-page .faq-head, .home-page .faq-shell { width: 100%; margin-inline: 0; }
+.home-page .faq-q-wrap { font: inherit; }
+.home-page .faq-q { font: 600 clamp(18px, 1.6vw, 22px)/1.4 Poppins, sans-serif; }
+.home-page .faq-a p { font: 400 var(--type-body)/1.65 Poppins, sans-serif; }
+.home-page .home-news-copy p { font-size: var(--type-body); }
+.home-page .home-news-copy h3 { font-family: Poppins, sans-serif; font-weight: 800; }
+.home-page .home-news-copy time { font-size: var(--type-meta); }
+.home-page .home-hero-img-container .home-hero-img, .home-page .bento-item { border-radius: 0; }
+.home-page .home-release-card, .home-page .home-hero-next { font-family: Poppins, sans-serif; }
+.home-page .cta-text-headline-pt1 { font-size: var(--type-feature); line-height: 1; letter-spacing: -.03em; }
+.home-page .home-release-copy strong { font-size: var(--type-feature); line-height: 1; letter-spacing: -.03em; }
+.home-page .home-hero-next-show { font-size: var(--type-feature); line-height: 1; letter-spacing: -.03em; }
+.home-page .home-news a, .home-page .footer-link { text-underline-offset: .25em; text-decoration-thickness: 2px; }
+.home-page :is(a, button):focus-visible { outline: 3px solid currentColor; outline-offset: 5px; }
+.home-page ::selection { background: #0c0c0c; color: #f00000; }
+.home-page .home-news ::selection { background: #f00000; color: #0c0c0c; }
+.home-page :is(.home-hero-next, .home-release-card, .button, .site-nav-next) {
+  transition: background-color var(--motion-fast) var(--motion-ease), color var(--motion-fast) var(--motion-ease), transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease);
+}
+.home-page :is(.faq-q, .faq-toggle, .customers-el) { transition: background-color var(--motion-fast) var(--motion-ease), color var(--motion-fast) var(--motion-ease); }
+.home-page .faq-a-clip { transition: grid-template-rows 280ms var(--motion-ease); }
+.home-page :is(.home-release-copy b, .home-hero-next-arrow, .customers-el-arrow) { transition: transform var(--motion-fast) var(--motion-ease); }
+.home-page .button { min-height: 48px; }
+.home-page .button:focus-visible { background: #0c0c0c; color: #f00000; }
+.home-page .cta-text-container { opacity: 1 !important; transform: none !important; }
+.home-page .cta-text-headline-pt1 { background: none !important; color: #f00000; -webkit-text-fill-color: currentColor; }
+.home-page .cta-text .button { border-color: currentColor; color: #f00000; }
+.home-page .customers-el .customers-el-img { display: none !important; }
+@media (hover: hover) and (pointer: fine) {
+  .home-page .customers-el:hover { background: #0c0c0c !important; color: #f00000 !important; }
+  .home-page .customers-el:hover :is(.heading-7, .heading-8, h6) { color: #f00000 !important; }
+  .home-page .customers-el:hover .customers-el-next { background: #f00000; color: #0c0c0c; }
+  .home-page .customers-el:hover .customers-el-img {
+    display: block !important;
+    z-index: 3;
+    pointer-events: none;
+    left: auto !important;
+    right: 24%;
+    top: 50%;
+    transform: translateY(-50%) !important;
+  }
+  .home-page .customers-el-img-pic { width: var(--hover-preview-size); height: var(--hover-preview-size); border-radius: 0; opacity: 1 !important; }
+}
+@media (max-width: 767px) {
+  .home-page .section-about, .home-page .section-bento, .home-page .section-customers, .home-page .home-news, .home-page .section-faq { padding-block: var(--section-space-mobile) !important; }
+  .home-page .home-hero-text { max-width: calc(var(--content-width) + 2 * var(--page-gutter)); margin-inline: auto; }
+  .home-page .bento-head, .home-page .home-news-heading, .home-page .faq-head { margin-bottom: var(--space-6); }
+  .home-page .customers-since { display: none; }
+  .home-page .home-news-copy h3 { font-size: var(--type-card); }
+  .home-page .cta-video-container { width: calc(100% - 2 * var(--page-gutter)); }
+  .home-page .cta-text-headline-pt1, .home-page .cta-text .button { color: #0c0c0c; }
+  .home-page .footer-container { padding-block: var(--space-6) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-page *, .home-page *::before, .home-page *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

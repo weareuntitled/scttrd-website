@@ -9,7 +9,7 @@ const siteUrl = 'https://scttrd.de';
 
 export const GET: APIRoute = async () => {
   const [shows, releases, news] = await Promise.all([getShows(), getReleases(), getNews()]) as any[][];
-  const staticPaths = ['/', '/links/', '/gallery/', '/styleguide/', '/news/'];
+  const staticPaths = ['/', '/links/', '/gallery/', '/styleguide/', '/news/', '/facts/'];
   const entries = [
     ...staticPaths.map((path) => ({ loc: `${siteUrl}${path}` })),
     ...shows.map((show) => ({ loc: `${siteUrl}${showUrl(show)}`, lastmod: show.updatedAt })),

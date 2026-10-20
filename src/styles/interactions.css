@@ -1,0 +1,20 @@
+/* Shared hover/focus mechanics. Colors stay with each surface. */
+:is(.home-news-card, .news-card) { transition: translate var(--motion-fast) var(--motion-ease); }
+:is(.home-news-image, .news-card-image) { overflow: hidden; }
+:is(.home-news-image, .news-card-image) img {
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+:is(.home-news-read, .news-read-more) span {
+  display: inline-block;
+  transition: translate var(--motion-fast) var(--motion-ease);
+}
+:is(.home-news-card, .news-card):focus-within { translate: 0 var(--hover-lift); }
+:is(.home-news-card, .news-card):focus-within :is(.home-news-read, .news-read-more) span { translate: var(--hover-arrow) calc(-1 * var(--hover-arrow)); }
+@media (hover: hover) and (pointer: fine) {
+  :is(.home-news-card, .news-card):hover { translate: 0 var(--hover-lift); }
+  :is(.home-news-card, .news-card):hover img { transform: scale(var(--hover-image-scale)); }
+  :is(.home-news-card, .news-card):hover :is(.home-news-read, .news-read-more) span { translate: var(--hover-arrow) calc(-1 * var(--hover-arrow)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.home-news-card, .news-card, .home-news-image img, .news-card-image img, .home-news-read span, .news-read-more span) { transition: none; translate: none !important; transform: none !important; }
+}

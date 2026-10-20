@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { getFacts } from '../lib/cms.ts';
+import { bandFacts, musicGroupSchema } from '../lib/facts.ts';
+import '../styles/tokens.css';
+
+const cms = await getFacts();
+const facts = cms ?? bandFacts;
+const description = facts.description;
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    musicGroupSchema,
+    {
+      '@type': 'AboutPage',
+      '@id': 'https://scttrd.de/facts/#page',
+      url: 'https://scttrd.de/facts/',
+      name: facts.title,
+      inLanguage: 'de',
+      about: { '@id': musicGroupSchema['@id'] },
+      mainEntity: { '@id': musicGroupSchema['@id'] },
+      publisher: { '@id': musicGroupSchema['@id'] },
+    },
+  ],
+};
+---
+<BaseLayout title={facts.title} description={description} currentPath="/facts/" canonical="https://scttrd.de/facts/" nextShowUrl={null} bodyClass="facts-body" image="https://scttrd.de/images/about_04.jpg">
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <main class="facts-page">
+    <Breadcrumbs items={[{ label: 'Home', url: '/' }, { label: 'Fakten' }]} />
+    <header>
+      <h1>{facts.title}</h1>
+      <p class="facts-intro">{description}</p>
+      <p>{facts.intro}</p>
+    </header>
+    <section aria-labelledby="facts-heading">
+      <h2 id="facts-heading">Auf einen Blick</h2>
+      <dl>
+        {facts.facts.map((fact) => <div><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}
+      </dl>
+    </section>
+    {facts.sections.map((section) => (
+      <section aria-labelledby={`section-${section.heading}`}>
+        <h2 id={`section-${section.heading}`}>{section.heading}</h2>
+        {String(section.body ?? '').split(/\n\s*\n/).filter(Boolean).map((paragraph) => <p>{paragraph}</p>)}
+        {section.links?.length ? <ul>{section.links.map((link) => <li><a href={link.url}>{link.label}</a></li>)}</ul> : null}
+      </section>
+    ))}
+  </main>
+  <SiteFooter />
+</BaseLayout>
+
+<style is:global>
+  .facts-body { margin: 0; background: #f00000; color: #0c0c0c; font-family: Poppins, sans-serif; }
+  .facts-body ::selection { background: #0c0c0c; color: #f00000; }
+</style>
+<style>
+  .facts-page { width: min(calc(100% - 2 * var(--page-gutter)), 960px); margin-inline: auto; padding: 32px 0 var(--section-space); }
+  header { margin-top: 64px; }
+  h1 { max-width: 20ch; margin: 0 0 32px; font-size: var(--type-feature); line-height: 1.05; letter-spacing: -.03em; }
+  h2 { margin: 0 0 24px; font-size: clamp(24px, 3vw, 32px); line-height: 1.2; letter-spacing: -.02em; }
+  p, li, dl { max-width: 70ch; font-size: var(--type-body); line-height: 1.7; }
+  p { margin: 0 0 20px; }
+  .facts-intro { font-size: clamp(19px, 2vw, 24px); line-height: 1.55; }
+  section { margin-top: 56px; }
+  dl { margin: 0; }
+  dl div { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding-block: 16px; border-top: 1px solid currentColor; }
+  dl div:last-child { border-bottom: 1px solid currentColor; }
+  dt { font-weight: 600; }
+  dd { margin: 0; }
+  ul { padding-left: 24px; }
+  li { padding-block: 8px; }
+  a { color: inherit; text-underline-offset: .25em; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 3px; }
+  a:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+  @media (max-width: 600px) {
+    header { margin-top: 40px; }
+    dl div { grid-template-columns: 1fr; gap: 4px; }
+    section { margin-top: 40px; }
+  }
+</style>

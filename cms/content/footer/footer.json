@@ -1,0 +1,29 @@
+{
+  "type": "footer",
+  "data": {
+    "groups": [
+      {
+        "label": "Seiten",
+        "links": [
+          { "label": "shows", "url": "/#shows" },
+          { "label": "news", "url": "/news/" },
+          { "label": "gallery", "url": "/gallery/" }
+        ]
+      },
+      {
+        "label": "Material",
+        "links": [
+          { "label": "press pack", "url": "/styleguide/#presse" },
+          { "label": "fakten", "url": "/facts/" }
+        ]
+      },
+      {
+        "label": "Kontakt",
+        "links": [
+          { "label": "info@scttrd.de", "url": "mailto:info@scttrd.de?subject=STTRD%20Reqzest" }
+        ]
+      }
+    ]
+  },
+  "sources": [{ "url": "https://scttrd.de/" }]
+}

@@ -13,10 +13,12 @@ import { fileURLToPath } from 'node:url'
 import { verifyReport } from './content-verify.mjs'
 import {
   apiAuthHeader,
+  apiPathFor,
   authHeaderForEnv,
   buildPlan,
   collectionFor,
   expandPath,
+  isGlobal,
   isRemoteUrl,
   isSitePath,
   isUploadCandidate,
@@ -155,6 +157,11 @@ try {
   for (const item of items) {
     const collection = collectionFor(item.type)
     byType[item.type] ??= []
+    // Globals (z. B. Footer) liegen unter /api/globals/<slug> und haben keine id.
+    if (isGlobal(item.type)) {
+      byType[item.type].push(await request(apiPathFor(item.type)))
+      continue
+    }
     // Mit id wird der Datensatz direkt adressiert — so lassen sich auch
     // Identity-Felder umbenennen, ohne einen zweiten Eintrag anzulegen.
     if (item.id !== undefined) {
@@ -184,6 +191,11 @@ try {
     for (const item of plan) {
       if (item.action === 'skip') continue
       const collection = collectionFor(item.type)
+      if (isGlobal(item.type)) {
+        // Globals werden per POST aktualisiert (Payload 3 hat kein PATCH für Globals).
+        await request(apiPathFor(item.type), { method: 'POST', body: JSON.stringify(item.data) })
+        continue
+      }
       if (item.action === 'create') await request(`/api/${collection}`, { method: 'POST', body: JSON.stringify(item.data) })
       if (item.action === 'update') await request(`/api/${collection}/${item.id}`, { method: 'PATCH', body: JSON.stringify(item.data) })
     }

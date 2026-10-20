@@ -192,7 +192,7 @@ test('show pages reuse the site header typography and footer', () => {
 
   const footer = read('src/components/SiteFooter.astro')
   assert.match(footer, /class="footer"/)
-  assert.match(footer, /class="footer-links"/)
+  assert.match(footer, /class="footer-grid"/)
 
   const homepage = read('src/pages/index.astro')
   const showPage = read('src/pages/shows/[slug].astro')

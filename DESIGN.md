@@ -120,3 +120,12 @@ Hintergrund-Muster (optional, nur Show-Seiten):
 - Show-Seite: `src/pages/shows/[slug].astro`.
 - Link Hub: `src/pages/links.astro` + CMS-Global `Link Hub`.
 - Neue Seiten folgen diesen Tokens – nicht der alten Webflow-CSS-Datei.
+
+## 9 · Startseiten-Raster und Interaktion
+
+- `src/styles/tokens.css` steuert Gutter, Inhaltsbreite, Typografiestufen und Motion-Werte.
+- `src/styles/home.css` gleicht das bestehende Webflow-Layout an diese Skala an. Abschnittstitel, Shows, News, FAQ, Header und Footer teilen dieselben Inhaltskanten.
+- Poppins trägt lesbare Texte und Überschriften einschließlich Umlauten und Sonderzeichen; die SCTTRD-Wortmarke bleibt eigenständig.
+- `src/styles/interactions.css` enthält die gemeinsamen Karten-, Bildvorschau- und Pfeil-Hovers. `--hover-lift`, `--hover-press`, `--hover-arrow`, `--hover-image-scale` und `--hover-preview-size` sind die zentralen Regler.
+- `src/lib/homeMotion.ts` steuert einmalige Scroll-Entries für `data-entry`, optional mit `data-entry-delay`. Kein zweiter Webflow-Entry auf denselben Elementen.
+- Bild-Zoom und Show-Bildvorschauen nur bei echtem Hover. Tastaturfokus bleibt sichtbar, Reduced Motion überspringt Entry und Bewegung.

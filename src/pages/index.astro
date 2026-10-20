@@ -4,15 +4,22 @@ import { absoluteUrl } from '../lib/seo.ts';
 import Customers from '../components/Customers.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import HomeNews from '../components/HomeNews.astro';
 import { isoDate, past as hubPast, nextShow as hubNextShow, orderedUpcoming, showUrl } from '../lib/show.ts';
-import { getPage, getReleases, getShows } from '../lib/cms.ts';
+import { getNews, getPage, getReleases, getShows } from '../lib/cms.ts';
 import { bannerRelease, releaseDateLabel, releasePhase, releaseUrl } from '../lib/release.ts';
 import '../styles/tokens.css';
+import '../styles/interactions.css';
+import '../styles/home.css';
+import { musicGroupSchema } from '../lib/facts.ts';
 
 const shows = (await getShows()) as any;
 const homePage = (await getPage('home')) as any;
 const releases = (await getReleases()) as any[];
 const promotedRelease = bannerRelease(releases);
+const latestNews = ((await getNews()) as any[])
+  .filter((article) => article.status === 'published')
+  .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3);
 const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
 const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
 const [homeText] = await getCollection('homeText');
@@ -47,18 +54,8 @@ const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'MusicGroup',
-      '@id': `${siteUrl}/#scttrd`,
-      name: 'SCTTRD',
-      url: siteUrl,
+      ...musicGroupSchema,
       description: pageDescription,
-      genre: ['Post-Punk', 'Techno', 'Trance'],
-      foundingDate: '2023',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: 'Augsburg',
-        addressCountry: 'DE',
-      },
       email: `mailto:${homeText?.data.email ?? 'info@scttrd.de'}`,
     },
     {
@@ -133,7 +130,7 @@ const structuredData = {
   <link href="images/favicon.png" rel="shortcut icon" type="image/x-icon">
   <link href="images/webclip.png" rel="apple-touch-icon">
 </head>
-<body class="body-container">
+<body class="body-container home-page">
   <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
   <SiteHeader currentPath="/" nextShowUrl={nextShowHref} />
   <div class="custom-cursor-container"><div class="custom-cursor"><div class="custom-cursor-text">see project</div></div></div>
@@ -176,10 +173,10 @@ const structuredData = {
       <div class="wrapper">
         <div class="about-grid">
           <div id="w-node-_529206b4-7da0-2990-4c60-98b86e7763c4-269f9a25" class="about-section-name"><div class="section-name"><p></p></div></div>
-          <div id="w-node-_61c881b4-2eb7-871b-4876-6bf2bfaa1b2b-269f9a25" data-w-id="61c881b4-2eb7-871b-4876-6bf2bfaa1b2b" style="opacity:0" class="about-section-content"><h2><strong class="bold-text">{homePage?.text ?? homeText?.data.text}</strong></h2></div>
+          <div id="w-node-_61c881b4-2eb7-871b-4876-6bf2bfaa1b2b-269f9a25" data-entry class="about-section-content"><h2><strong class="bold-text">{homePage?.text ?? homeText?.data.text}</strong></h2></div>
           <div id="w-node-cd29ea5f-7453-d826-cc6d-399efe605862-269f9a25" class="about-divider-container"><div data-w-id="e874bee6-fa6b-19ee-6d1e-429f4ee903e7" style="width:0%" class="about-divider-line"></div></div>
           <div id="w-node-ec49d079-7c20-fd16-182a-884cbce6489d-269f9a25" class="about-section-empty"></div>
-          <div id="w-node-_255ae96c-450a-d978-a401-15ae2c42833a-269f9a25" data-w-id="255ae96c-450a-d978-a401-15ae2c42833a" style="opacity:0" class="about-section-content"><h5 class="heading"><strong>SCTTRD. Augsburg, Germany. <br></strong>{homeText?.data.bio_de}</h5></div>
+          <div id="w-node-_255ae96c-450a-d978-a401-15ae2c42833a-269f9a25" data-entry class="about-section-content"><h5 class="heading"><strong>SCTTRD. Augsburg, Germany. <br></strong>{homeText?.data.bio_de}</h5></div>
         </div>
       </div>
     </section>
@@ -221,6 +218,7 @@ const structuredData = {
         </div>
       </div>
     </section>
+    {latestNews.length > 0 && <HomeNews articles={latestNews} />}
     <section class="section-faq" id="faq" aria-label="Häufige Fragen">
       <div class="wrapper">
         <div class="faq-head"><div class="section-name"><h2 class="paragraph">häufige fragen</h2></div></div>
@@ -255,7 +253,7 @@ const structuredData = {
       </div>
       <div class="cta-text">
         <div class="wrapper">
-          <div data-w-id="bb3f2a80-5f68-8b27-91b3-956af024382e" class="cta-text-container">
+          <div class="cta-text-container">
             <div class="cta-text-headline"><h3 class="cta-text-headline-pt1">{homeText?.data.cta_headline ?? 'Want to book us?'}</h3></div>
             <a href={`mailto:info@scttrd.de?subject=${homeText?.data.cta_button_email_subject ?? 'Booking%20SCTTRD'}`} class="button w-inline-block"><div class="button-arrow-container"></div><div class="button-text">{homeText?.data.cta_button ?? 'Book us here'}</div></a>
           </div>
@@ -268,7 +266,7 @@ const structuredData = {
   <script is:inline src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=6729da1e7ab5d6b5269f99bb" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
   <script is:inline src="js/webflow.js" type="text/javascript"></script>
   <style is:global>
-     html, body { max-width: 100%; overflow-x: hidden; }
+     html, body { max-width: 100%; overflow-x: clip; }
      .skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; padding: 12px 16px; background: #0c0c0c; color: #f00000; transform: translateY(-150%); transition: transform .2s ease; }
      .skip-link:focus { transform: translateY(0); }
      .section-bento { background-color: var(--dark); color: var(--white, #fff); padding: 80px 0 120px; overflow: hidden; }
@@ -297,14 +295,14 @@ const structuredData = {
      .home-hero-cta { margin-top: clamp(28px, 6vw, 72px); }
      .home-release { margin-top: 18px; }
      .home-release-card { display: grid; grid-template-columns: clamp(112px, 18vw, 190px) 1fr; min-height: 170px; color: #0c0c0c; background: #f00000; border: 2px solid #0c0c0c; box-shadow: 8px 8px 0 rgba(12,12,12,.28); text-decoration: none; font-family: Founders, Arial, sans-serif; transition: transform .18s ease, box-shadow .18s ease; }
-     .home-release-card:hover, .home-release-card:focus-visible { transform: translate(4px,4px); box-shadow: 4px 4px 0 #0c0c0c; }
+      .home-release-card:hover, .home-release-card:focus-visible { transform: translate(var(--hover-press),var(--hover-press)); box-shadow: 4px 4px 0 #0c0c0c; }
      .home-release-card img { width: 100%; height: 100%; min-height: 170px; object-fit: cover; border-right: 2px solid #0c0c0c; }
      .home-release-copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(20px,4vw,42px); }
      .home-release-kicker { font-size: 11px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
      .home-release-copy strong { margin: 8px 0 14px; font-size: clamp(34px,6vw,70px); line-height: .86; letter-spacing: -.045em; text-transform: uppercase; }
      .home-release-copy > span:last-child { font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
      .home-release-copy b { display: inline-block; margin-left: 8px; transition: transform .18s ease; }
-     .home-release-card:hover b, .home-release-card:focus-visible b { transform: translateX(8px); }
+      .home-release-card:hover b, .home-release-card:focus-visible b { transform: translateX(var(--hover-arrow)); }
      .customers-empty { grid-column: 1 / -1; margin: 0; padding: 24px 0; border-bottom: 1px solid #000; color: #000; font-size: 17px; }
      .customers-section-description { font-size: var(--text-heading) !important; line-height: 1.1; font-weight: 800; }
      .customers-since { display: none; }
@@ -338,7 +336,7 @@ const structuredData = {
       background: transparent;
       color: var(--dark, #0c0c0c);
       box-shadow: 4px 4px 0 #0c0c0c;
-      transform: translate(4px, 4px);
+      transform: translate(var(--hover-press), var(--hover-press));
     }
     .home-hero-next-label {
       position: relative;
@@ -374,7 +372,7 @@ const structuredData = {
       line-height: 1;
       transition: transform .2s ease;
     }
-    .home-hero-next:hover .home-hero-next-arrow, .home-hero-next:focus-visible .home-hero-next-arrow { transform: translateX(10px); }
+    .home-hero-next:hover .home-hero-next-arrow, .home-hero-next:focus-visible .home-hero-next-arrow { transform: translateX(var(--hover-arrow)); }
     @media (max-width: 767px) {
       .body-container { font-family: Poppins, sans-serif; }
       .wrapper { padding-inline: var(--page-gutter) !important; }
@@ -440,7 +438,7 @@ const structuredData = {
        }, { threshold: 0.1 });
        if (!reducedMotion) document.querySelectorAll('video[data-autoplay]').forEach((v) => io.observe(v));
       const tiltEls = document.querySelectorAll('[data-tilt]');
-      if (tiltEls.length && window.matchMedia('(hover: hover)').matches) {
+      if (tiltEls.length && !reducedMotion && window.matchMedia('(hover: hover)').matches) {
         tiltEls.forEach((el) => {
           const imgs = el.querySelectorAll('.home-hero-img');
           el.addEventListener('mousemove', (e) => {
@@ -459,14 +457,14 @@ const structuredData = {
 
 <style>
   .section-faq { padding-block: clamp(64px, 8vw, 112px); background: #f00000; color: #0c0c0c; }
-  .faq-head, .faq-shell { width: min(100%, 840px); margin-inline: auto; }
+  .faq-head, .faq-shell { width: 100%; margin-inline: 0; }
   .faq-head .paragraph { margin: 0; color: #0c0c0c; }
   .faq-shell { display: flex; flex-direction: column; }
   .faq-item { border-top: 1px solid rgba(12, 12, 12, .65); }
   .faq-item:last-child { border-bottom: 1px solid rgba(12, 12, 12, .65); }
   .faq-q-wrap { margin: 0; }
-  .faq-q { width: 100%; min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); padding: 20px 0; background: none; border: 0; cursor: pointer; text-align: left; font: inherit; font-size: clamp(18px, 1.8vw, 23px); font-weight: 700; line-height: 1.3; color: #0c0c0c; transition: color .2s ease; }
-  .faq-q:hover { color: #fff; }
+  .faq-q { width: 100%; min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); padding: 20px 0; background: none; border: 0; cursor: pointer; text-align: left; font: 600 clamp(18px, 1.6vw, 22px)/1.4 Poppins, sans-serif; color: #0c0c0c; transition: color var(--motion-fast) var(--motion-ease); }
+  .faq-q:hover { color: #0c0c0c; text-decoration: underline; text-underline-offset: .25em; }
   .faq-q:focus-visible { outline: 3px solid #0c0c0c; outline-offset: 4px; }
   .faq-toggle { flex: 0 0 auto; width: 34px; height: 34px; border: 1px solid #0c0c0c; position: relative; transition: background .2s ease, border-color .2s ease; }
   .faq-toggle::before, .faq-toggle::after { content: ""; position: absolute; inset: 0; margin: auto; background: #0c0c0c; transition: transform .25s ease, background .2s ease; }
@@ -489,6 +487,9 @@ const structuredData = {
 </style>
 
 <script>
+  import { initHomeMotion } from '../lib/homeMotion.ts';
+  initHomeMotion();
+
   const closeItem = (item: HTMLElement) => {
     const button = item.querySelector<HTMLButtonElement>('.faq-q');
     button?.setAttribute('aria-expanded', 'false');

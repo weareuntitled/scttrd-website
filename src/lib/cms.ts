@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content'
 import { showSlug } from './show.ts'
+import { galleryImages } from './gallery.ts'
 
 export { showSlug }
 
@@ -49,15 +50,14 @@ export async function getLinkHub() {
 
 export async function getGallery() {
   const page: any = await getPage('about')
-  if (page?.gallery?.length) {
-    const base = cmsBase()
-    return page.gallery.map((item: any) => ({
-      src: /^https?:\/\//i.test(item.image?.url ?? '') ? item.image.url : new URL(item.image?.url ?? '', base).href,
-      alt: item.alt || item.image?.alt || 'SCTTRD',
-    }))
-  }
-  const [fallback] = await getCollection('aboutPageImages')
-  return (fallback?.data.gallery ?? []).map((src) => ({ src, alt: 'SCTTRD' }))
+  const remote = page?.gallery?.length
+    ? page.gallery.map((item: any) => ({
+        src: /^https?:\/\//i.test(item.image?.url ?? '') ? item.image.url : new URL(item.image?.url ?? '', cmsBase()).href,
+        alt: item.alt || item.image?.alt || 'SCTTRD',
+      }))
+    : (await getCollection('aboutPageImages')).map((entry: any) => entry.data.gallery.map((src: string) => ({ src, alt: 'SCTTRD' }))).flat();
+  // Die lokalen Bilder (Ulm-Recap) laufen dauerhaft mit, auch wenn das CMS eine eigene Galerie pflegt.
+  return [...remote, ...galleryImages];
 }
 
 export async function getLinks() {
@@ -65,6 +65,33 @@ export async function getLinks() {
   if (docs?.length) return docs.map((d: any) => ({ label: d.label, platform: d.platform, url: d.url, target: d.target || '_blank', cover: d.cover || undefined }))
   const local = await getCollection('links')
   return local.sort((a, b) => a.data.order - b.data.order).map((item) => item.data)
+}
+
+export async function getFacts() {
+  const docs = await cmsList('facts?where[slug][equals]=facts&limit=1&depth=1')
+  if (!docs?.length) return null
+  const doc = docs[0]
+  return {
+    title: doc.title,
+    description: doc.description,
+    intro: doc.intro ?? '',
+    facts: doc.facts ?? [],
+    members: doc.members ?? [],
+    profiles: doc.profiles ?? [],
+    sections: doc.sections ?? [],
+    researchSources: doc.researchSources ?? [],
+  }
+}
+
+export async function getFooterGroups() {
+  try {
+    const r = await fetch(`${cmsBase()}/api/globals/footer?depth=1`, { signal: AbortSignal.timeout(1500) } as any)
+    if (r.ok) {
+      const doc = await r.json()
+      if (Array.isArray(doc?.groups) && doc.groups.length) return doc.groups
+    }
+  } catch { cmsWarning('footer') }
+  return null
 }
 
 export async function getReleases() {

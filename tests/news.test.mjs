@@ -27,11 +27,14 @@ test('news routes, CMS reader, navigation and sitemap are connected', () => {
   assert.match(read('src/pages/sitemap.xml.ts'), /getNews\(\)/)
 })
 
-test('footer links use matching desktop columns and a two-column mobile layout', () => {
+test('footer groups its links in three columns and stacks them on mobile', () => {
   const footer = read('src/components/SiteFooter.astro')
-  assert.match(footer, /\.footer-links\s*\{[^}]*display:\s*grid/)
-  assert.match(footer, /grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
+  const groups = read('src/lib/facts.ts')
+  assert.match(footer, /\.footer-grid\s*\{[^}]*display:\s*grid/)
+  assert.match(footer, /grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/)
   assert.match(footer, /@media\s*\(max-width:\s*767px\)[\s\S]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/)
+  for (const group of ['Seiten', 'Material', 'Kontakt']) assert.match(groups, new RegExp(`label: '${group}'`))
+  for (const link of ['/#shows', '/news/', '/gallery/', '/styleguide/#presse', '/facts/']) assert.ok(groups.includes(`url: '${link}'`), `footer missing ${link}`)
   assert.doesNotMatch(footer, /font-family:\s*['"]Inter/)
 })
 
@@ -45,4 +48,17 @@ test('recap article and reading column align to the breadcrumb edge', () => {
 test('event, show and recording links appear immediately above the article heading', () => {
   const page = read('src/pages/news/[slug].astro')
   assert.ok(page.indexOf('class="article-actions"') < page.indexOf('class="article-heading"'))
+})
+
+test('homepage displays up to three published news cards immediately before the FAQ', () => {
+  const home = read('src/pages/index.astro')
+  assert.match(home, /getNews\(\)/)
+  assert.match(home, /status === 'published'/)
+  assert.match(home, /\.slice\(0, 3\)/)
+  assert.match(home, /<HomeNews articles=\{latestNews\}/)
+  assert.ok(home.indexOf('<HomeNews') < home.indexOf('<section class="section-faq"'))
+  const component = read('src/components/HomeNews.astro')
+  assert.match(component, /href=\{newsUrl\(article\)\}/)
+  assert.match(component, /href="\/news\/"/)
+  assert.match(component, /articles\.map/)
 })

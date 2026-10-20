@@ -74,6 +74,7 @@ export interface Config {
     links: Link;
     releases: Release;
     news: News;
+    facts: Fact;
     'rider-requests': RiderRequest;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -89,6 +90,7 @@ export interface Config {
     links: LinksSelect<false> | LinksSelect<true>;
     releases: ReleasesSelect<false> | ReleasesSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
+    facts: FactsSelect<false> | FactsSelect<true>;
     'rider-requests': RiderRequestsSelect<false> | RiderRequestsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -101,9 +103,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'link-hub': LinkHub;
+    footer: Footer;
   };
   globalsSelect: {
     'link-hub': LinkHubSelect<false> | LinkHubSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
   };
   locale: null;
   widgets: {
@@ -471,6 +475,66 @@ export interface News {
   createdAt: string;
 }
 /**
+ * Belegbare Bandfakten und offizielle Links fuer /facts/ (KI- und Pressereferenz).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facts".
+ */
+export interface Fact {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  intro?: string | null;
+  facts?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  members?:
+    | {
+        name: string;
+        role: string;
+        id?: string | null;
+      }[]
+    | null;
+  profiles?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  sections?:
+    | {
+        heading: string;
+        body?: string | null;
+        links?:
+          | {
+              label: string;
+              url: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Beleglinks fuer die Faktenpruefung; werden im Artikel nicht ausgegeben.
+   */
+  researchSources?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Wer hat Rider-PDF und Hospitality Rider angefordert (Name, Venue, E-Mail, Zeitpunkt).
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -542,6 +606,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'news';
         value: number | News;
+      } | null)
+    | ({
+        relationTo: 'facts';
+        value: number | Fact;
       } | null)
     | ({
         relationTo: 'rider-requests';
@@ -763,6 +831,60 @@ export interface NewsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facts_select".
+ */
+export interface FactsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  intro?: T;
+  facts?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  members?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        id?: T;
+      };
+  profiles?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  sections?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  researchSources?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rider-requests_select".
  */
 export interface RiderRequestsSelect<T extends boolean = true> {
@@ -855,6 +977,34 @@ export interface LinkHub {
   createdAt?: string | null;
 }
 /**
+ * Spalten und Links im Footer der Website.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  groups?:
+    | {
+        label: string;
+        links?:
+          | {
+              label: string;
+              /**
+               * Pfad (/news/) oder URL (https://…)
+               */
+              url: string;
+              target?: ('self' | 'blank') | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "link-hub_select".
  */
@@ -885,6 +1035,29 @@ export interface LinkHubSelect<T extends boolean = true> {
         spotify?: T;
       };
   bookingEmail?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  groups?:
+    | T
+    | {
+        label?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              target?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

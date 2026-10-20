@@ -9,6 +9,17 @@ const images = await getGallery();
 const shows = await getShows();
 const next = hubNextShow(shows);
 const nextShowUrl = next ? showUrl(next) : null;
+// Der Atlas wiederholt die Bilder endlos. Wir zeigen zuerst die kuratierten
+// Pressefotos und füllen mit einer gleichmäßigen Auswahl der übrigen auf.
+const curated = images.filter((image) => image.src.startsWith('/images/'));
+const remote = images.filter((image) => !image.src.startsWith('/images/'));
+const spread = remote.filter((_, index) => index % Math.max(1, Math.ceil(remote.length / 8)) === 0);
+const gridItems = [...curated.slice(0, 24), ...spread.slice(0, 8)].slice(0, 32).map((image, index) => ({
+  image: image.src,
+  alt: image.alt,
+  title: image.alt,
+  meta: String(index + 1).padStart(2, '0'),
+}));
 ---
 <BaseLayout
   title="Galerie | SCTTRD"
@@ -19,31 +30,90 @@ const nextShowUrl = next ? showUrl(next) : null;
   image={absoluteUrl(DEFAULT_OG_IMAGE)}
 >
     <main class="gallery-page">
-      <div class="gallery-title">
-        <h1>Galerie</h1>
+      <div
+        class="gallery-grid"
+        data-fisheye
+        data-items={JSON.stringify(gridItems)}
+        role="region"
+        tabindex="0"
+        aria-label="Unendliche Bilderwand. Ziehen oder Pfeiltasten benutzen."
+      >
+        <canvas aria-hidden="true"></canvas>
+        <div class="gallery-vignette" aria-hidden="true"></div>
+        <p class="gallery-hint">Ziehen, scrollen, Pfeiltasten.</p>
+        <ul class="gallery-fallback">
+          {images.map((image) => (
+            <li><img src={image.src} alt={image.alt} loading="lazy" /></li>
+          ))}
+        </ul>
       </div>
-      <section class="gallery-grid" aria-label="SCTTRD Galerie">
-        {images.map((image) => (
-          <figure><img src={image.src} alt={image.alt} loading="lazy" /></figure>
-        ))}
-      </section>
     </main>
+
+    <script is:inline>document.documentElement.classList.add('has-js');</script>
+    <script>
+      import { initFisheyeGrid } from '../lib/fisheyeGrid.ts';
+      const root = document.querySelector<HTMLElement>('[data-fisheye]');
+      if (root) initFisheyeGrid(root, JSON.parse(root.dataset.items ?? '[]'), { theme: 'dark' });
+    </script>
 </BaseLayout>
 
 <style>
   :global(*) { box-sizing: border-box; }
-  :global(body) { margin: 0; background: #f4f1ea; color: #111; font-family: Poppins, system-ui, sans-serif; }
-  .gallery-page { max-width: 1440px; margin: auto; padding: 40px clamp(18px, 4vw, 64px) 80px; }
-  .gallery-title { margin-bottom: 48px; border-bottom: 2px solid #111; padding-bottom: 14px; }
-  h1 { margin: 0; font-size: clamp(42px, 9vw, 128px); line-height: .85; letter-spacing: -.08em; text-transform: uppercase; }
-  .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  figure { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; background: #ddd; }
-  img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
-  figure:hover img { transform: scale(1.04); }
+  :global(body) { margin: 0; background: #0c0c0c; color: #f00000; font-family: Poppins, system-ui, sans-serif; }
+  /* Full bleed: die Wand sitzt über die gesamte Seitenbreite, ohne Innenabstand. */
+  .gallery-page { width: 100%; margin: 0; padding: 0; }
+  .gallery-grid {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 520px;
+    overflow: hidden;
+    background: #060606;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .gallery-grid[data-dragging='true'] { cursor: grabbing; }
+  .gallery-grid:focus-visible { outline: 3px solid #f00000; outline-offset: -3px; }
+  .gallery-grid canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+  .gallery-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 48%, rgba(0, 0, 0, .32) 100%);
+  }
+  .gallery-hint {
+    position: absolute;
+    z-index: 2;
+    right: clamp(18px, 4vw, 64px);
+    bottom: clamp(18px, 4vw, 64px);
+    margin: 0;
+    padding: 10px 14px;
+    border: 2px solid #f00000;
+    background: rgba(12, 12, 12, .82);
+    color: #f00000;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  /* Ohne JavaScript (oder ohne WebGL) bleibt die statische Liste sichtbar. */
+  .gallery-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .gallery-fallback li { overflow: hidden; background: #0c0c0c; }
+  .gallery-fallback img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  :global(html.has-js) .gallery-fallback { display: none; }
   @media (max-width: 700px) {
-    .gallery-page { padding: 40px 18px 72px; }
-    .gallery-title { margin-bottom: 32px; padding-bottom: 18px; }
-    h1 { font-size: clamp(46px, 15vw, 64px); line-height: .9; }
-    .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .gallery-grid { height: 100vh; min-height: 420px; }
+    .gallery-fallback { grid-template-columns: repeat(2, 1fr); }
   }
 </style>

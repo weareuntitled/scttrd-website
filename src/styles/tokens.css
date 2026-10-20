@@ -7,10 +7,25 @@
   --space-8: 32px;
   --space-12: 48px;
   --page-gutter: clamp(18px, 4vw, 64px);
-  --section-space: clamp(72px, 9vw, 120px);
-  --section-space-mobile: 64px;
+  --section-space: clamp(56px, 6vw, 88px);
+  --section-space-mobile: 48px;
   --text-heading: 28px;
   --text-show: 17px;
   --text-show-mobile: 16px;
   --text-show-mobile-sm: 15px;
+  --content-width: 1280px;
+  --type-section: clamp(28px, 3vw, 44px);
+  --type-feature: clamp(36px, 5vw, 72px);
+  --type-statement: clamp(36px, 15vw, 120px);
+  --type-card: clamp(28px, 2.8vw, 40px);
+  --type-body: clamp(16px, 1.3vw, 18px);
+  --type-meta: 13px;
+  --motion-fast: 180ms;
+  --motion-entry: 700ms;
+  --motion-ease: cubic-bezier(.22, 1, .36, 1);
+  --hover-lift: -4px;
+  --hover-press: 2px;
+  --hover-arrow: 4px;
+  --hover-image-scale: 1.035;
+  --hover-preview-size: 160px;
 }
