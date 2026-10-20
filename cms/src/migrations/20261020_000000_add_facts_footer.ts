@@ -78,14 +78,15 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
       END IF;
     END $$
   `)
+  await db.execute(sql`DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_footer_groups_links_target') THEN CREATE TYPE "enum_footer_groups_links_target" AS ENUM ('self', 'blank'); END IF; END $$`)
   await db.execute(sql`
     CREATE TABLE IF NOT EXISTS "footer_groups_links" (
       "_order" integer NOT NULL,
-      "_parent_id" integer NOT NULL,
+      "_parent_id" varchar NOT NULL,
       "id" varchar PRIMARY KEY NOT NULL,
       "label" varchar NOT NULL,
       "url" varchar NOT NULL,
-      "target" varchar DEFAULT 'self'
+      "target" "enum_footer_groups_links_target" DEFAULT 'self'
     )
   `)
   await db.execute(sql`CREATE INDEX IF NOT EXISTS "footer_groups_links_order_idx" ON "footer_groups_links" USING btree ("_order")`)
