@@ -1,0 +1,26 @@
+{
+  "type": "show",
+  "identity": {
+    "venue": "Komfortrauschen x SCTTRD",
+    "city": "München",
+    "date": "06.12.2025"
+  },
+  "data": {
+    "venue": "Komfortrauschen x SCTTRD",
+    "city": "München",
+    "date": "06.12.2025",
+    "status": "past",
+    "order": 15,
+    "description": "Komfortrauschen x SCTTRD mit Noctronica im Kulturhaus Milbertshofen, eingeladen von RSR, dem RaveStreamRadio. Komfortrauschen spielen Techno live mit Gitarre, Bass und Schlagzeug, SCTTRD heizen als Vorband ein, danach Afterparty mit lokalen Techno-Acts.",
+    "link": "https://www.eventbrite.de/e/komfortrauschen-x-scttrd-x-noctronica-tickets-1367544334919",
+    "linkKind": "ticket",
+    "image": "/images/shows/komfortrauschen-x-scttrd-06-12-2025.jpg",
+    "imageAlt": "Komfortrauschen im Container: Gitarre, Schlagzeug und Bass, weiße Trainingsanzüge, Kabel und Effektgeräte am Boden"
+  },
+  "sources": [
+    {
+      "url": "https://www.eventbrite.de/e/komfortrauschen-x-scttrd-x-noctronica-tickets-1367544334919"
+    }
+  ],
+  "id": 11
+}
