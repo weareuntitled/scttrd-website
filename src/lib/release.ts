@@ -29,6 +29,11 @@ export function releaseLink(release: any, now = new Date()): { href: string; ext
   return { href: releaseUrl(release), external: false, label: 'Release ansehen' };
 }
 
+export function spotifyUri(url: string): string | null {
+  const match = url.match(/^https:\/\/open\.spotify\.com\/(?:intl-[a-z]+\/)?(album|track)\/([A-Za-z0-9]+)/);
+  return match ? `spotify:${match[1]}:${match[2]}` : null;
+}
+
 export function featuredRelease(releases: any[], now = new Date()): any | null {
   const valid = releases.filter((release) => Number.isFinite(timeOf(release)));
   const upcoming = valid

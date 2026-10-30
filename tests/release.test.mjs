@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { bannerRelease, featuredRelease, releaseLink, releasePhase, releaseSlug, releaseUrl } from '../src/lib/release.ts';
+import { bannerRelease, featuredRelease, releaseLink, releasePhase, releaseSlug, releaseUrl, spotifyUri } from '../src/lib/release.ts';
 
 const release = (title, releaseDate, extra = {}) => ({ title, slug: releaseSlug(title), releaseDate, ...extra });
 const now = new Date('2026-10-01T12:00:00Z');
@@ -33,6 +33,12 @@ describe('Release-Auswahl', () => {
     const item = release('Wo du bist', '2026-10-17T00:00:00Z', { spotifyUrl });
     assert.deepEqual(releaseLink(item, now), { href: '/releases/wo-du-bist/', external: false, label: 'Release ansehen' });
     assert.deepEqual(releaseLink(item, new Date('2026-10-17T00:00:00Z')), { href: spotifyUrl, external: true, label: 'Auf Spotify anhören' });
+  });
+
+  it('leitet die Player-URI aus Spotify-Links ab', () => {
+    assert.equal(spotifyUri('https://open.spotify.com/album/2cQFpi9jGJ59Gtz1jAVHeh'), 'spotify:album:2cQFpi9jGJ59Gtz1jAVHeh');
+    assert.equal(spotifyUri('https://open.spotify.com/intl-de/track/abc123?si=xyz'), 'spotify:track:abc123');
+    assert.equal(spotifyUri('https://distrokid.com/hyperfollow/scttrd/wo-du-bist'), null);
   });
 
   it('bleibt nach dem Release ohne Spotify-Link auf der Release-Seite', () => {
