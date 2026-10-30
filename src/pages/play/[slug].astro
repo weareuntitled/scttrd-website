@@ -1,0 +1,13 @@
+---
+import PlayRedirect from '../../components/PlayRedirect.astro';
+import { getReleases } from '../../lib/cms.ts';
+import { releaseLink } from '../../lib/release.ts';
+
+// Smart-Link je Release: entsteht automatisch mit dem CMS-Eintrag, z. B. für Ads und Posts.
+const releases: any[] = await getReleases();
+const release = releases.find((item) => item.slug === Astro.params.slug);
+if (!release) return Astro.redirect('/links/');
+const link = releaseLink(release);
+if (!link.external) return Astro.redirect(link.href);
+---
+<PlayRedirect release={release} href={link.href} />

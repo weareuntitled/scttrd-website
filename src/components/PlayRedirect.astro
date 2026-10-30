@@ -1,13 +1,5 @@
 ---
-import { getReleases } from '../lib/cms.ts';
-import { featuredRelease, releaseLink } from '../lib/release.ts';
-
-// Smart-Link für Bio und Ads: öffnet beim Aufruf den neuesten Release direkt in Spotify.
-const releases: any[] = await getReleases();
-const release = featuredRelease(releases);
-if (!release) return Astro.redirect('/links/');
-const link = releaseLink(release);
-if (!link.external) return Astro.redirect(link.href);
+const { release, href } = Astro.props as { release: any; href: string };
 ---
 <!doctype html>
 <html lang="de">
@@ -24,20 +16,17 @@ if (!link.external) return Astro.redirect(link.href);
     <main>
       <img src={release.cover} alt={release.coverAlt || release.title} />
       <h1>{release.title}</h1>
-      <a id="play-link" href={link.href}>In Spotify öffnen →</a>
+      <a id="play-link" href={href}>In Spotify öffnen →</a>
       <a class="hub" href="/links/">Alle Links</a>
     </main>
     <script>
       import { spotifyAppLink } from '../lib/release.ts';
 
+      // Der Button bleibt der Web-Link, falls die App nicht aufgeht.
       const webLink = document.querySelector<HTMLAnchorElement>('#play-link')!;
       const appLink = spotifyAppLink(webLink.href, navigator.userAgent, { anyIosBrowser: true });
-      if (appLink) {
-        webLink.href = appLink;
-        window.location.href = appLink;
-      } else {
-        window.location.replace(webLink.href);
-      }
+      if (appLink) window.location.href = appLink;
+      else window.location.replace(webLink.href);
     </script>
   </body>
 </html>

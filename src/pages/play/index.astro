@@ -1,0 +1,13 @@
+---
+import PlayRedirect from '../../components/PlayRedirect.astro';
+import { getReleases } from '../../lib/cms.ts';
+import { featuredRelease, releaseLink } from '../../lib/release.ts';
+
+// Smart-Link für die Bio: öffnet immer den aktuellen Release direkt in Spotify.
+const releases: any[] = await getReleases();
+const release = featuredRelease(releases);
+if (!release) return Astro.redirect('/links/');
+const link = releaseLink(release);
+if (!link.external) return Astro.redirect(link.href);
+---
+<PlayRedirect release={release} href={link.href} />
