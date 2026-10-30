@@ -34,7 +34,11 @@ export function releaseLink(release: any, now = new Date()): { href: string; ext
 export function spotifyAppLink(url: string, userAgent: string): string | null {
   const match = url.match(/^https:\/\/open\.spotify\.com\/(?:intl-[a-z]+\/)?(album|track|playlist|artist)\/([A-Za-z0-9]+)/);
   if (!match) return null;
-  const path = `${match[1]}/${match[2]}?play=1`;
+  const params = new URLSearchParams();
+  const context = new URL(url).searchParams.get('context');
+  if (context) params.set('context', context);
+  params.set('play', '1');
+  const path = `${match[1]}/${match[2]}?${params}`;
   if (/android/i.test(userAgent)) {
     const fallback = encodeURIComponent(`https://open.spotify.com/${path}`);
     return `intent://${path}#Intent;scheme=spotify;package=com.spotify.music;S.browser_fallback_url=${fallback};end`;

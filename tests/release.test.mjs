@@ -55,6 +55,11 @@ describe('Release-Auswahl', () => {
       );
     });
 
+    it('behält den Kontext eines Track-Links für den Start in der App', () => {
+      const track = 'https://open.spotify.com/track/abc123?context=spotify:album:def456&si=xyz';
+      assert.equal(spotifyAppLink(track, instagramIos), 'spotify://track/abc123?context=spotify%3Aalbum%3Adef456&play=1');
+    });
+
     it('überlässt Safari, Desktop und Nicht-Spotify-Links dem normalen Link', () => {
       assert.equal(spotifyAppLink(url, safariIos), null);
       assert.equal(spotifyAppLink(url, desktop), null);
