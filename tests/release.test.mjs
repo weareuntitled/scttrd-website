@@ -60,6 +60,10 @@ describe('Release-Auswahl', () => {
       assert.equal(spotifyAppLink(track, instagramIos), 'spotify://track/abc123?context=spotify%3Aalbum%3Adef456&play=1');
     });
 
+    it('öffnet per Auto-Weiterleitung auch aus Safari das spotify-Schema', () => {
+      assert.equal(spotifyAppLink(url, safariIos, { anyIosBrowser: true }), 'spotify://album/abc123?play=1');
+    });
+
     it('überlässt Safari, Desktop und Nicht-Spotify-Links dem normalen Link', () => {
       assert.equal(spotifyAppLink(url, safariIos), null);
       assert.equal(spotifyAppLink(url, desktop), null);

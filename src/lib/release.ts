@@ -31,7 +31,7 @@ export function releaseLink(release: any, now = new Date()): { href: string; ext
 
 // Logik aus spotify-smartlinks: Android per Intent (mit Fallback im Intent), iOS-In-App-Browser per spotify://.
 // Normale Mobilbrowser und Desktop öffnen den https-Link selbst, dann null.
-export function spotifyAppLink(url: string, userAgent: string): string | null {
+export function spotifyAppLink(url: string, userAgent: string, { anyIosBrowser = false } = {}): string | null {
   const match = url.match(/^https:\/\/open\.spotify\.com\/(?:intl-[a-z]+\/)?(album|track|playlist|artist)\/([A-Za-z0-9]+)/);
   if (!match) return null;
   const params = new URLSearchParams();
@@ -43,7 +43,7 @@ export function spotifyAppLink(url: string, userAgent: string): string | null {
     const fallback = encodeURIComponent(`https://open.spotify.com/${path}`);
     return `intent://${path}#Intent;scheme=spotify;package=com.spotify.music;S.browser_fallback_url=${fallback};end`;
   }
-  if (/iPad|iPhone|iPod/i.test(userAgent) && /FBAN|FBAV|FB_IAB|Instagram/i.test(userAgent)) {
+  if (/iPad|iPhone|iPod/i.test(userAgent) && (anyIosBrowser || /FBAN|FBAV|FB_IAB|Instagram/i.test(userAgent))) {
     return `spotify://${path}`;
   }
   return null;
