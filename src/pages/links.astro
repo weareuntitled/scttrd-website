@@ -2,7 +2,7 @@
 import { getLinkHub, getLinks, getReleases, getShows } from '../lib/cms.ts';
 import { upcoming as hubUpcoming, nextShow as hubNextShow, showUrl, parseDate, isoDate } from '../lib/show.ts';
 import { trackedTicketUrl } from '../lib/tracking.ts';
-import { featuredRelease, releaseDateLabel, releasePhase, releaseUrl } from '../lib/release.ts';
+import { featuredRelease, releaseDateLabel, releaseLink, releasePhase } from '../lib/release.ts';
 
 const hub: any = await getLinkHub();
 const links: any[] = await getLinks();
@@ -20,6 +20,7 @@ const seoDescription = hub?.seo?.description || profileDescription;
 const socialLinks = links.filter((link) => ['spotify', 'soundcloud', 'instagram', 'youtube'].includes(link.platform));
 const sameAs = socialLinks.map((link) => link.url);
 const selectedRelease = featuredRelease(releases);
+const selectedReleaseLink = selectedRelease ? releaseLink(selectedRelease) : null;
 const spotifyUrl: string | undefined = !selectedRelease ? hub?.featuredRelease?.spotify : undefined;
 let legacyRelease: any = null;
 if (spotifyUrl) {
@@ -65,12 +66,12 @@ const profileSchema = {
         <h1 class="name">{profileName}</h1>
         <p class="bio">{profileDescription}</p>
       </header>
-      {selectedRelease && <a class="release-card" href={releaseUrl(selectedRelease)}>
+      {selectedRelease && selectedReleaseLink && <a class="release-card" href={selectedReleaseLink.href} target={selectedReleaseLink.external ? '_blank' : undefined} rel={selectedReleaseLink.external ? 'noopener noreferrer' : undefined}>
         <img class="release-cover" src={selectedRelease.cover} alt={selectedRelease.coverAlt || ''} />
         <span class="release-body">
           <span class="release-type">{releasePhase(selectedRelease) === 'upcoming' ? `Neuer Track · ${releaseDateLabel(selectedRelease)}` : 'Neuester Track'}</span>
           <strong class="release-title">{selectedRelease.title}</strong>
-          <span class="release-play">Release ansehen →</span>
+          <span class="release-play">{selectedReleaseLink.label} →</span>
         </span>
       </a>}
       {!selectedRelease && legacyRelease && <a class="release-card" href={legacyRelease.url} target="_blank" rel="noopener noreferrer">

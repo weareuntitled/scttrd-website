@@ -21,6 +21,14 @@ export function releasePhase(release: any, now = new Date()): 'upcoming' | 'rele
   return timeOf(release) > now.getTime() ? 'upcoming' : 'released';
 }
 
+export function releaseLink(release: any, now = new Date()): { href: string; external: boolean; label: string } {
+  const { spotifyUrl } = dataOf(release);
+  if (spotifyUrl && releasePhase(release, now) === 'released') {
+    return { href: spotifyUrl, external: true, label: 'Auf Spotify anhören' };
+  }
+  return { href: releaseUrl(release), external: false, label: 'Release ansehen' };
+}
+
 export function featuredRelease(releases: any[], now = new Date()): any | null {
   const valid = releases.filter((release) => Number.isFinite(timeOf(release)));
   const upcoming = valid
