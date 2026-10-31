@@ -83,7 +83,9 @@
 .home-page :is(.faq-q, .faq-toggle, .customers-el) { transition: background-color var(--motion-fast) var(--motion-ease), color var(--motion-fast) var(--motion-ease); }
 .home-page .faq-a-clip { transition: grid-template-rows 280ms var(--motion-ease); }
 .home-page :is(.home-release-copy b, .home-hero-next-arrow, .customers-el-arrow) { transition: transform var(--motion-fast) var(--motion-ease); }
-.home-page .button { min-height: 48px; }
+.home-page .button { min-height: 48px; border-radius: 0; }
+/* Der Footer bringt eine eigene Wrapper-Breite mit; zusammen mit dem Seiten-Gutter gäbe das doppelten Einzug. */
+.home-page .footer .wrapper { width: 100%; }
 .home-page .button:focus-visible { background: #0c0c0c; color: #f00000; }
 .home-page .cta-text-container { opacity: 1 !important; transform: none !important; }
 .home-page .cta-text-headline-pt1 { background: none !important; color: #f00000; -webkit-text-fill-color: currentColor; }
