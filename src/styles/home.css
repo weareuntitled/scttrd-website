@@ -1,5 +1,8 @@
 /* Keep the legacy Webflow layout on one type, spacing and interaction scale. */
 .home-page { font-family: Poppins, sans-serif; font-size: var(--type-body); }
+/* Das Webflow-CSS setzt #ff0000; die Marke ist #f00000. */
+.home-page { --color: var(--scttrd-red); background-color: var(--scttrd-red); }
+.home-page .home-release-card img { background: var(--scttrd-black); }
 .home-page .wrapper {
   box-sizing: border-box;
   width: 100%;
@@ -35,14 +38,29 @@
 .home-page .about-section-name, .home-page .about-section-empty { display: none; }
 .home-page .about-section-content { margin-left: 0 !important; }
 .home-page .about-section-content h2 { max-width: 14ch; margin: 0; font-family: Poppins, sans-serif; font-size: var(--type-statement); line-height: .92; letter-spacing: -.03em; }
-.home-page .about-section-content h5 { max-width: 65ch; margin: 0; font: 400 var(--type-body)/1.65 Poppins, sans-serif; }
+.home-page .about-section-content .bold-text { padding-left: 0; }
+.home-page .about-section-content h5 { max-width: 52ch; margin: 0; font: 400 var(--type-body)/1.6 Poppins, sans-serif; }
+.home-page .about-section-content h5 strong { display: block; margin-bottom: var(--space-3); font-size: var(--type-meta); font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.home-page .about-section-content h5 br { display: none; }
 .home-page .about-divider-container { margin-block: var(--space-8) !important; }
+.home-page .about-divider-line { width: 100% !important; }
+@media (min-width: 992px) {
+  .home-page .about-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); column-gap: var(--space-12); align-items: end; }
+  /* grid-area !important schlägt die Webflow-#w-node-Regeln. */
+  .home-page .about-divider-container { grid-area: 1 / 1 / 2 / 3 !important; margin-block: 0 var(--space-12) !important; }
+  .home-page .about-section-content:has(h2) { grid-area: 2 / 1 / 3 / 2 !important; }
+  .home-page .about-section-content:has(h5) { grid-area: 2 / 2 / 3 / 3 !important; }
+  .home-page .about-section-content h2 { font-size: clamp(64px, 7.6vw, 112px); }
+}
 .home-page .customers-grid { margin-top: 0; }
 .home-page .customers-list { max-width: none; margin-inline: 0; }
 .home-page .customers-section-description { padding-inline: 0 !important; }
 .home-page .customers-el { padding-inline: 0 !important; }
 .home-page .customers-el-service, .home-page .customers-el-date { opacity: 1; }
-.home-page .customers-el h6 { margin-block: 0; }
+.home-page .customers-el { background-color: transparent !important; }
+.home-page .customers-el h6 { margin-block: 0; font-size: clamp(16px, 1.4vw, 19px) !important; font-weight: 500; letter-spacing: -.01em !important; }
+.home-page .customers-el .heading-7 { font-weight: 700; }
+.home-page .customers-text .paragraph { white-space: nowrap; }
 .home-page .faq-head, .home-page .faq-shell { width: 100%; margin-inline: 0; }
 .home-page .faq-q-wrap { font: inherit; }
 .home-page .faq-q { font: 600 clamp(18px, 1.6vw, 22px)/1.4 Poppins, sans-serif; }
@@ -70,6 +88,20 @@
 .home-page .cta-text-container { opacity: 1 !important; transform: none !important; }
 .home-page .cta-text-headline-pt1 { background: none !important; color: #f00000; -webkit-text-fill-color: currentColor; }
 .home-page .cta-text .button { border-color: currentColor; color: #f00000; }
+/* Auf dem Video: rote Fläche statt roter Schrift, sonst ist die Zeile nicht lesbar. */
+@media (min-width: 768px) {
+  .home-page .cta-text-headline-pt1 { display: inline-block; margin: 0; padding: .12em .3em; background: var(--scttrd-red) !important; color: var(--scttrd-black); font-weight: 800; letter-spacing: -.03em; text-transform: uppercase; }
+  .home-page .cta-text .button { background: var(--scttrd-black); border-color: var(--scttrd-black); color: var(--scttrd-red); }
+  .home-page .cta-text .button:hover, .home-page .cta-text .button:focus-visible { background: var(--scttrd-red); color: var(--scttrd-black); }
+}
+/* Eine einzelne News füllt die Breite, statt zwei leere Spalten zu lassen. */
+@media (min-width: 768px) {
+  .home-page .home-news-grid:has(> .home-news-card:only-child) { grid-template-columns: 1fr; }
+  .home-page .home-news-card:only-child { flex-direction: row; }
+  .home-page .home-news-card:only-child .home-news-image { flex: 0 0 56%; }
+  .home-page .home-news-card:only-child .home-news-image img { width: 100%; height: 100%; object-fit: cover; }
+  .home-page .home-news-card:only-child .home-news-copy { padding: clamp(24px, 3vw, 40px); }
+}
 .home-page .customers-el .customers-el-img { display: none !important; }
 @media (hover: hover) and (pointer: fine) {
   .home-page .customers-el:hover { background: #0c0c0c !important; color: #f00000 !important; }
@@ -91,6 +123,10 @@
   .home-page .home-hero-text { max-width: calc(var(--content-width) + 2 * var(--page-gutter)); margin-inline: auto; }
   .home-page .bento-head, .home-page .home-news-heading, .home-page .faq-head { margin-bottom: var(--space-6); }
   .home-page .customers-since { display: none; }
+  .home-page .home-release-kicker { font-size: 10px; letter-spacing: .1em; }
+  .home-page .customers-section-description { letter-spacing: -.02em !important; }
+  .home-page .cta-text-headline { width: 100%; }
+  .home-page .cta-text-headline-pt1 { padding: 0; font-weight: 800; text-align: left; text-transform: uppercase; }
   .home-page .home-news-copy h3 { font-size: var(--type-card); }
   .home-page .cta-video-container { width: calc(100% - 2 * var(--page-gutter)); }
   .home-page .cta-text-headline-pt1, .home-page .cta-text .button { color: #0c0c0c; }

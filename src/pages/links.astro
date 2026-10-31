@@ -90,9 +90,8 @@ const profileSchema = {
           const chipHref = trackedTicketUrl(show, { source: 'linkhub', medium: 'show-card' }) ?? (hasTicket ? show.data.link : showHref);
           return <div class="show-row">
             <a class="show-main link-btn" href={showHref} aria-label={show === next ? `Nächste Show: ${show.data.venue}, ${show.data.city}` : undefined}>
-              {show === next && <span class="show-next-badge">Next</span>}
               <time datetime={machineDate}><strong>{day}</strong><span>{month}</span></time>
-              <span class="show-copy"><strong>{show.data.venue}</strong><span>{show.data.city}</span></span>
+              <span class="show-copy">{show === next && <span class="show-next-badge">Next</span>}<strong>{show.data.venue}</strong><span class="show-city">{show.data.city}</span></span>
             </a>
             <a class="ticket-btn" href={chipHref} target={hasTicket ? '_blank' : undefined} rel={hasTicket ? 'noopener noreferrer' : undefined} aria-label={`Tickets für ${show.data.venue}`}>{hasTicket ? 'Tickets ↗' : 'Details ↗'}</a>
           </div>;
@@ -131,23 +130,27 @@ const profileSchema = {
   .bio { margin: 8px auto 0; max-width: 420px; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.7); }
   .release-card { display: flex; gap: 18px; align-items: center; margin-bottom: 28px; padding: 16px; background: #f00000; color: #000; border-radius: 4px; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
   .release-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(240,0,0,.4); }
-  .release-cover { width: 96px; height: 96px; flex: 0 0 96px; object-fit: cover; }
-  .release-body { min-width: 0; flex: 1; display: grid; gap: 4px; } .release-type { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; opacity: .65; } .release-title { font-size: 20px; font-weight: 800; letter-spacing: -.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .release-play { font-size: 12px; font-weight: 600; }
-  .section-heading { margin: 0 0 12px; text-align: center; } .section-heading h2 { margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: rgba(255,255,255,.55); }
-  section, nav { display: grid; gap: 14px; margin-bottom: 26px; }
+  .release-cover { width: 112px; height: 112px; flex: 0 0 112px; object-fit: cover; background: #000; }
+  .release-body { min-width: 0; flex: 1; display: grid; gap: 6px; } .release-type { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .14em; } .release-title { font-size: 30px; line-height: 1; font-weight: 800; letter-spacing: -.03em; text-transform: uppercase; overflow-wrap: anywhere; } .release-play { font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+  .section-heading { margin: 0 0 12px; text-align: center; } .section-heading h2 { margin: 0; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .14em; color: rgba(255,255,255,.65); }
+  section, nav { display: grid; gap: 12px; margin-bottom: 28px; }
+  :is(.release-card, .link-btn, .ticket-btn, footer a):focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
   a { color: inherit; }
   .link-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 14px 20px; background: #111; border: 1px solid #2a2a2a; border-radius: 4px; font-size: 16px; font-weight: 700; text-align: center; text-decoration: none; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
   .link-btn:hover { background: #f00000; border-color: #f00000; color: #000; transform: translateY(-2px); }
-  .link-btn .arrow { font-size: 13px; opacity: .5; }
+  .link-btn .arrow { font-size: 13px; opacity: .7; }
   .link-cover { width: 40px; height: 40px; flex: 0 0 40px; object-fit: cover; border-radius: 2px; }
   .show-btn { justify-content: flex-start; text-align: left; }
-  .show-next-badge { flex: 0 0 auto; padding: 4px 8px; background: #f00000; color: #000; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; border-radius: 2px; }
+  .show-next-badge { justify-self: start; padding: 2px 6px; background: #f00000; color: #000; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; border-radius: 2px; }
   .show-row { display: flex; gap: 10px; }
-  .show-row .show-main { flex: 1; min-width: 0; justify-content: flex-start; text-align: left; }
+  .show-row .show-main { flex: 1; min-width: 0; min-height: 72px; justify-content: flex-start; text-align: left; }
   .ticket-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 128px; min-height: 56px; padding: 0 18px; background: #f00000; color: #000; border: 1px solid #f00000; border-radius: 4px; font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
-  .ticket-btn:hover, .ticket-btn:focus-visible { background: #fff; border-color: #fff; transform: translateY(-2px); }
-  time { width: 44px; flex: 0 0 44px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 20px; font-weight: 800; } time span { margin-top: 4px; font-size: 9px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,.6); }
-  .show-copy { min-width: 0; flex: 1; display: grid; gap: 3px; } .show-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; } .show-copy span { font-size: 12px; color: rgba(255,255,255,.6); }
+  .ticket-btn:hover, .ticket-btn:focus-visible { background: #000; color: #f00000; transform: translateY(-2px); }
+  time { width: 44px; flex: 0 0 44px; display: grid; text-align: center; line-height: 1; } time strong { font-size: 22px; font-weight: 800; } time span { margin-top: 4px; font-size: 11px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,.7); }
+  .show-copy { min-width: 0; flex: 1; display: grid; gap: 3px; } .show-copy strong { font-size: 15px; line-height: 1.25; } .show-city { font-size: 13px; font-weight: 400; color: rgba(255,255,255,.7); }
+  .link-btn:hover :is(time span, .show-city) { color: inherit; }
+  .link-btn:hover .show-next-badge { background: #000; color: #f00000; }
+  @media (prefers-reduced-motion: reduce) { :is(.release-card, .link-btn, .ticket-btn) { transition: none; } :is(.release-card, .link-btn, .ticket-btn):hover { transform: none; } }
   footer { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); } footer a { color: inherit; text-decoration: none; }
   @media (max-width: 600px) {
     .hub { width: calc(100% - 36px); padding: 48px 0 36px; }
@@ -156,13 +159,13 @@ const profileSchema = {
     .name { font-size: 27px; line-height: 1.1; }
     .bio { margin-top: 12px; font-size: 15px; line-height: 1.55; }
     .release-card { gap: 14px; margin-bottom: 36px; padding: 14px; }
-    .release-cover { width: 80px; height: 80px; flex-basis: 80px; }
-    .release-title { font-size: 18px; }
+    .release-cover { width: 88px; height: 88px; flex-basis: 88px; }
+    .release-title { font-size: 24px; }
     .section-heading { margin-bottom: 16px; }
     section, nav { gap: 12px; margin-bottom: 36px; }
-    .link-btn { min-height: 60px; padding: 15px 16px; font-size: 15px; line-height: 1.3; }
-    .show-row { flex-wrap: wrap; gap: 8px; }
-    .ticket-btn { flex: 1 1 100%; min-height: 52px; }
+    .link-btn { min-height: 60px; padding: 12px 14px; font-size: 15px; line-height: 1.3; }
+    .show-row { gap: 8px; }
+    .ticket-btn { min-width: 84px; min-height: 72px; padding: 0 10px; font-size: 12px; }
     footer { padding: 16px 0 24px; font-size: 12px; }
   }
 </style>
